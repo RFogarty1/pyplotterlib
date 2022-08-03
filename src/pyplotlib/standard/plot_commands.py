@@ -1,0 +1,151 @@
+
+import itertools as it
+import matplotlib.pyplot as plt
+
+import numpy as np
+
+from ..core import plot_command as plotCommCoreHelp
+
+
+
+#These are the multi-plotter class ones
+
+#Below ALL refer to single-plotter cases
+class CreateFigureIfNoAxHandle(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "create-figure"
+		self._description = "If no ax-handle is present, create a figure"
+		self._axHandleKey = "axHandle"
+
+	def execute(self, plotterInstance):
+		try:
+			currAxHandle = plotterInstance._scratchSpace["axHandle"]
+		except KeyError:
+			self._createFigure(plotterInstance)
+
+	def _createFigure(self, plotterInstance):
+		try:
+			figSize = getattr(plotterInstance.opts,"figSizeOnCreation").value
+		except AttributeError:
+			figSize = None
+
+		currFigHandle = plt.figure(figsize=figSize)
+		currFigHandle.add_subplot(111)
+		plotterInstance._scratchSpace["axHandle"] = plt.gca()
+
+
+
+#Will likely need to factor most out + inherit
+class PlotDataAsLines(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "plot-line-data"
+		self._description = "Plots available data using standard line-plot mode (matplotlibs plot)"
+		self._optName = "plotData"
+
+	def execute(self, plotterInstance):
+		#Get the data; exit if none present
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+		elif len(targVal)==0:
+			return None
+
+		#Plot the data; may want to return handles to scratch space later
+		for currData in targVal:
+			plt.plot( np.array(currData)[:,0], np.array(currData)[:,1] )
+
+		return
+
+
+class SetDataLabels(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetDataLabels"
+		self._description = "Sets the data labels for lines currently plotted; this is needed to show a legend"
+		self._optName = "dataLabels"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		plottedLineHandles = plt.gca().get_lines()
+#		for lineHandle, dataLabel in it.zip_longest(plottedLineHandles, targVal):
+		for lineHandle, dataLabel in zip(plottedLineHandles, targVal):
+			if dataLabel is not None:
+				lineHandle.set_label(dataLabel)
+
+
+
+class SetXLabelStr(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetXLabelStr"
+		self._description = "Set the string value for the x-label" 
+		self._optName = "xLabelStr"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+		plt.xlabel(targVal)
+
+class SetXLimit(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetXLimit"
+		self._description = "Set the x-axis limits"
+		self._optName = "xLimit"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+		plt.xlim(targVal)
+
+class SetYLimit(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetYLimit"
+		self._description = "Set the y-axis limits"
+		self._optName = "yLimit"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+		plt.ylim(targVal)
+
+
+class SetYLabelStr(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetYLabelStr"
+		self._description = "Set the string value for the y-label"
+		self._optName = "yLabelStr"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+		plt.ylabel(targVal)
+
+
+class TurnLegendOnIfRequested(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "TurnLegendOnIfRequested"
+		self._description = "Turn the legend on if requested"
+		self._optName = "showLegend"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+		if targVal is True:
+			plt.legend()
+
+
+

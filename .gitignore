@@ -1,0 +1,4 @@
+build/
+ignore_folder/
+__pycache__/
+pyplotlib.egg-info/
