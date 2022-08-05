@@ -64,7 +64,7 @@ class PlotterInter(jsonTransHelp.JSONTransformInterface):
 		""" Set a group of options at once
 		
 		Args:
-			optVals (dict): Keys are the names of each option. Can be found in [x.name for x in self.opts]. Values are what to set them to. 
+			optVals (dict): Keys are the names of each option. Can be found in self._options.names. Values are what to set them to. 
 		
 		Notes:
 			i) If an option takes a namespace as its value, you can use dot-notation to change only a property of the namespace. e.g. {"showBorder.top":True} would set the .top attribute of showBorder to True 
