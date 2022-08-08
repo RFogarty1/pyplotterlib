@@ -33,7 +33,7 @@ class DoubleAxisPlotter(plotterCoreHelp.SingleGraphPlotter):
 
 def _createCommandsList():
 	outList = [
-
+	CheckMaxThreeAxes(),
 	plotCommStdHelp.CreateFigureIfNoAxHandle(),
 	GenerateSecondAxisForPlotting(),
 	CheckAxesAndPlottersConsistent(),
@@ -45,6 +45,7 @@ def _createCommandsList():
 def _createOptionsList():
 	outList = [
 
+	AllowTwoIndependentAxes(),
 	plotOptStdHelp.PlotterIter(),
 	IndependentXAxis(),
 	IndependentYAxis()
@@ -54,6 +55,16 @@ def _createOptionsList():
 
 
 #These commands/options are only really EVER needed here
+
+@serializationReg.registerForSerialization()
+class AllowTwoIndependentAxes(plotOptCoreHelp.BooleanPlotOption):
+
+	def __init__(self, name=None, value=None):
+		self.name = "allowTwoIndependentAxes" if name is None else name
+		self.value = value
+
+#allowTwoIndependentAxes
+
 @serializationReg.registerForSerialization()
 class IndependentYAxis(plotOptCoreHelp.BooleanPlotOption):
 
@@ -120,5 +131,22 @@ class CheckAxesAndPlottersConsistent(plotCommCoreHelp.PlotCommand):
 			raise ValueError("Cant plot >1 plotter when independentXAxis/independentYAxis are both False")
 
 
+@serializationReg.registerForSerialization()
+class CheckMaxThreeAxes(plotCommCoreHelp.PlotCommand):
 
+	def __init__(self):
+		self._name = "check-max-three-axes"
+		self._description = "Check that we twin both x AND y axes; since i cant guarantee that working"
+		self._indepXOpt = "independentXAxis"
+		self._indepYOpt = "independentYAxis"
+		self._allowOpt = "allowTwoIndependentAxes"
 
+	def execute(self, plotterInstance):
+		indepX = getattr(plotterInstance.opts, self._indepXOpt).value
+		indepY = getattr(plotterInstance.opts, self._indepYOpt).value
+		allowTwoIndeps = getattr(plotterInstance.opts, self._allowOpt).value
+
+		if not(allowTwoIndeps):
+			if (indepX and indepY):
+				msg = "Independent x AND y axes are currently not supported; if you want to use them regardless you can supress this error by setting 'allowTwoIndependentAxes' to True but results may be unpredictable"
+				raise ValueError(msg)
