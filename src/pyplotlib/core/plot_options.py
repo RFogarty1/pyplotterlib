@@ -137,7 +137,6 @@ class IntIterPlotOption(BooleanPlotOption):
 
 
 
-#TODO: Need unit test for this one
 @regHelp.registerForSerialization()
 class FloatIterPlotOption(SinglePlotOptionInter):
 
@@ -164,6 +163,19 @@ class FloatIterPlotOption(SinglePlotOptionInter):
 		useDict = json.loads(inpJSON)
 		return cls( useDict["payload"]["name"], useDict["payload"]["value"] )
 
+
+@regHelp.registerForSerialization()
+class FloatIterOrSingleFloatOption(SinglePlotOptionInter):
+
+	def __eq__(self, other):
+		return True
+
+	def toJSON(self):
+		raise NotImplementedError("")
+
+	@classmethod
+	def fromJSON(cls, inpJSON):
+		raise NotImplementedError("")
 
 
 class ObjectIterPlotOption(SinglePlotOptionInter):
