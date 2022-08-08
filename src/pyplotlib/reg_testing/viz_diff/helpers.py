@@ -48,4 +48,8 @@ def findFilesWithExt(startPath, ext):
 				outPaths.append( os.path.normpath(currPath) )
 	return outPaths
 
+def getKwargDictFromCmdLineArgs(cmdLineArgs):
+	outDict = {"saveExp":cmdLineArgs.saveExp, "saveAct":cmdLineArgs.saveAct, "expName":cmdLineArgs.expName, "actName":cmdLineArgs.actName}
+	return outDict
+
 
