@@ -59,6 +59,56 @@ class PlotDataAsLines(plotCommCoreHelp.PlotCommand):
 		return
 
 
+class SetAxisColorX(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetAxisColorX"
+		self._description = "Sets the base color for the x-axis"
+		self._optName = "axisColorX"
+		self._inclSpinesOptName = "axisColorX_exclSpines"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		#Set options
+		currAx = plt.gca()
+		currAx.xaxis.label.set_color(targVal)
+		currAx.tick_params(axis='x', colors=targVal)
+
+		exclSpines = getattr(plotterInstance.opts, self._inclSpinesOptName).value
+		if exclSpines is not True:
+			currAx.spines["bottom"].set_color(targVal)
+			currAx.spines["top"].set_color(targVal)
+
+
+class SetAxisColorY(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetAxisColorY"
+		self._description = "Sets the base color for the y-axis"
+		self._optName = "axisColorY"
+		self._inclSpinesOptName = "axisColorY_exclSpines"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		#Set options
+		currAx = plt.gca()
+		currAx.yaxis.label.set_color(targVal)
+		currAx.tick_params(axis='y', colors=targVal)
+
+		exclSpines = getattr(plotterInstance.opts, self._inclSpinesOptName).value
+		if exclSpines is not True:
+			currAx.spines["left"].set_color(targVal)
+			currAx.spines["right"].set_color(targVal)
+
+
+
+
 class SetDataLabels(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -72,11 +122,98 @@ class SetDataLabels(plotCommCoreHelp.PlotCommand):
 			return None
 
 		plottedLineHandles = plt.gca().get_lines()
-#		for lineHandle, dataLabel in it.zip_longest(plottedLineHandles, targVal):
 		for lineHandle, dataLabel in zip(plottedLineHandles, targVal):
 			if dataLabel is not None:
 				lineHandle.set_label(dataLabel)
 
+
+class SetLegendNumberColumns(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setLegendNumbColumns"
+		self._description = "Sets the number of columns to use in the legend"
+		self._optName = "legendNumbCols"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		plotterInstance._scratchSpace["legendKwargDict"]["ncol"] = targVal
+
+
+class SetLegendLocStr(plotCommCoreHelp.PlotCommand):
+	
+	def __init__(self):
+		self._name = "setLegendLocStr"
+		self._description = "Sets the 'loc' option for matplotlibs legend() function; as far as i understand, this either tells mpl where to draw the legend or where to START drawing from"
+		self._optName = "legendLocStr"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		#We REALLY want to avoid setting to something that isnt a string (such as the loc tuple)
+		#or things will get confusing when setting fractional position
+		assert isinstance(targVal, str)
+		plotterInstance._scratchSpace["legendKwargDict"]["loc"] = targVal
+
+
+#Note: This should generally be called AFTER SetLegendLocStr
+class SetLegendFractPosStart(plotCommCoreHelp.PlotCommand):
+	
+	def __init__(self):
+		self._name = "setLegendFractPosStart"
+		self._description = "Sets either the 'loc' or 'bbox_to_anchor' values in mpl. Regardless, this tells it where to start drawing the legend"
+		self._optName = "legendFractPosStart"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		try:
+			locStr = plotterInstance._scratchSpace["legendKwargDict"]["loc"] = targVal
+		except KeyError:
+			plotterInstance._scratchSpace["legendKwargDict"]["loc"] = targVal
+		else:
+			plotterInstance._scratchSpace["legendKwargDict"]["bbox_to_anchor"] = targVal
+
+
+class SetLineColors(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setLineColors"
+		self._description = "Sets the line colors for lines currently plotted"
+		self._optName = "lineColors"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		dataLines = plt.gca().get_lines()
+		colors = it.cycle(targVal)
+		for dataLine, color in zip(dataLines, colors):
+			dataLine.set_color(color)
+
+class SetLineMarkerStyles(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setLineMarkerStyles"
+		self._description = "Sets the line markers for lines currently plotted"
+		self._optName = "lineMarkerStyles"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		dataLines = plt.gca().get_lines()
+		markerStyles = it.cycle(targVal)
+		for dataLine, markerStyle in zip(dataLines, markerStyles):
+			dataLine.set_marker(markerStyle)
 
 
 class SetXLabelStr(plotCommCoreHelp.PlotCommand):
@@ -144,8 +281,11 @@ class TurnLegendOnIfRequested(plotCommCoreHelp.PlotCommand):
 		targVal = getattr(plotterInstance.opts, self._optName).value
 		if targVal is None:
 			return None
+
+		legendKwargDict = plotterInstance._scratchSpace["legendKwargDict"]
+
 		if targVal is True:
-			plt.legend()
+			plt.legend(**legendKwargDict)
 
 
 

@@ -6,6 +6,46 @@ from ..core.serialization import register as serializationReg
 
 
 @serializationReg.registerForSerialization()
+class AxisColorX(plotOptCore.StringPlotOption):
+	""" String representing the base color for the x-axis. Valid values include keywords like 'red' or hex rgb codes if prepended with a # (e.g. #d010f0)
+
+	Note: This value may be overwritten by more specific options
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "axisColorX" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class AxisColorX_exclSpines(plotOptCore.BooleanPlotOption):
+	""" Option for whether to include the spines when setting color for x-axis. Can be useful to exclude them when making shared axis plots
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "axisColorX_exclSpines"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class AxisColorY(plotOptCore.StringPlotOption):
+	""" String representing the base color of the y-axis. Valid values include keywords like 'red' or hex rgb codes if prepended with a #  (e.g. #d010f0)
+
+	Note: This value may be overwritten by more specific options
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "axisColorY" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class AxisColorY_exclSpines(plotOptCore.BooleanPlotOption):
+	""" Option for whether to include the spines when setting color for y-axis. Can be useful to exclude them when making shared axis plots
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "axisColorY_exclSpines"
+		self.value = value
+
+
+@serializationReg.registerForSerialization()
 class DataLabels(plotOptCore.StringIterPlotOption):
 	""" Set the data labels for the plot. Values should be a list of string, with None for any data you want left with the default label. e.g. ["seriesA", None, "seriesC"] should mean only 1st and 3rd appear in the legend
 
@@ -13,6 +53,32 @@ class DataLabels(plotOptCore.StringIterPlotOption):
 	def __init__(self, name=None, value=None):
 		self.name = "dataLabels" if name is None else name
 		self.value = value
+
+
+@serializationReg.registerForSerialization()
+class LegendLocStr(plotOptCore.StringPlotOption):
+	""" String representing location of legend, e.g. 'upper right' or 'best'. Same as used in matplotlib.
+
+	If legendFractPosStart is also set then this string determines which part of the legend matches that fractional position (i.e. where we start drawing from). 
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "legendLocStr" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class LegendFractPosStart(plotOptCore.FloatIterPlotOption):
+	""" len-2 iter with the fractional x/y ([x,y]) position to start drawing the legend.[values should generally be between 0 and 1]
+
+	 Should default to lower-left corner as being the point it draws from, though this can be overwritten by LegendLocStr and currently is relying on matplotlib defaults (meaning it may change in future versions)
+
+	Also setting LegendLocStr is recommended in order to control which corner [x,y] positions refer to
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "legendFractPosStart" if name is None else name
+		self.value = value
+
 
 
 @serializationReg.registerForSerialization()
@@ -24,6 +90,36 @@ class LegendOn(plotOptCore.BooleanPlotOption):
 		self.name = "showLegend" if name is None else name
 		self.value = value
 
+@serializationReg.registerForSerialization()
+class LegendNumbCols(plotOptCore.IntPlotOption):
+	""" Number of columns the legend should have
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "legendNumbCols"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class LineColors(plotOptCore.StringIterPlotOption):
+	""" The line colors to use. Allowed strings are the same as in matplotlib, meaning special color names or hex rgb codes are both fine. For Example ['red','green','orange'] is a valid value
+
+	Note: The number of colors doesnt have to match the number of data series. If you provide too few colors, they will simply cycle. For example if you set ['red','green'] then plotted data would be [red, green, red, green,.... etc]
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "lineColors"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class LineMarkerStyles(plotOptCore.StringIterPlotOption):
+	""" The line markers to use. Valid values are currently shown at "https://matplotlib.org/stable/api/markers_api.html". E.g. ['x', 'o', '^']
+
+	Note: The number of markers doesnt have to match the number of data series. If you provide too few marker styles they will simply cycle
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "lineMarkerStyles"
+		self.value = value
 
 @serializationReg.registerForSerialization()
 class PlotterIter(plotOptCore.ObjectIterPlotOption):

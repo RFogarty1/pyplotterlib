@@ -16,7 +16,7 @@ class LinePlotter(plotterCoreHelp.SingleGraphPlotter):
 		"""
 		self._createCommands()
 		self._createOptions()
-		self._scratchSpace = dict()
+		self._scratchSpace = {"legendKwargDict":{}}
 		self.setOptionVals(kwargs)
 
 	def _createCommands(self):
@@ -36,11 +36,18 @@ def _createCommandsList():
 	plotCmdStdHelp.CreateFigureIfNoAxHandle(),
 	plotCmdStdHelp.PlotDataAsLines(),
 	plotCmdStdHelp.SetDataLabels(),
-	plotCmdStdHelp.TurnLegendOnIfRequested(),
+	plotCmdStdHelp.SetLineColors(),
+	plotCmdStdHelp.SetLineMarkerStyles(),
 	plotCmdStdHelp.SetXLabelStr(),
 	plotCmdStdHelp.SetYLabelStr(),
 	plotCmdStdHelp.SetXLimit(),
-	plotCmdStdHelp.SetYLimit()
+	plotCmdStdHelp.SetYLimit(),
+	plotCmdStdHelp.SetAxisColorX(), #Best if done after labels etc. set
+	plotCmdStdHelp.SetAxisColorY(),
+	plotCmdStdHelp.SetLegendLocStr(),
+	plotCmdStdHelp.SetLegendFractPosStart(),
+	plotCmdStdHelp.SetLegendNumberColumns(),
+	plotCmdStdHelp.TurnLegendOnIfRequested()
 	]
 
 	return outList
@@ -48,8 +55,17 @@ def _createCommandsList():
 #Write in alphabetical order
 def _createOptionsList():
 	outList = [
+	plotOptStdHelp.AxisColorX(),
+	plotOptStdHelp.AxisColorX_exclSpines(),
+	plotOptStdHelp.AxisColorY(),
+	plotOptStdHelp.AxisColorY_exclSpines(),
 	plotOptStdHelp.DataLabels(),
+	plotOptStdHelp.LegendFractPosStart(),
+	plotOptStdHelp.LegendLocStr(),
+	plotOptStdHelp.LegendNumbCols(),
 	plotOptStdHelp.LegendOn(),
+	plotOptStdHelp.LineColors(),
+	plotOptStdHelp.LineMarkerStyles(),
 	plotOptStdHelp.PlotData2D(),
 	plotOptStdHelp.SetFigsizeOnCreation(),
 	plotOptStdHelp.XLabelStr(),
