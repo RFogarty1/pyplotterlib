@@ -2,5 +2,5 @@ build/
 ignore_folder/
 __pycache__/
 pyplotlib.egg-info/
-expected-plot-vizdiff.png
+actual-plot-vizdiff.png
 *.swp
