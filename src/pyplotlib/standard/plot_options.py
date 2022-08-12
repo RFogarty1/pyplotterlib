@@ -1,9 +1,25 @@
 
+import types
+
 import numpy as np
 
 from ..core import plot_options as plotOptCore
 from ..core.serialization import register as serializationReg
 
+
+@serializationReg.registerForSerialization()
+class AxisBorderMakeInvisible(plotOptCore.BoolNamespaceOption):
+	""" Namespace controlling visibility of axis borders. Access values with .value.top, .value.bottom, .value.left, .value.right.
+
+	Setting to True should hide that border, including any tick markers. This is useful for split axis plotters.
+
+	Note: We assume x-ticks are "bottom" and y-ticks are "left". If not, other visiblity options may be more appropriate
+	Note: Setting values to False does NOTHING (i.e. it wont override any other settings that make borders invisible)
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "axisBorderMakeInvisible" if name is None else name
+		self.value = types.SimpleNamespace(top=False, bottom=False, left=False, right=False) if value is None else value
 
 @serializationReg.registerForSerialization()
 class AxisColorX(plotOptCore.StringPlotOption):
@@ -122,6 +138,17 @@ class LineMarkerStyles(plotOptCore.StringIterPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class LineStyles(plotOptCore.StringIterPlotOption):
+	""" The line styles to use. Valid values are the strings currently shown at "https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle"
+
+	Note: The number of styles doesnt have to match the number of data series. If you provide too few, line styles they will simply cycle
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "lineStyles"
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class PlotterIter(plotOptCore.ObjectIterPlotOption):
 	""" Iter of individual plotter objects. Used in cases where a graph is made of multiple individual "plots" (e.g. when using axis-splitting or multiple-independent x/y axes")
 
@@ -169,12 +196,31 @@ class XLabelStr(plotOptCore.StringPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class XLabelFractPos(plotOptCore.FloatIterPlotOption):
+	""" Option to set the x/y fraction positions of the x-label. Useful for split-axes plotters in particular. Needs to be a len-2 float iter [xPos, yPos], e.g. [0.5, -0.1] will put it in approximately the standard place
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "xLabelFractPos" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class YLabelStr(plotOptCore.StringPlotOption):
 	""" Option for the value of the y-axis label; Any string should be fine
 
 	"""
 	def __init__(self, name=None, value=None):
 		self.name = "yLabelStr" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class YLabelFractPos(plotOptCore.FloatIterPlotOption):
+	"""The summary line for a class docstring should fit on one line.
+
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "yLabelFractPos" if name is None else name
 		self.value = value
 
 @serializationReg.registerForSerialization()

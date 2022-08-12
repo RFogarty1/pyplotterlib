@@ -38,12 +38,16 @@ def _createCommandsList():
 	plotCmdStdHelp.SetDataLabels(),
 	plotCmdStdHelp.SetLineColors(),
 	plotCmdStdHelp.SetLineMarkerStyles(),
+	plotCmdStdHelp.SetLineStyles(),
 	plotCmdStdHelp.SetXLabelStr(),
 	plotCmdStdHelp.SetYLabelStr(),
+	plotCmdStdHelp.SetXLabelFractPos(),
+	plotCmdStdHelp.SetYLabelFractPos(),
 	plotCmdStdHelp.SetXLimit(),
 	plotCmdStdHelp.SetYLimit(),
 	plotCmdStdHelp.SetAxisColorX(), #Best if done after labels etc. set
 	plotCmdStdHelp.SetAxisColorY(),
+	plotCmdStdHelp.SetAxisBorderInvisible(),
 	plotCmdStdHelp.SetLegendLocStr(),
 	plotCmdStdHelp.SetLegendFractPosStart(),
 	plotCmdStdHelp.SetLegendNumberColumns(),
@@ -55,6 +59,7 @@ def _createCommandsList():
 #Write in alphabetical order
 def _createOptionsList():
 	outList = [
+	plotOptStdHelp.AxisBorderMakeInvisible(),
 	plotOptStdHelp.AxisColorX(),
 	plotOptStdHelp.AxisColorX_exclSpines(),
 	plotOptStdHelp.AxisColorY(),
@@ -66,9 +71,12 @@ def _createOptionsList():
 	plotOptStdHelp.LegendOn(),
 	plotOptStdHelp.LineColors(),
 	plotOptStdHelp.LineMarkerStyles(),
+	plotOptStdHelp.LineStyles(),
 	plotOptStdHelp.PlotData2D(),
 	plotOptStdHelp.SetFigsizeOnCreation(),
+	plotOptStdHelp.XLabelFractPos(),
 	plotOptStdHelp.XLabelStr(),
+	plotOptStdHelp.YLabelFractPos(),
 	plotOptStdHelp.YLabelStr(),
 	plotOptStdHelp.XLimit(),
 	plotOptStdHelp.YLimit()

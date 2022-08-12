@@ -1,5 +1,6 @@
 
 import copy
+import types
 import unittest
 
 import numpy as np
@@ -111,6 +112,22 @@ class TestNumpyIter(unittest.TestCase):
 		self.testObjB = tCode.NumpyIterPlotOption.fromJSON(self.testObjA.toJSON())
 		self.assertEqual(self.testObjA, self.testObjB)
 
+
+class TestBoolNamespaceOption(unittest.TestCase):
+
+	def setUp(self):
+		self.name = "test-name"
+		self.value = types.SimpleNamespace(x=True, y=False)
+		self.createTestObjs()
+
+	def createTestObjs(self):
+		self.testObjA = tCode.BoolNamespaceOption(self.name, self.value)
+
+	def testToAndFromJSONEqual(self):
+		""" Checking .toJSON and .fromJSON are consistent for BoolNamespaceOption """
+		self.testObjB = tCode.BoolNamespaceOption.fromJSON( self.testObjA.toJSON() )
+		self.assertEqual(self.testObjA, self.testObjB)
+
 class TestFloatIter(unittest.TestCase):
 
 	def setUp(self):
@@ -154,34 +171,76 @@ class TestFloatIterOrSingleFloat(unittest.TestCase):
 
 	def testEqCmpEq_floatIters(self):
 		""" Two equal FloatIterOrSingleFloatOption should compare equal (both with float-iter vals) """
-		self.assertTrue(False)
+		self.assertEqual(self.testObjA, self.testObjB)
 
 	def testEqCmpEq_floatVals(self):
 		""" Two equal FloatIterOrSingleFloatOption should compare equal (both with float vals) """
-		self.assertTrue(False)
+		self.value = 5.3
+		self.createTestObjs()
+		self.assertEqual(self.testObjA, self.testObjB)
 
 	def testNonEqCmpNonEq_floatIterVsFloat(self):
 		""" Two FloatIterOrSingleFloatOption should compare unequal if one has a float value and the other a float iter """
-		self.assertTrue(False)
+		self.testObjB.value = 5.4
+		self.assertNotEqual(self.testObjA, self.testObjB)
 
 	def testNonEqCmpNonEq_diffLengthFloatIters(self):
 		""" Two unequal FloatIterOrSingleFloatOption should compare unequal when iter lengths vary """
-		self.assertTrue(False)
+		self.testObjB.value.append(5.8)
+		self.assertNotEqual(self.testObjA, self.testObjB)
 
 	def testNonEqCmpNonEq_diffValFloatIters(self):
 		""" Two unequal FloatIterOrSingleFloatOption should compare unequal when iter values vary"""
-		self.assertTrue(False)
+		self.testObjA.value[0] += 1.5
+		self.assertNotEqual(self.testObjA, self.testObjB)
 
 	def testNonEqCmpNonEq_diffFloatVals(self):
 		""" Two unequal FloatIterOrSingleFloatOption should compare unequal when float values vary (not float-iters) """
-		self.assertTrue(False)
+		self.value = 5.8
+		self.createTestObjs()
+		self.testObjB.value = self.value +0.5
+		self.assertNotEqual(self.testObjA, self.testObjB)
 
-	def toJSON(self):
-		raise NotImplementedError("")
+	def testSerializationConsistent_floatVal(self):
+		""" toJSON() and fromJSON() should give consistent results when using a single float """
+		self.value = 0.8
+		objA = self.testObjA
+		objB = tCode.FloatIterOrSingleFloatOption.fromJSON( objA.toJSON() )
+		self.assertEqual(objA, objB)
 
-	@classmethod
-	def fromJSON(cls, inpJSON):
-		raise NotImplementedError("")
+	def testSerializationConsistent_floatIter(self):
+		""" toJSON() and fromJSON() should give consistent results when using an iter of floats """
+		objA = self.testObjA
+		objB = tCode.FloatIterOrSingleFloatOption.fromJSON( objA.toJSON() )
+		self.assertEqual(objA, objB)
+
+
+class TestObjectIterPlotOption(unittest.TestCase):
+
+	def setUp(self):
+		self.name = "test-name"
+		self.value = [ tCode.FloatIterPlotOption("nameA", [1.2,1.3]),
+		               tCode.FloatIterPlotOption("nameB", [4.5]) ]
+		self.createTestObjs()
+
+	def createTestObjs(self):
+		self.testObjA = tCode.ObjectIterPlotOption(self.name, self.value)
+		self.testObjB = copy.deepcopy(self.testObjA)
+
+	def testEqCmpEq(self):
+		""" Two equal ObjectIterPlotOption should compare equal """
+		self.assertEqual(self.testObjA, self.testObjB)
+
+	def testNonEqCmpNonEq_diffValObj(self):
+		""" Two ObjectIterPlotOption should compare unequal if one iter contains a different-valued object """
+		self.testObjB.value[1].value[0] += 1
+		self.assertNotEqual(self.testObjA, self.testObjB)
+
+	def testSerializationConsistent(self):
+		""" ObjectIterPlotOption toJSON() and fromJSON() should give consistent results """
+		objA = self.testObjA
+		objB = tCode.ObjectIterPlotOption.fromJSON( objA.toJSON() )
+		self.assertEqual(objA, objB)
 
 
 

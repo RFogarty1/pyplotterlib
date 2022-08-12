@@ -96,9 +96,13 @@ class SinglePlotOptionInter(jsonTransHelp.JSONTransformInterface):
 		self.name = str(name)
 		self.value = value
 
-#Registered for Serialization mainly for purposes of test code
-@regHelp.registerForSerialization()
-class BooleanPlotOption(SinglePlotOptionInter):
+	def toJSON(self):
+		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":self.value}})
+
+	@classmethod
+	def fromJSON(cls, inpJSON):
+		useDict = json.loads(inpJSON)
+		return cls( useDict["payload"]["name"], useDict["payload"]["value"] )
 
 	def __eq__(self, other):
 		if self.name != other.name:
@@ -108,31 +112,28 @@ class BooleanPlotOption(SinglePlotOptionInter):
 
 		return True
 
-	def toJSON(self):
-		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":self.value}})
 
-	@classmethod
-	def fromJSON(cls, inpJSON):
-		useDict = json.loads(inpJSON)
-		return cls( useDict["payload"]["name"], useDict["payload"]["value"] )
-
-#Behavior should be identical to the Boolean
+#Registered for Serialization mainly for purposes of test code
 @regHelp.registerForSerialization()
-class StringPlotOption(BooleanPlotOption):
+class BooleanPlotOption(SinglePlotOptionInter):
+	pass
+
+@regHelp.registerForSerialization()
+class StringPlotOption(SinglePlotOptionInter):
 	pass
 
 
 @regHelp.registerForSerialization()
-class StringIterPlotOption(BooleanPlotOption):
+class StringIterPlotOption(SinglePlotOptionInter):
 	pass
 
 
 @regHelp.registerForSerialization()
-class IntPlotOption(BooleanPlotOption):
+class IntPlotOption(SinglePlotOptionInter):
 	pass
 
 @regHelp.registerForSerialization()
-class IntIterPlotOption(BooleanPlotOption):
+class IntIterPlotOption(SinglePlotOptionInter):
 	pass
 
 
@@ -146,49 +147,66 @@ class FloatIterPlotOption(SinglePlotOptionInter):
 		if self.name != other.name:
 			return False
 
-		if len(self.value) != len(other.value):
-			return False
+		return _areTwoFloatItersEqual(self.value, other.value)
 
-		if not np.allclose( np.array(self.value), np.array(other.value) ):
-			return False
 
-		return True
 
-	#TODO: this is the standard toJSON/fromJSON; should factor out into a mixin or into SinglePlotOptionInter
-	def toJSON(self):
-		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":self.value}})
+def _areTwoFloatItersEqual(iterA, iterB):
+	if len(iterA) != len(iterB):
+		return False
 
-	@classmethod
-	def fromJSON(cls, inpJSON):
-		useDict = json.loads(inpJSON)
-		return cls( useDict["payload"]["name"], useDict["payload"]["value"] )
+	if not np.allclose( np.array(iterA), np.array(iterB) ):
+		return False
+
+	return True
+
 
 
 @regHelp.registerForSerialization()
 class FloatIterOrSingleFloatOption(SinglePlotOptionInter):
 
 	def __eq__(self, other):
+		#Figure out if vals iterable
+		aIsIter = _isIter(self.value)
+		bIsIter = _isIter(other.value)
+
+		#If not both the same type; return false
+		if aIsIter is not bIsIter:
+			return False
+
+		#Run the equality check for each type
+		if aIsIter:
+			return _areTwoFloatItersEqual(self.value, other.value)
+		else:
+			if not np.allclose( np.array([self.value]), np.array([other.value]) ):
+				return False
+
 		return True
 
-	def toJSON(self):
-		raise NotImplementedError("")
 
-	@classmethod
-	def fromJSON(cls, inpJSON):
-		raise NotImplementedError("")
+def _isIter(inpObj):
+	try:
+		iter(inpObj)
+	except TypeError:
+		return False
+	else:
+		return True
 
 
+@regHelp.registerForSerialization()
 class ObjectIterPlotOption(SinglePlotOptionInter):
 
-	def __eq__(self, other):
-		raise NotImplementedError("")
-
 	def toJSON(self):
-		raise NotImplementedError("")
+		outPayloads = [ x.toJSON() for x in self.value ]
+		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":outPayloads}})
 
 	@classmethod
 	def fromJSON(cls, inpJSON):
-		raise NotImplementedError("")
+		useDict = json.loads(inpJSON)
+		objs = [ jsonIoHelp.createInstanceFromJSON(x) for x in useDict["payload"]["value"] ]
+		return cls( useDict["payload"]["name"], objs )
+
+
 
 class NumpyIterPlotOption(SinglePlotOptionInter):
 
@@ -215,6 +233,16 @@ class NumpyIterPlotOption(SinglePlotOptionInter):
 		useDict = json.loads(inpJSON)
 		return cls( useDict["payload"]["name"], [np.array(x) for x in useDict["payload"]["value"]] )
 
+@regHelp.registerForSerialization()
+class BoolNamespaceOption(SinglePlotOptionInter):
 
+	def toJSON(self):
+		outDict = self.value.__dict__
+		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":outDict}})
+
+	@classmethod
+	def fromJSON(cls, inpJSON):
+		useDict = json.loads(inpJSON)
+		return cls( useDict["payload"]["name"], types.SimpleNamespace(**useDict["payload"]["value"]) )
 
 

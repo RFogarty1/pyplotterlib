@@ -58,6 +58,39 @@ class PlotDataAsLines(plotCommCoreHelp.PlotCommand):
 
 		return
 
+class SetAxisBorderInvisible(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetAxisBorderVisibility"
+		self._description = "Sets the border visibility for various axes (top/bottom/left/right)"
+		self._optName = "axisBorderMakeInvisible"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		attrKeys = ["top", "bottom", "left", "right"]
+		if targVal is None:
+			return None
+
+		attrVals = [getattr(targVal,attr) for attr in attrKeys]
+		if all([x is False for x in attrVals]):
+			return None
+
+		for attrKey, attrVal in it.zip_longest(attrKeys, attrVals):
+			if attrVal is True:
+				plt.gca().spines[attrKey].set_visible(False)
+				if attrKey == "left":
+					plt.gca().get_yaxis().set_ticks([])
+				if attrKey == "bottom":
+					plt.gca().get_xaxis().set_ticks([])
+
+		#NOTE: Possibly some better commands here
+		# hide the spines between ax and ax2
+#		ax1.spines.bottom.set_visible(False)
+#		ax2.spines.top.set_visible(False)
+#		ax1.xaxis.tick_top()
+#		ax1.tick_params(labeltop=False)  # don't put tick labels at the top
+#		ax2.xaxis.tick_bottom()
+
 
 class SetAxisColorX(plotCommCoreHelp.PlotCommand):
 
@@ -215,6 +248,22 @@ class SetLineMarkerStyles(plotCommCoreHelp.PlotCommand):
 		for dataLine, markerStyle in zip(dataLines, markerStyles):
 			dataLine.set_marker(markerStyle)
 
+class SetLineStyles(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setLineStyles"
+		self._description = "Sets the line styles for lines currently plotted"
+		self._optName = "lineStyles"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		dataLines = plt.gca().get_lines()
+		lineStyles = it.cycle(targVal)
+		for dataLine, lineStyle in zip(dataLines, lineStyles):
+			dataLine.set_linestyle(lineStyle)
 
 class SetXLabelStr(plotCommCoreHelp.PlotCommand):
 
@@ -228,6 +277,20 @@ class SetXLabelStr(plotCommCoreHelp.PlotCommand):
 		if targVal is None:
 			return None
 		plt.xlabel(targVal)
+
+class SetXLabelFractPos(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetXLabelFractPos"
+		self._description = "Set the fractional position for the x-label"
+		self._optName = "xLabelFractPos"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+		plt.gca().xaxis.set_label_coords(targVal[0], targVal[1])
+
 
 class SetXLimit(plotCommCoreHelp.PlotCommand):
 
@@ -268,6 +331,19 @@ class SetYLabelStr(plotCommCoreHelp.PlotCommand):
 		if targVal is None:
 			return None
 		plt.ylabel(targVal)
+
+class SetYLabelFractPos(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetYLabelFractPos"
+		self._description = "Set the fractional position for the y-label"
+		self._optName = "yLabelFractPos"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+		plt.gca().yaxis.set_label_coords(targVal[0], targVal[1])
 
 
 class TurnLegendOnIfRequested(plotCommCoreHelp.PlotCommand):
