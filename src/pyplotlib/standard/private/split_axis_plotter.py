@@ -180,7 +180,10 @@ class DrawDoubleLinesForAxisSplits(plotCmdCoreHelp.PlotCommand):
 
 		#3) Use all previous info to draw lines around x-splits
 		_drawDoubleLineOnXSplitsIfNeeded(plotterInstance.opts.splitDrawDoubleLinesX.value, xCentroids, axHeight)
+		_drawDoubleLineOnXSplitsIfNeeded(plotterInstance.opts.splitDrawDoubleLinesX.value, xCentroids, axHeight, offsetVal=[0,axHeight])
+
 		_drawDoubleLineOnYSplitsIfNeeded(plotterInstance.opts.splitDrawDoubleLinesY.value, yCentroids, axWidth)
+		_drawDoubleLineOnYSplitsIfNeeded(plotterInstance.opts.splitDrawDoubleLinesY.value, yCentroids, axWidth, offsetVal=[axWidth,0])
 
 	def _getCentroidPositionsX(self, plotterInstance):
 		allPositions = plotterInstance._scratchSpace["new_axis_positions"]
@@ -220,7 +223,9 @@ class DrawDoubleLinesForAxisSplits(plotCmdCoreHelp.PlotCommand):
 		return centroids
 
 
-def _drawDoubleLineOnXSplitsIfNeeded(drawOpts, centroids, axHeight):
+def _drawDoubleLineOnXSplitsIfNeeded(drawOpts, centroids, axHeight, offsetVal=None):
+	offsetVal = [0,0] if offsetVal is None else offsetVal
+
 	numbSplits = len(centroids)
 	useOpts = it.cycle(drawOpts)
 
@@ -237,6 +242,10 @@ def _drawDoubleLineOnXSplitsIfNeeded(drawOpts, centroids, axHeight):
 		outVector = np.dot(rotMatrix, inpVector)
 
 		#Build the output lines in terms of these vectors
+		centroidA[0] += offsetVal[0]
+		centroidA[1] += offsetVal[1]
+		centroidB[0] += offsetVal[0]
+		centroidB[1] += offsetVal[1]
 		xValsA = [ centroidA[0] - outVector[0]*0.5, centroidA[0] + outVector[0]*0.5 ]  
 		xValsB = [ centroidB[0] - outVector[0]*0.5, centroidB[0] + outVector[0]*0.5 ]
 		yValsA = [ centroidA[1] - outVector[1]*0.5, centroidA[1] + outVector[1]*0.5 ]
@@ -250,7 +259,8 @@ def _drawDoubleLineOnXSplitsIfNeeded(drawOpts, centroids, axHeight):
 			currFig.add_artist(lines.Line2D(xValsB, yValsB))
 
 #VERY similar to the x-splits
-def _drawDoubleLineOnYSplitsIfNeeded(drawOpts, centroids, axWidth):
+def _drawDoubleLineOnYSplitsIfNeeded(drawOpts, centroids, axWidth, offsetVal=None):
+	offsetVal = [0,0] if offsetVal is None else offsetVal
 	numbSplits = len(centroids)
 	useOpts = it.cycle(drawOpts)
 
@@ -265,6 +275,10 @@ def _drawDoubleLineOnYSplitsIfNeeded(drawOpts, centroids, axWidth):
 		outVector = np.dot(rotMatrix, inpVector)
 
 		#Build the output lines in terms of these vectors
+		centroidA[0] += offsetVal[0]
+		centroidA[1] += offsetVal[1]
+		centroidB[0] += offsetVal[0]
+		centroidB[1] += offsetVal[1]
 		xValsA = [ centroidA[0] - outVector[0]*0.5, centroidA[0] + outVector[0]*0.5 ]  
 		xValsB = [ centroidB[0] - outVector[0]*0.5, centroidB[0] + outVector[0]*0.5 ]
 		yValsA = [ centroidA[1] - outVector[1]*0.5, centroidA[1] + outVector[1]*0.5 ]
@@ -293,7 +307,9 @@ class CreateOutputAxes(plotCmdCoreHelp.PlotCommand):
 		_attrNames = ["plotterGrid", "fractsX", "fractsY", "spacingX", "spacingY"]
 		currArgs = [getattr(plotterInstance.opts,x).value for x in _attrNames]
 		if currArgs[0] is None:
-			currArgs[0] = list( list() )
+			raise ValueError("plotterGrid MUST be set to use split_axis_plotter")
+#			currArgs[0], _tempList = list(), list()
+#			currArgs[0].append(_tempList)
  
 		outPositions = _getOutputAxesPositions(*currArgs)
 		plotterInstance._scratchSpace["new_axis_positions"] = outPositions
