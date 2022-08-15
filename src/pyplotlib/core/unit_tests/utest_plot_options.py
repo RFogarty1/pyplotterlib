@@ -243,6 +243,63 @@ class TestObjectIterPlotOption(unittest.TestCase):
 		self.assertEqual(objA, objB)
 
 
+class TestJsonTransObjPlotOption(unittest.TestCase):
+
+	def setUp(self):
+		self.name = "test-name"
+		self.value = tCode.IntPlotOption("nameA", 4)
+		self.createTestObjs()
+
+	def createTestObjs(self):
+		self.testObjA = tCode.JsonTransObjPlotOption(self.name ,self.value)
+		self.testObjB = copy.deepcopy(self.testObjA)
+
+	def testEqCmpEq(self):
+		""" Two equal JsonTransObjPlotOption instances should compare equal"""
+		self.assertEqual(self.testObjA, self.testObjB)
+
+	def testNonEqCmpNonEq_diffValObj(self):
+		""" Two JsonTransObjPlotOption with different valued objects should compare unequal """
+		self.testObjB.value.value += 1
+		self.assertNotEqual(self.testObjA, self.testObjB)
+
+	def testSerializationConsistent(self):
+		""" JsonTransObjPlotOption toJSON() and fromJSON() should give consistent results """
+		objA = self.testObjA
+		objB = tCode.JsonTransObjPlotOption.fromJSON( objA.toJSON() )
+		self.assertEqual(objA, objB)
+
+
+class TestIterOfFloatIterPlotOption(unittest.TestCase):
+
+	def setUp(self):
+		self.name = "test-name"
+		self.value = [ [1.3,2.5], [3.2,6.8] ]
+		self.createTestObjs()
+
+	def createTestObjs(self):
+		self.testObjA = tCode.IterOfFloatIterPlotOption(self.name, self.value)
+		self.testObjB = copy.deepcopy(self.testObjA)
+
+	def testEqCmpEq(self):
+		""" Two equal IterOfFloatIterPlotOption instances should compare equal """
+		self.assertEqual(self.testObjA, self.testObjB)
+
+	def testNonEqCmpNonEq_diffVals(self):
+		""" Two IterOfFloatIterPlotOption with different values should compare unequal"""
+		self.testObjB.value[0][1] += 0.4
+		self.assertNotEqual(self.testObjA, self.testObjB)
+
+	def testNonEqCmpNonEq_diffLenVals(self):
+		""" Two IterOfFloatIterPlotOption with different length float-iters should compare unequal """
+		self.testObjB.value.append( [5] )
+		self.assertNotEqual(self.testObjA, self.testObjB)
+
+	def testSerializationConsistent(self):
+		""" JsonTransObjPlotOption toJSON() and fromJSON() should give consistent results """
+		objA = self.testObjA
+		objB = tCode.IterOfFloatIterPlotOption.fromJSON( objA.toJSON() )
+		self.assertEqual(objA, objB)
 
 if __name__ == '__main__':
 	unittest.main()

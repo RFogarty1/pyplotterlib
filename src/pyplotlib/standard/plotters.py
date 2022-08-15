@@ -2,6 +2,7 @@
 from .private.line_plotter import LinePlotter as LinePlotter
 from .private.rect_multi_plotter import RectMultiPlotter as RectMultiPlotter
 from .private.split_axis_plotter import SplitAxisPlotter as SplitAxisPlotter
+from .private.split_axis_plotter_creator import SplitAxisPlotterCreator as SplitAxisPlotterCreator
 
 from .private import shared_axis_plotter
 

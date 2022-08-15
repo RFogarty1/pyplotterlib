@@ -137,6 +137,47 @@ class IntIterPlotOption(SinglePlotOptionInter):
 	pass
 
 
+@regHelp.registerForSerialization()
+class JsonTransObjPlotOption(SinglePlotOptionInter):
+
+	def toJSON(self):
+		embeddedVal = self.value.toJSON()
+		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":embeddedVal}})
+
+	@classmethod
+	def fromJSON(cls, inpJSON):
+		useDict = json.loads(inpJSON)
+		value = jsonIoHelp.createInstanceFromJSON( useDict["payload"]["value"] )
+		return cls( useDict["payload"]["name"], value)
+
+
+
+@regHelp.registerForSerialization()
+class IterOfFloatIterPlotOption(SinglePlotOptionInter):
+	
+
+	def __eq__(self, other):
+		if self.name != other.name:
+			return False
+
+		if len(self.value) != len(other.value):
+			return False
+
+		for valsA, valsB in zip(self.value,other.value):
+			if not _areTwoFloatItersEqual(valsA, valsB):
+				return False
+
+		return True
+
+@regHelp.registerForSerialization()
+class FloatPlotOption(SinglePlotOptionInter):
+
+	def __eq__(self, other):
+		if self.name != other.name:
+			return False
+
+		return _areTwoFloatItersEqual([self.value], [other.value])
+
 
 @regHelp.registerForSerialization()
 class FloatIterPlotOption(SinglePlotOptionInter):
