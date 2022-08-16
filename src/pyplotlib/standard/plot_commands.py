@@ -6,7 +6,17 @@ import numpy as np
 
 from ..core import plot_command as plotCommCoreHelp
 
+#Generic commands should work for all
+class AddPlotterToOutput(plotCommCoreHelp.PlotCommand):
+	""" Adds the plotter instance to the output of createPlot()
 
+	"""
+	def __init__(self):
+		self._name = "add-plotter-instance-to-output"
+		self._description = "Adds the plotter instance used to create a plot to the output generated"
+
+	def execute(self, plotterInstance):
+		plotterInstance._scratchSpace["outDict"]["plotter"] = plotterInstance
 
 #These are the multi-plotter class ones
 

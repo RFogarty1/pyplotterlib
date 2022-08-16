@@ -171,6 +171,20 @@ class PlotData2D(plotOptCore.NumpyIterPlotOption):
 		self.name = "plotData" if name is None else name
 		self.value = value
 
+@serializationReg.registerForSerialization()
+class PlotData1D(plotOptCore.NumpyIterPlotOption):
+	""" Option for 1-dimensional plot data. Expected formats are:
+
+	a) None, if no plotData is available
+	b) An iterable of 1-D numpy arrays
+	c) An iterable that transforms to b) when np.array() is called on each element (e.g. an iter of float-lists)
+
+	e.g. [ [0,1,2], [3,2,1] ] may be input for two data series, each with three data points
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "plotData1D" if name is None else name
+		self.value = value
 
 @serializationReg.registerForSerialization()
 class SetFigsizeOnCreation(plotOptCore.FloatIterPlotOption):

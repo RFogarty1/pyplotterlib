@@ -1,4 +1,5 @@
 
+from .private.bar_plotter import BarPlotter as BarPlotter
 from .private.line_plotter import LinePlotter as LinePlotter
 from .private.rect_multi_plotter import RectMultiPlotter as RectMultiPlotter
 from .private.split_axis_plotter import SplitAxisPlotter as SplitAxisPlotter
