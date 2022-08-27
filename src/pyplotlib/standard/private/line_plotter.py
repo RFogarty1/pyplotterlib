@@ -1,11 +1,17 @@
 
 
+from . import shared
+
 from ...core import plotters as plotterCoreHelp
 from ...core import plot_options as plotOptCoreHelp
+from ...core.serialization import register as serializationReg
+
 from .. import plot_options as plotOptStdHelp
 from .. import plot_commands as plotCmdStdHelp
 
-class LinePlotter(plotterCoreHelp.SingleGraphPlotter):
+
+@serializationReg.registerForSerialization()
+class LinePlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
 
 	def __init__(self, **kwargs):
 		""" Initializer
@@ -25,8 +31,6 @@ class LinePlotter(plotterCoreHelp.SingleGraphPlotter):
 	def _createOptions(self):
 		_optionsList = _createOptionsList()
 		self._options = plotOptCoreHelp.OptionsCollection(options=_optionsList)
-
-
 
 
 

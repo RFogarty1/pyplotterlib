@@ -38,3 +38,11 @@ class PlotCommand(jsonTransHelp.JSONTransformInterface):
 	def fromJSON(cls, inpJSON):
 		return cls() #Should almost ALWAYS be called without any values passed
 
+
+	def __eq__(self, other):
+
+		if self.toJSON() != other.toJSON():
+			return False
+
+		return True
+

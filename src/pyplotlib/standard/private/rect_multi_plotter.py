@@ -3,6 +3,8 @@ import itertools as it
 import numpy as np
 import matplotlib.pyplot as plt
 
+from . import shared
+
 from ...core import plotters as plotterCoreHelp
 from ...core import plot_options as plotOptCoreHelp
 from .. import plot_options as plotOptStdHelp
@@ -11,8 +13,11 @@ from .. import plot_commands as plotCmdStdHelp
 from ...core import plot_command as plotCmdCoreHelp
 from ...core.serialization import register as serializationReg
 
-class RectMultiPlotter(plotterCoreHelp.MultiGraphPlotter):
+@serializationReg.registerForSerialization()
+class RectMultiPlotter(shared.FromJsonMixin, plotterCoreHelp.MultiGraphPlotter):
+	""" MultiGraphPlotter which combines individual plotters into a rectangular grid
 
+	"""
 	def __init__(self, **kwargs):
 		self._createCommands()
 		self._createOptions()
@@ -48,7 +53,7 @@ def _createOptionsList():
 	ConstrainedLayout(),
 	FillColsToMatchPlotters(),
 	FillPlottersToMatchGrid(),
-	FillRowsToMatchPlotters(),
+	FillRowsToMatchPlotters(value=True),
 	FigHeightPerRow(),
 	FigWidthPerCol(),
 	NColsGrid(),
@@ -152,6 +157,7 @@ class RelGridHeights(plotOptCoreHelp.IntIterPlotOption):
 class RelGridWidths(plotOptCoreHelp.IntIterPlotOption):
 	""" Option for relative widths of each subplot in a multi-plot grid. Values should be integers, where 1 is the default
 
+	For example, [1,2,1] would mean the 1st/3rd plot spanned 1 col each, whilst the second spanned 2 cols
 
 	"""
 	def __init__(self, name=None, value=None):
@@ -163,14 +169,8 @@ class RelGridWidths(plotOptCoreHelp.IntIterPlotOption):
 
 
 
-
-
-
-
-
-
-
 #Commands
+@serializationReg.registerForSerialization()
 class CreateEmptyFigureIfNeeded(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -206,7 +206,7 @@ class CreateEmptyFigureIfNeeded(plotCmdCoreHelp.PlotCommand):
 		plotterInstance._scratchSpace["figHandle"] = plt.figure(constrained_layout=constrLayout, figsize=figSize)
 
 
-
+@serializationReg.registerForSerialization()
 class CreateRectGridAndAxes(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -294,7 +294,7 @@ class CreateRectGridAndAxes(plotCmdCoreHelp.PlotCommand):
 		plotterInstance._scratchSpace["ax_handles"] = outAxes
 
 
-
+@serializationReg.registerForSerialization()
 class FillPlottersToMatchGridCommand(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -331,7 +331,7 @@ class FillPlottersToMatchGridCommand(plotCmdCoreHelp.PlotCommand):
 				keepAdding = False
 
 
-
+@serializationReg.registerForSerialization()
 class FillColsToMatchPlottersCommand(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -353,7 +353,7 @@ class FillColsToMatchPlottersCommand(plotCmdCoreHelp.PlotCommand):
 
 		getattr(plotterInstance.opts, self._nColsAttr).value = outCols
 
-
+@serializationReg.registerForSerialization()
 class FillRowsToMatchPlottersCommand(FillColsToMatchPlottersCommand):
 
 	def __init__(self):
@@ -372,8 +372,8 @@ class FillRowsToMatchPlottersCommand(FillColsToMatchPlottersCommand):
 		getattr(plotterInstance.opts, self._nRowsAttr).value = outRows
 
 
-
-class PopulateAxesWithPlotters():
+@serializationReg.registerForSerialization()
+class PopulateAxesWithPlotters(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
 		self._name = "populate-axes-with-plotters"
@@ -392,8 +392,8 @@ class PopulateAxesWithPlotters():
 			if currPlotter is not None:
 				currPlotter.createPlot(currAx)
 
-
-class SetHeightBasedOnNumberRows():
+@serializationReg.registerForSerialization()
+class SetHeightBasedOnNumberRows(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
 		self._name = "set-fig-height-based-on-nRows"
@@ -411,7 +411,9 @@ class SetHeightBasedOnNumberRows():
 		outHeight = nRows*sizeVal
 		figHandle.set_figheight(outHeight)
 
-class SetWidthBasedOnNumberCols():
+
+@serializationReg.registerForSerialization()
+class SetWidthBasedOnNumberCols(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
 		self._name = "set-fig-width-based-on-nCols"

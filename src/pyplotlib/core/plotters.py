@@ -115,6 +115,18 @@ class PlotterInter(jsonTransHelp.JSONTransformInterface):
 
 		return cls(optionsObj, commandObjs)
 
+	def __eq__(self, other):
+		if self._options != other._options:
+			return False
+
+		if len(self._commands) != len(other._commands):
+			return False
+
+		if self._commands != other._commands:
+			return False
+
+		return True
+
 
 class SingleGraphPlotter(PlotterInter):
 

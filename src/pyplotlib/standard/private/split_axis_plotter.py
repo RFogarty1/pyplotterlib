@@ -1,21 +1,25 @@
 
 import itertools as it
+import json
 import math
 
 import numpy as np
 import matplotlib.lines as lines
 import matplotlib.pyplot as plt
 
+from . import shared
+
 from ...core import plotters as plotterCoreHelp
 from ...core import plot_options as plotOptCoreHelp
 from ...core import plot_command as plotCmdCoreHelp
 from ...core import json_transform as jsonTransformCoreHelp
+from ...core.serialization import register as serializationReg
 
 from .. import plot_commands as plotCmdStdHelp
 
 
-
-class SplitAxisPlotter(plotterCoreHelp.SingleGraphPlotter):
+@serializationReg.registerForSerialization()
+class SplitAxisPlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
 
 	def __init__(self, **kwargs):
 		self._createCommands()
@@ -58,8 +62,7 @@ def _createOptionsList():
 
 
 #Options
-
-
+@serializationReg.registerForSerialization()
 class SplitDrawDoubleLinesX(plotOptCoreHelp.ObjectIterPlotOption):
 	""" Controls drawing of double lines to demarcate points where the x-axis is split. Values are iters of DoubleLinesConfig objects.
 
@@ -70,6 +73,7 @@ class SplitDrawDoubleLinesX(plotOptCoreHelp.ObjectIterPlotOption):
 		self.name = "splitDrawDoubleLinesX" if name is None else name
 		self.value = [DoubleLinesConfig(draw=False)] if value is None else value
 
+@serializationReg.registerForSerialization()
 class SplitDrawDoubleLinesY(plotOptCoreHelp.ObjectIterPlotOption):
 	""" Controls drawing of double lines to demarcate points where the y-axis is split. Values are iters of DoubleLinesConfig objects.
 
@@ -80,8 +84,7 @@ class SplitDrawDoubleLinesY(plotOptCoreHelp.ObjectIterPlotOption):
 		self.name = "splitDrawDoubleLinesY" if name is None else name
 		self.value = [DoubleLinesConfig(draw=False)] if value is None else value
 
-
-
+@serializationReg.registerForSerialization()
 class DoubleLinesConfig(jsonTransformCoreHelp.JSONTransformInterface):
 	""" Effectively a namespace for holding options related to drawing double lines for points where an axis is split 
 
@@ -97,16 +100,30 @@ class DoubleLinesConfig(jsonTransformCoreHelp.JSONTransformInterface):
 		self.angle = angle
 
 	def toJSON(self):
-		raise NotImplementedError("")
+		payload = {"draw":self.draw, "length":self.length, "angle":self.angle}
+		return json.dumps({"class":str(self.__class__), "payload":payload})
 
 	@classmethod
 	def fromJSON(cls, inpJSON):
-		raise NotImplementedError("")
+		useDict = json.loads(inpJSON)
+		payload = useDict["payload"]
+		return cls(**payload)
 
+	def __eq__(self, other):
+		eqTol = 1e-6
+		if self.draw != other.draw:
+			return False
 
-#NOTE: Cant serialize this 2-d grid of objects yet
-#@serializationReg.registerForSerialization()
-class PlotterGrid(plotOptCoreHelp.SinglePlotOptionInter):
+		if abs(self.length-other.length) > eqTol:
+			return False
+
+		if abs(self.angle-other.angle) > eqTol:
+			return False
+
+		return True
+
+@serializationReg.registerForSerialization()
+class PlotterGrid(plotOptCoreHelp.ObjectTwoDimIterPlotOption):
 	""" Contains individual plotters for the axis. Iter of iters (essentially a 2-d grid) with each element being an iter of plotters for one x-segment. For example: [ [plotterX0Y0, plotterX0Y1, plotterX0Y2], [plotterX1Y0, plotterX1Y1, plotter X1Y2] ] corresponds to a case of 1-split on the x-axis and 2 splits on the y-axis
 
 	"""
@@ -114,7 +131,7 @@ class PlotterGrid(plotOptCoreHelp.SinglePlotOptionInter):
 		self.name = "plotterGrid" if name is None else name
 		self.value = value
 
-
+@serializationReg.registerForSerialization()
 class FractsX(plotOptCoreHelp.FloatIterOrSingleFloatOption):
 	""" The fractional widths of each x-plotter. Can set as a float if they are all equal, else a list. Note, these values will be normalised it doesnt matter if the sum of fractsX and spacingX add to 1.0 or not 
 
@@ -125,6 +142,7 @@ class FractsX(plotOptCoreHelp.FloatIterOrSingleFloatOption):
 		self.name = "fractsX" if name is None else name
 		self.value = 0.5 if value is None else value
 
+@serializationReg.registerForSerialization()
 class FractsY(plotOptCoreHelp.FloatIterOrSingleFloatOption):
 	""" The fractional heights of each y-plotter. Can set as a float if they are all equal, else a list. Note, these values will be normalised it doesnt matter if the sum of fractsY and spacingX add to 1.0 or not 
 
@@ -135,7 +153,7 @@ class FractsY(plotOptCoreHelp.FloatIterOrSingleFloatOption):
 		self.name = "fractsY" if name is None else name
 		self.value = 0.5 if value is None else value
 
-
+@serializationReg.registerForSerialization()
 class SpacingX(plotOptCoreHelp.FloatIterOrSingleFloatOption):
 	""" The fractional spacing BETWEEN each pair of split x-axes. Can be a single float or an iter of floats. If an iter, it should be 1 less than the number of x-plotters (and equal the number of splits).
 
@@ -146,6 +164,7 @@ class SpacingX(plotOptCoreHelp.FloatIterOrSingleFloatOption):
 		self.name = "spacingX" if name is None else name
 		self.value = 0.1 if value is None else value
 
+@serializationReg.registerForSerialization()
 class SpacingY(plotOptCoreHelp.FloatIterOrSingleFloatOption):
 	""" The fractional spacing BETWEEN each pair of split y-axes. Can be a single float or an iter of floats. If an iter, it should be 1 less than the number of y-plotters (and equal the number of splits).
 
@@ -157,7 +176,7 @@ class SpacingY(plotOptCoreHelp.FloatIterOrSingleFloatOption):
 		self.value = 0.1 if value is None else value
 
 #Commands
-
+@serializationReg.registerForSerialization()
 class DrawDoubleLinesForAxisSplits(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -293,7 +312,7 @@ def _drawDoubleLineOnYSplitsIfNeeded(drawOpts, centroids, axWidth, offsetVal=Non
 
 		
 
-
+@serializationReg.registerForSerialization()
 class CreateOutputAxes(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -386,7 +405,7 @@ def _getAxisEdges(inpAx):
 	endX, endY = startX+xLength, startY+yLength
 	return startX, startY, endX, endY
 
-
+@serializationReg.registerForSerialization()
 class AddPlotsToAxisGrid(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -402,7 +421,7 @@ class AddPlotsToAxisGrid(plotCmdCoreHelp.PlotCommand):
 				plotterGrid[xIdx][yIdx].createPlot(axHandle=axGrid[xIdx][yIdx])
 
 
-
+@serializationReg.registerForSerialization()
 class MakeOrigAxisInvisible(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):

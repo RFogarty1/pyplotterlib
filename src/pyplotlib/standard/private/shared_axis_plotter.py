@@ -1,6 +1,7 @@
 
-from .. import plot_options as plotOptStdHelp
+from . import shared
 
+from .. import plot_options as plotOptStdHelp
 from .. import plot_commands as plotCommStdHelp
 
 from ...core import plot_command as plotCommCoreHelp
@@ -10,8 +11,8 @@ from ...core.serialization import register as serializationReg
 
 
 @serializationReg.registerForSerialization()
-class DoubleAxisPlotter(plotterCoreHelp.SingleGraphPlotter):
-	""" Plotter which creates a plot from a single axis handle, but can have up to 2 independent x and y axes
+class DoubleAxisPlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
+	""" Plotter which creates a plot from a single axis handle, but can have 2 independent x XOR y axes
 
 	"""
 

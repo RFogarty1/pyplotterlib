@@ -160,6 +160,12 @@ class IterOfFloatIterPlotOption(SinglePlotOptionInter):
 		if self.name != other.name:
 			return False
 
+		if (self.value is None) and (other.value is None):
+			return True
+		elif (self.value is None) or (other.value is None):
+			return False
+
+
 		if len(self.value) != len(other.value):
 			return False
 
@@ -176,6 +182,11 @@ class FloatPlotOption(SinglePlotOptionInter):
 		if self.name != other.name:
 			return False
 
+		if (self.value is None) and (other.value is None):
+			return True
+		elif (self.value is None) or (other.value is None):
+			return False
+
 		return _areTwoFloatItersEqual([self.value], [other.value])
 
 
@@ -186,6 +197,11 @@ class FloatIterPlotOption(SinglePlotOptionInter):
 	def __eq__(self, other):
 
 		if self.name != other.name:
+			return False
+
+		if (self.value is None) and (other.value is None):
+			return True
+		elif (self.value is None) or (other.value is None):
 			return False
 
 		return _areTwoFloatItersEqual(self.value, other.value)
@@ -238,21 +254,75 @@ def _isIter(inpObj):
 class ObjectIterPlotOption(SinglePlotOptionInter):
 
 	def toJSON(self):
-		outPayloads = [ x.toJSON() for x in self.value ]
+		if self.value is None:
+			outPayloads = None
+		else:
+			outPayloads = [ x.toJSON() for x in self.value ]
+
 		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":outPayloads}})
 
 	@classmethod
 	def fromJSON(cls, inpJSON):
 		useDict = json.loads(inpJSON)
-		objs = [ jsonIoHelp.createInstanceFromJSON(x) for x in useDict["payload"]["value"] ]
+		if useDict["payload"]["value"] is None:
+			objs = None
+		else:
+			objs = [ jsonIoHelp.createInstanceFromJSON(x) for x in useDict["payload"]["value"] ]
 		return cls( useDict["payload"]["name"], objs )
 
+
+@regHelp.registerForSerialization()
+class ObjectTwoDimIterPlotOption(SinglePlotOptionInter):
+
+	def toJSON(self):
+		if self.value is None:
+			outVal = None
+		else:
+			outVal = self._generateOutPayloadIfValNotNone()
+
+		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":outVal}})
+
+
+	def _generateOutPayloadIfValNotNone(self):
+		outVal = list()
+		for rowIdx, unused in enumerate(self.value):
+			currList = list()
+			for colIdx, unused in enumerate(self.value[rowIdx]):
+				 currList.append( self.value[rowIdx][colIdx].toJSON() )
+			outVal.append(currList)
+		return outVal
+
+	@classmethod
+	def fromJSON(cls, inpJSON):
+		useDict = json.loads(inpJSON)
+		if useDict["payload"]["value"] is None:
+			objs = None
+		else:
+			objs = cls._generateInpPayloadIfNotNone(inpJSON)
+
+		return cls( useDict["payload"]["name"], objs )
+
+	@classmethod
+	def _generateInpPayloadIfNotNone(self, inpJSON):
+		useDict = json.loads(inpJSON)
+		objs = list()
+		for rowIdx, currRow in enumerate(useDict["payload"]["value"]):
+			currList = [ jsonIoHelp.createInstanceFromJSON(x) for x in currRow ]
+			objs.append(currList)
+
+		return objs	
 
 
 class NumpyIterPlotOption(SinglePlotOptionInter):
 
 	def __eq__(self, other):
 		if self.name != other.name:
+			return False
+
+		#TODO: likely factor this into a function
+		if (self.value is None) and (other.value is None):
+			return True
+		elif (self.value is None) or (other.value is None):
 			return False
 
 		if len(self.value) != len(other.value):
@@ -266,13 +336,22 @@ class NumpyIterPlotOption(SinglePlotOptionInter):
 
 	def toJSON(self):
 		#Note np arrays arent JSON-compatible; hence need to work with them as lists
-		outArrays = [ np.array(x).tolist() for x in self.value ]
+		if self.value is None:
+			outArrays = None
+		else:
+			outArrays = [ np.array(x).tolist() for x in self.value ]
+
 		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":outArrays}})
 
 	@classmethod
 	def fromJSON(cls, inpJSON):
 		useDict = json.loads(inpJSON)
-		return cls( useDict["payload"]["name"], [np.array(x) for x in useDict["payload"]["value"]] )
+		if useDict["payload"]["value"] is None:
+			outVal = useDict["payload"]["value"]
+		else:
+			outVal = [np.array(x) for x in useDict["payload"]["value"]]
+
+		return cls( useDict["payload"]["name"], outVal )
 
 @regHelp.registerForSerialization()
 class BoolNamespaceOption(SinglePlotOptionInter):

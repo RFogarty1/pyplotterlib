@@ -112,6 +112,12 @@ class TestNumpyIter(unittest.TestCase):
 		self.testObjB = tCode.NumpyIterPlotOption.fromJSON(self.testObjA.toJSON())
 		self.assertEqual(self.testObjA, self.testObjB)
 
+	def testToAndFromJsonEqual_NoneVals(self):
+		""" Checking .toJSON and .fromJSON are consistent for NumpyIterPlotOption when value is None """
+		self.testObjA.value = None
+		self.testObjB = tCode.NumpyIterPlotOption.fromJSON(self.testObjA.toJSON())
+		self.assertEqual(self.testObjA, self.testObjB)
+
 
 class TestBoolNamespaceOption(unittest.TestCase):
 
@@ -240,6 +246,50 @@ class TestObjectIterPlotOption(unittest.TestCase):
 		""" ObjectIterPlotOption toJSON() and fromJSON() should give consistent results """
 		objA = self.testObjA
 		objB = tCode.ObjectIterPlotOption.fromJSON( objA.toJSON() )
+		self.assertEqual(objA, objB)
+
+	def testSerializationConsistent_valOfNone(self):
+		""" ObjectIterPlotOption toJSON() and fromJSON() should give consistent results when the option value is None """
+		objA = self.testObjA
+		objA.value = None
+		objB = tCode.ObjectIterPlotOption.fromJSON( objA.toJSON() )
+		self.assertEqual(objA, objB)
+
+
+class TestTwoDimObjectIterPlotOption(unittest.TestCase):
+
+	def setUp(self):
+		self.name = "test-name"
+		listA = [ tCode.FloatIterPlotOption("nameA", [1.2,1.3]),
+		          tCode.FloatIterPlotOption("nameB", [4.5]) ]
+		listB = [ tCode.FloatIterPlotOption("nameC", [8,7]) ]
+		self.value = [ listA, listB ]
+		self.createTestObjs()
+
+	def createTestObjs(self):
+		self.testObjA = tCode.ObjectTwoDimIterPlotOption(self.name, self.value)
+		self.testObjB = copy.deepcopy(self.testObjA)
+
+	def testEqCmpEq(self):
+		""" Two equal ObjectTwoDimIterPlotOption plot options should compare equal """
+		self.assertEqual(self.testObjA, self.testObjB)
+
+	def testNonEqCmpNonEq_diffValObj(self):
+		""" Two ObjectTwoDimIterPlotOption should compare unequal if one contains a different-valued object """
+		self.testObjB.value[0][1].value[0] += 2
+		self.assertNotEqual(self.testObjA, self.testObjB)
+
+	def testSerializationConsistent(self):
+		""" ObjectTwoDimIterPlotOption toJSON() and fromJSON() should give consistent results """
+		objA = self.testObjA
+		objB = tCode.ObjectTwoDimIterPlotOption.fromJSON( objA.toJSON() )
+		self.assertEqual(objA, objB)
+
+	def testSerializationConsistent_valNone(self):
+		""" ObjectTwoDimIterPlotOption toJSON() and fromJSON() should give consistent results when value is None """
+		objA = self.testObjA
+		objA.value = None
+		objB = tCode.ObjectTwoDimIterPlotOption.fromJSON( objA.toJSON() )
 		self.assertEqual(objA, objB)
 
 

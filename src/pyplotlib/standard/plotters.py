@@ -7,6 +7,9 @@ from .private.split_axis_plotter_creator import SplitAxisPlotterCreator as Split
 
 from .private import shared_axis_plotter
 
+#Code for serialization
+from .serialization import writePlotterToFile, readPlotterFromFile
+
 
 
 #Define them like this to keep the file easier to read + plotters easy as possible to access

@@ -5,8 +5,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from ..core import plot_command as plotCommCoreHelp
+from ..core.serialization import register as serializationReg
+
 
 #Generic commands should work for all
+@serializationReg.registerForSerialization()
 class AddPlotterToOutput(plotCommCoreHelp.PlotCommand):
 	""" Adds the plotter instance to the output of createPlot()
 
@@ -21,6 +24,7 @@ class AddPlotterToOutput(plotCommCoreHelp.PlotCommand):
 #These are the multi-plotter class ones
 
 #Below ALL refer to single-plotter cases
+@serializationReg.registerForSerialization()
 class CreateFigureIfNoAxHandle(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -47,6 +51,7 @@ class CreateFigureIfNoAxHandle(plotCommCoreHelp.PlotCommand):
 
 
 #Will likely need to factor most out + inherit
+@serializationReg.registerForSerialization()
 class PlotDataAsLines(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -68,6 +73,7 @@ class PlotDataAsLines(plotCommCoreHelp.PlotCommand):
 
 		return
 
+@serializationReg.registerForSerialization()
 class SetAxisBorderInvisible(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -102,6 +108,7 @@ class SetAxisBorderInvisible(plotCommCoreHelp.PlotCommand):
 #		ax2.xaxis.tick_bottom()
 
 
+@serializationReg.registerForSerialization()
 class SetAxisColorX(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -125,7 +132,7 @@ class SetAxisColorX(plotCommCoreHelp.PlotCommand):
 			currAx.spines["bottom"].set_color(targVal)
 			currAx.spines["top"].set_color(targVal)
 
-
+@serializationReg.registerForSerialization()
 class SetAxisColorY(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -151,7 +158,7 @@ class SetAxisColorY(plotCommCoreHelp.PlotCommand):
 
 
 
-
+@serializationReg.registerForSerialization()
 class SetDataLabels(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -169,7 +176,7 @@ class SetDataLabels(plotCommCoreHelp.PlotCommand):
 			if dataLabel is not None:
 				lineHandle.set_label(dataLabel)
 
-
+@serializationReg.registerForSerialization()
 class SetLegendNumberColumns(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -185,6 +192,7 @@ class SetLegendNumberColumns(plotCommCoreHelp.PlotCommand):
 		plotterInstance._scratchSpace["legendKwargDict"]["ncol"] = targVal
 
 
+@serializationReg.registerForSerialization()
 class SetLegendLocStr(plotCommCoreHelp.PlotCommand):
 	
 	def __init__(self):
@@ -204,6 +212,7 @@ class SetLegendLocStr(plotCommCoreHelp.PlotCommand):
 
 
 #Note: This should generally be called AFTER SetLegendLocStr
+@serializationReg.registerForSerialization()
 class SetLegendFractPosStart(plotCommCoreHelp.PlotCommand):
 	
 	def __init__(self):
@@ -224,6 +233,7 @@ class SetLegendFractPosStart(plotCommCoreHelp.PlotCommand):
 			plotterInstance._scratchSpace["legendKwargDict"]["bbox_to_anchor"] = targVal
 
 
+@serializationReg.registerForSerialization()
 class SetLineColors(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -241,6 +251,7 @@ class SetLineColors(plotCommCoreHelp.PlotCommand):
 		for dataLine, color in zip(dataLines, colors):
 			dataLine.set_color(color)
 
+@serializationReg.registerForSerialization()
 class SetLineMarkerStyles(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -258,6 +269,7 @@ class SetLineMarkerStyles(plotCommCoreHelp.PlotCommand):
 		for dataLine, markerStyle in zip(dataLines, markerStyles):
 			dataLine.set_marker(markerStyle)
 
+@serializationReg.registerForSerialization()
 class SetLineStyles(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -275,6 +287,7 @@ class SetLineStyles(plotCommCoreHelp.PlotCommand):
 		for dataLine, lineStyle in zip(dataLines, lineStyles):
 			dataLine.set_linestyle(lineStyle)
 
+@serializationReg.registerForSerialization()
 class SetXLabelStr(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -288,6 +301,7 @@ class SetXLabelStr(plotCommCoreHelp.PlotCommand):
 			return None
 		plt.xlabel(targVal)
 
+@serializationReg.registerForSerialization()
 class SetXLabelFractPos(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -302,6 +316,7 @@ class SetXLabelFractPos(plotCommCoreHelp.PlotCommand):
 		plt.gca().xaxis.set_label_coords(targVal[0], targVal[1])
 
 
+@serializationReg.registerForSerialization()
 class SetXLimit(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -315,6 +330,7 @@ class SetXLimit(plotCommCoreHelp.PlotCommand):
 			return None
 		plt.xlim(targVal)
 
+@serializationReg.registerForSerialization()
 class SetYLimit(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -329,6 +345,7 @@ class SetYLimit(plotCommCoreHelp.PlotCommand):
 		plt.ylim(targVal)
 
 
+@serializationReg.registerForSerialization()
 class SetYLabelStr(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -342,6 +359,7 @@ class SetYLabelStr(plotCommCoreHelp.PlotCommand):
 			return None
 		plt.ylabel(targVal)
 
+@serializationReg.registerForSerialization()
 class SetYLabelFractPos(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -355,7 +373,7 @@ class SetYLabelFractPos(plotCommCoreHelp.PlotCommand):
 			return None
 		plt.gca().yaxis.set_label_coords(targVal[0], targVal[1])
 
-
+@serializationReg.registerForSerialization()
 class TurnLegendOnIfRequested(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):

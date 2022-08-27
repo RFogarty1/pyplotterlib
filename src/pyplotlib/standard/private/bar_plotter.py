@@ -4,15 +4,19 @@ import itertools as it
 import matplotlib.pyplot as plt
 import numpy as np
 
+from . import shared
+
 from ...core import plotters as plotterCoreHelp
 from ...core import plot_command as plotCommCoreHelp
 from ...core import plot_options as plotOptCoreHelp
 
+from ...core.serialization import register as serializationReg
+
 from .. import plot_options as plotOptStdHelp
 from .. import plot_commands as plotCmdStdHelp
 
-
-class BarPlotter(plotterCoreHelp.SingleGraphPlotter):
+@serializationReg.registerForSerialization()
+class BarPlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
 
 	def __init__(self, **kwargs):
 		""" Initializer
@@ -91,7 +95,7 @@ def _createOptionsList():
 
 
 #Options
-
+@serializationReg.registerForSerialization()
 class GroupLabels(plotOptCoreHelp.StringIterPlotOption):
 	"""String iter. Each is a label for a group of bars; if your only plotting one data series then this means 1 label per value input. 
 
@@ -102,7 +106,7 @@ class GroupLabels(plotOptCoreHelp.StringIterPlotOption):
 		self.name = "groupLabels"
 		self.value = value
 
-
+@serializationReg.registerForSerialization()
 class PlotHorizontally(plotOptCoreHelp.BooleanPlotOption):
 	""" Boolean. If False labels are on the x-axis and bars on the y-axis. If True, its the other way around.
 
@@ -111,7 +115,7 @@ class PlotHorizontally(plotOptCoreHelp.BooleanPlotOption):
 		self.name = "plotHorizontally"
 		self.value = value
 
-
+@serializationReg.registerForSerialization()
 class WidthBars(plotOptCoreHelp.FloatPlotOption):
 	""" Width value for each bar in the bar chart. The default is generally 1.0
 
@@ -120,6 +124,7 @@ class WidthBars(plotOptCoreHelp.FloatPlotOption):
 		self.name = "widthBars"
 		self.value = value
 
+@serializationReg.registerForSerialization()
 class WidthInterSpacing(plotOptCoreHelp.FloatPlotOption):
 	""" Space between data for different labels. E.g. if you had a plot of population by various years, this would be the space between a bar for year 1971 and year 1972. Default will generally be some multiple of bar width
 
@@ -128,6 +133,7 @@ class WidthInterSpacing(plotOptCoreHelp.FloatPlotOption):
 		self.name = "widthInterSpacing"
 		self.value = value
 
+@serializationReg.registerForSerialization()
 class WidthIntraSpacing(plotOptCoreHelp.FloatPlotOption):
 	""" Space between bars with the same label, but for different data series. The default is generally 0.
 
@@ -140,6 +146,7 @@ class WidthIntraSpacing(plotOptCoreHelp.FloatPlotOption):
 
 
 #Commands
+@serializationReg.registerForSerialization()
 class CalculateCentreVals(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -189,6 +196,7 @@ class CalculateCentreVals(plotCommCoreHelp.PlotCommand):
 
 
 #This will get A LOT more complicated later (when dealing with widths etc)
+@serializationReg.registerForSerialization()
 class PlotOneDimDataAsBars(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -230,7 +238,7 @@ class PlotOneDimDataAsBars(plotCommCoreHelp.PlotCommand):
 		plotterInstance._scratchSpace["barHandles"] = outBars
 		return
 
-
+@serializationReg.registerForSerialization()
 class SetBarDataLabels(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -251,7 +259,7 @@ class SetBarDataLabels(plotCommCoreHelp.PlotCommand):
 			if dataLabel is not None:
 				barHandle.set_label(dataLabel)
 
-
+@serializationReg.registerForSerialization()
 class SetTickValsToGroupCentres(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -270,6 +278,7 @@ class SetTickValsToGroupCentres(plotCommCoreHelp.PlotCommand):
 		else:
 			plt.gca().set_xticks(groupCentres)
 		
+@serializationReg.registerForSerialization()
 class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
