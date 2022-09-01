@@ -1,5 +1,6 @@
 
 import itertools as it
+import types
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,6 +51,7 @@ def _createCommandsList():
 	SetBarDataLabels(),
 	plotCmdStdHelp.SetXLabelStr(),
 	plotCmdStdHelp.SetYLabelStr(),
+	plotCmdStdHelp.SetTickLabelFontSize(),
 	plotCmdStdHelp.SetXLabelFractPos(),
 	plotCmdStdHelp.SetYLabelFractPos(),
 	plotCmdStdHelp.SetXLimit(),
@@ -57,7 +59,9 @@ def _createCommandsList():
 	plotCmdStdHelp.SetAxisColorX(), #Best if done after labels etc. set
 	plotCmdStdHelp.SetAxisColorY(),
 	plotCmdStdHelp.SetAxisBorderInvisible(),
+	plotCmdStdHelp.SetAxisTickAndLabelVisibilitiesEachSide(),
 	plotCmdStdHelp.SetLegendLocStr(),
+	plotCmdStdHelp.SetLegendFontSize(),
 	plotCmdStdHelp.SetLegendFractPosStart(),
 	plotCmdStdHelp.SetLegendNumberColumns(),
 	plotCmdStdHelp.TurnLegendOnIfRequested()
@@ -72,6 +76,7 @@ def _createOptionsList():
 	plotOptStdHelp.AxisColorY(),
 	plotOptStdHelp.AxisColorY_exclSpines(),
 	plotOptStdHelp.DataLabels(),
+	plotOptStdHelp.FontSizeDefault(),
 	GroupLabels(),
 	plotOptStdHelp.LegendFractPosStart(),
 	plotOptStdHelp.LegendLocStr(),
@@ -83,6 +88,7 @@ def _createOptionsList():
 	WidthInterSpacing(),
 	WidthIntraSpacing(value=0.0),
 	plotOptStdHelp.SetFigsizeOnCreation(),
+	plotOptStdHelp.ShowTicksAndLabelsOnSides( value=types.SimpleNamespace(top=None,bottom=None,left=None, right=None) ),
 	plotOptStdHelp.XLabelFractPos(),
 	plotOptStdHelp.XLabelStr(),
 	plotOptStdHelp.YLabelFractPos(),
@@ -185,6 +191,12 @@ class CalculateCentreVals(plotCommCoreHelp.PlotCommand):
 			currPos += widthInterSpacing
 
 		plotterInstance._scratchSpace["centres"] = outCentres
+
+
+		#TODO: If requested reverse the ordering of each
+		reverseIntraOrdering = False
+#		if reverseIntraOrdering:
+			#NOT sure... Seems to be grouped by data series???
 
 		#Figure out the centre of each GROUP
 		groupCentres = list()

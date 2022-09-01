@@ -157,6 +157,36 @@ class SetAxisColorY(plotCommCoreHelp.PlotCommand):
 			currAx.spines["right"].set_color(targVal)
 
 
+@serializationReg.registerForSerialization()
+class SetAxisTickAndLabelVisibilitiesEachSide(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetAxisTickAndLabelVisiblityEachSide"
+		self._description = "Sets which sides of the plot to show/hide tick markers and labels"
+		self._optName = "showTicksAndLabelsOnSides"
+
+	def execute(self, plotterInstance):
+		#
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+		
+		#
+		useDict = {}
+		attrs = ["bottom", "top", "left", "right"]
+		for attr in attrs:
+			currVal = getattr(targVal, attr)
+			currLabelOpt, currTickOpt = "label" + attr, attr
+			if currVal is True:
+				useDict[currLabelOpt], useDict[currTickOpt] = True, True
+			elif currVal is False:
+				useDict[currLabelOpt], useDict[currTickOpt] = False, False
+			else:
+				pass #To catch None. Though will also catch other values
+
+		plt.gca().tick_params(**useDict)
+
+
 
 @serializationReg.registerForSerialization()
 class SetDataLabels(plotCommCoreHelp.PlotCommand):
@@ -175,6 +205,23 @@ class SetDataLabels(plotCommCoreHelp.PlotCommand):
 		for lineHandle, dataLabel in zip(plottedLineHandles, targVal):
 			if dataLabel is not None:
 				lineHandle.set_label(dataLabel)
+
+
+@serializationReg.registerForSerialization()
+class SetLegendFontSize(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setLegendFontSize"
+		self._description = "Sets the font size to use in the legend"
+
+	def execute(self, plotterInstance):
+		defFont = _getDefaultFontSizeFromPlotter(plotterInstance)
+		useFont = defFont #No more specific way to overide yet
+		if useFont is None:
+			return None
+
+		plotterInstance._scratchSpace["legendKwargDict"]["fontsize"] = useFont
+
 
 @serializationReg.registerForSerialization()
 class SetLegendNumberColumns(plotCommCoreHelp.PlotCommand):
@@ -252,6 +299,31 @@ class SetLineColors(plotCommCoreHelp.PlotCommand):
 			dataLine.set_color(color)
 
 @serializationReg.registerForSerialization()
+class SetLineMarkerSizes(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setLineMarkerSizes"
+		self._description = "Sets the sizes for line markers"
+		self._optName = "lineMarkerSizes"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		dataLines = plt.gca().get_lines()
+		try:
+			iter(targVal)
+		except TypeError:
+			useVal = it.cycle([targVal])
+		else:
+			useVal = it.cycle(targVal)
+
+		for dataLine, markerSize in zip(dataLines, useVal):
+			dataLine.set_markersize(markerSize)
+
+
+@serializationReg.registerForSerialization()
 class SetLineMarkerStyles(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -288,6 +360,41 @@ class SetLineStyles(plotCommCoreHelp.PlotCommand):
 			dataLine.set_linestyle(lineStyle)
 
 @serializationReg.registerForSerialization()
+class SetTitleStr(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setTitleString"
+		self._description = "Sets the axis title string"
+		self._optName = "titleStr"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		defFontSize = _getDefaultFontSizeFromPlotter(plotterInstance)
+
+		plt.title(targVal,fontsize=defFontSize)
+
+
+@serializationReg.registerForSerialization()
+class SetTickLabelFontSize(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setTickLabelFontSize"
+		self._description = "Sets the size of the font for axis tick labels"
+		self._optName = "setTickLabelFontSize"
+
+	def execute(self, plotterInstance):
+		defVal = _getDefaultFontSizeFromPlotter(plotterInstance)
+		if defVal is None:
+			return None
+
+		plt.gca().xaxis.set_tick_params(labelsize=defVal)
+		plt.gca().yaxis.set_tick_params(labelsize=defVal)
+
+
+@serializationReg.registerForSerialization()
 class SetXLabelStr(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -299,7 +406,9 @@ class SetXLabelStr(plotCommCoreHelp.PlotCommand):
 		targVal = getattr(plotterInstance.opts, self._optName).value
 		if targVal is None:
 			return None
-		plt.xlabel(targVal)
+
+		defFontSize = _getDefaultFontSizeFromPlotter(plotterInstance)
+		plt.xlabel(targVal, fontsize=defFontSize)
 
 @serializationReg.registerForSerialization()
 class SetXLabelFractPos(plotCommCoreHelp.PlotCommand):
@@ -357,7 +466,10 @@ class SetYLabelStr(plotCommCoreHelp.PlotCommand):
 		targVal = getattr(plotterInstance.opts, self._optName).value
 		if targVal is None:
 			return None
-		plt.ylabel(targVal)
+
+		defFontSize = _getDefaultFontSizeFromPlotter(plotterInstance)
+		plt.ylabel(targVal, fontsize=defFontSize)
+
 
 @serializationReg.registerForSerialization()
 class SetYLabelFractPos(plotCommCoreHelp.PlotCommand):
@@ -391,5 +503,14 @@ class TurnLegendOnIfRequested(plotCommCoreHelp.PlotCommand):
 		if targVal is True:
 			plt.legend(**legendKwargDict)
 
+
+
+#Some shared helper functions
+def _getDefaultFontSizeFromPlotter(plotterInstance):
+	try:
+		outVal = getattr(plotterInstance.opts, "fontSizeDefault").value
+	except AttributeError:
+		outVal = None
+	return outVal
 
 

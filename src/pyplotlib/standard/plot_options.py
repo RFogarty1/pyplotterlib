@@ -70,6 +70,16 @@ class DataLabels(plotOptCore.StringIterPlotOption):
 		self.name = "dataLabels" if name is None else name
 		self.value = value
 
+@serializationReg.registerForSerialization()
+class FontSizeDefault(plotOptCore.IntPlotOption):
+	""" The default font size to use for a figure. None will fall back on matplotlib value.
+
+	Valid values are integers (e.g. 10-ish is standard)
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "fontSizeDefault" if name is None else name
+		self.value = value
 
 @serializationReg.registerForSerialization()
 class LegendLocStr(plotOptCore.StringPlotOption):
@@ -125,6 +135,18 @@ class LineColors(plotOptCore.StringIterPlotOption):
 	def __init__(self, name=None, value=None):
 		self.name = "lineColors"
 		self.value = value
+
+@serializationReg.registerForSerialization()
+class LineMarkerSizes(plotOptCore.FloatIterOrSingleFloatOption):
+	""" The sizes of line marker sizes. Valid values are either a single number or a list of numbers.
+
+	e.g. 20 will set all markers to a size of 20; [10,15] will set the first data series size to 10, and the second to 15
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "lineMarkerSizes"
+		self.value = value
+
 
 @serializationReg.registerForSerialization()
 class LineMarkerStyles(plotOptCore.StringIterPlotOption):
@@ -197,6 +219,54 @@ class SetFigsizeOnCreation(plotOptCore.FloatIterPlotOption):
 	"""
 	def __init__(self, name=None, value=None):
 		self.name = "figSizeOnCreation"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ShowTicksAndLabelsOnSides(plotOptCore.BoolNamespaceOption):
+	""" Controls which sides of the plot relevant ticks and labels are displayed. The value is a namespace with "top", "bottom", "left", "right" as the keys and True/False as valid values.
+
+	Setting a key to True will make the tick-markers and labels appear on that side, False will make neither appear.
+
+	Note: More specific options SHOULD overwrite this one (e.g. ShowTicksOnSides)
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "showTicksAndLabelsOnSides"
+		self.value = value
+
+
+@serializationReg.registerForSerialization()
+class ShowTicksOnSides(plotOptCore.BoolNamespaceOption):
+	""" Controls which sides of the plot relevant tick markers are displayed. The value is a namespace with "top", "bottom", "left", "right" as the keys and True/False as valid values.
+
+	Setting a key to True will make the tick-markers appear on that side, False will make them not appear. Setting a key to None will fallback on matplotlibs default behavior
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "showTicksOnSides"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ShowTickLabelsOnSides(plotOptCore.BoolNamespaceOption):
+	""" Controls which sides of the plot relevant tick labels are displayed. The value is a namespace with "top", "bottom", "left", "right" as the keys and True/False as valid values.
+
+	Setting a key to True will make the tick-labels appear on that side, False will make them not appear.
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "showTickLabelsOnSides"
+		self.value = value
+
+
+
+
+@serializationReg.registerForSerialization()
+class TitleStr(plotOptCore.StringPlotOption):
+	""" The string to use for the plot title (None means dont have a title)
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "titleStr"
 		self.value = value
 
 

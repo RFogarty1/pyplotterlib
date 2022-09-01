@@ -1,5 +1,7 @@
 
 
+import types
+
 from . import shared
 
 from ...core import plotters as plotterCoreHelp
@@ -41,10 +43,13 @@ def _createCommandsList():
 	plotCmdStdHelp.PlotDataAsLines(),
 	plotCmdStdHelp.SetDataLabels(),
 	plotCmdStdHelp.SetLineColors(),
+	plotCmdStdHelp.SetLineMarkerSizes(),
 	plotCmdStdHelp.SetLineMarkerStyles(),
 	plotCmdStdHelp.SetLineStyles(),
 	plotCmdStdHelp.SetXLabelStr(),
 	plotCmdStdHelp.SetYLabelStr(),
+	plotCmdStdHelp.SetTickLabelFontSize(),
+	plotCmdStdHelp.SetAxisTickAndLabelVisibilitiesEachSide(),
 	plotCmdStdHelp.SetXLabelFractPos(),
 	plotCmdStdHelp.SetYLabelFractPos(),
 	plotCmdStdHelp.SetXLimit(),
@@ -52,7 +57,9 @@ def _createCommandsList():
 	plotCmdStdHelp.SetAxisColorX(), #Best if done after labels etc. set
 	plotCmdStdHelp.SetAxisColorY(),
 	plotCmdStdHelp.SetAxisBorderInvisible(),
+	plotCmdStdHelp.SetTitleStr(),
 	plotCmdStdHelp.SetLegendLocStr(),
+	plotCmdStdHelp.SetLegendFontSize(),
 	plotCmdStdHelp.SetLegendFractPosStart(),
 	plotCmdStdHelp.SetLegendNumberColumns(),
 	plotCmdStdHelp.TurnLegendOnIfRequested()
@@ -69,15 +76,19 @@ def _createOptionsList():
 	plotOptStdHelp.AxisColorY(),
 	plotOptStdHelp.AxisColorY_exclSpines(),
 	plotOptStdHelp.DataLabels(),
+	plotOptStdHelp.FontSizeDefault(),
 	plotOptStdHelp.LegendFractPosStart(),
 	plotOptStdHelp.LegendLocStr(),
 	plotOptStdHelp.LegendNumbCols(),
 	plotOptStdHelp.LegendOn(),
 	plotOptStdHelp.LineColors(),
+	plotOptStdHelp.LineMarkerSizes(),
 	plotOptStdHelp.LineMarkerStyles(),
 	plotOptStdHelp.LineStyles(),
 	plotOptStdHelp.PlotData2D(),
 	plotOptStdHelp.SetFigsizeOnCreation(),
+	plotOptStdHelp.ShowTicksAndLabelsOnSides( value=types.SimpleNamespace(top=None,bottom=None,left=None, right=None) ),
+	plotOptStdHelp.TitleStr(),
 	plotOptStdHelp.XLabelFractPos(),
 	plotOptStdHelp.XLabelStr(),
 	plotOptStdHelp.YLabelFractPos(),

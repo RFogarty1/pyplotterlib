@@ -24,7 +24,7 @@ class RegisterClassDecorator():
 			def decoFunct(inpVal):
 				registerKey = str(inpVal)
 				if self.overwrite is False:
-					assert registerKey not in self.register.keys()
+					assert registerKey not in self.register.keys(), "Duplicate keys found for {}".format(registerKey)
 				if self.forceKeysToCase:
 					registerKey = self._getFormattedKey(registerKey)
 

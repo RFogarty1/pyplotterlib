@@ -223,6 +223,12 @@ def _areTwoFloatItersEqual(iterA, iterB):
 class FloatIterOrSingleFloatOption(SinglePlotOptionInter):
 
 	def __eq__(self, other):
+		#First check for None conditions
+		if (self.value is None) and (other.value is None):
+			return True
+		elif (self.value is None) or (other.value is None):
+			return False
+
 		#Figure out if vals iterable
 		aIsIter = _isIter(self.value)
 		bIsIter = _isIter(other.value)

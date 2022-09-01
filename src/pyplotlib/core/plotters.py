@@ -81,7 +81,6 @@ class PlotterInter(jsonTransHelp.JSONTransformInterface):
 			if len(currAttrKeys)==1:
 				setattr(currObj, "value", optVals[key])
 			else:
-				pass
 				currObj = getattr(currObj, "value")
 				for idx,attrSubKey in enumerate(currAttrKeys[1:],start=1):
 					if idx==len(currAttrKeys)-1:
@@ -93,6 +92,10 @@ class PlotterInter(jsonTransHelp.JSONTransformInterface):
 	@property
 	def opts(self):
 		return self._options.opts
+
+	@property
+	def optionNames(self):
+		return self._options.names
 
 	@property
 	def commands(self):
