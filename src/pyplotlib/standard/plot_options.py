@@ -247,6 +247,24 @@ class ShowTicksOnSides(plotOptCore.BoolNamespaceOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class ShowMinorTickMarkersX(plotOptCore.BooleanPlotOption):
+	""" Controls whether minor tick markers are shown for the x-axis
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "showMinorTickMarkersX"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ShowMinorTickMarkersY(plotOptCore.BooleanPlotOption):
+	""" Controls whether minor tick markers are shown for the y-axis
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "showMinorTickMarkersY"
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class ShowTickLabelsOnSides(plotOptCore.BoolNamespaceOption):
 	""" Controls which sides of the plot relevant tick labels are displayed. The value is a namespace with "top", "bottom", "left", "right" as the keys and True/False as valid values.
 

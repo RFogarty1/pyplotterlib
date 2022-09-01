@@ -1,6 +1,8 @@
 
 import itertools as it
+import matplotlib.ticker
 import matplotlib.pyplot as plt
+
 
 import numpy as np
 
@@ -185,7 +187,7 @@ class SetAxisTickAndLabelVisibilitiesEachSide(plotCommCoreHelp.PlotCommand):
 				pass #To catch None. Though will also catch other values
 
 		plt.gca().tick_params(**useDict)
-
+		plt.gca().tick_params(which="minor",**useDict)
 
 
 @serializationReg.registerForSerialization()
@@ -407,8 +409,6 @@ class SetTickLabelValues(plotCommCoreHelp.PlotCommand):
 		xLabelVals = _getValueFromOptName(plotterInstance, self._optNameX)
 		yLabelVals = _getValueFromOptName(plotterInstance, self._optNameY)
 
-		print("xLabelVals = {}".format(xLabelVals))
-
 		if xLabelVals is not None:
 			plt.gca().set_xticklabels(xLabelVals)
 			
@@ -433,6 +433,31 @@ class SetTickMarkerValues(plotCommCoreHelp.PlotCommand):
 
 		if yTickVals is not None:
 			plt.gca().set_yticks(yTickVals)
+
+@serializationReg.registerForSerialization()
+class SetTickMinorMarkersOn(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setTickMinorMarkersOn"
+		self._description = "Optionally turns the minor tick markers on/off"
+		self._optNameX = "showMinorTickMarkersX"
+		self._optNameY = "showMinorTickMarkersY"
+
+	def execute(self, plotterInstance):
+		showMinorTicksX = _getValueFromOptName(plotterInstance, self._optNameX)
+		showMinorTicksY = _getValueFromOptName(plotterInstance, self._optNameY)
+
+		if showMinorTicksX is not None:
+			if showMinorTicksX is False:
+				plt.gca().xaxis.set_minor_locator( matplotlib.ticker.AutoMinorLocator(n=1) )
+			elif showMinorTicksX is True:
+				plt.gca().xaxis.set_minor_locator( matplotlib.ticker.AutoMinorLocator()   )
+
+		if showMinorTicksY is not None:
+			if showMinorTicksY is False:
+				plt.gca().yaxis.grid(visible=False, which="minor")
+			elif showMinorTicksY is True:
+				plt.gca().yaxis.set_minor_locator( matplotlib.ticker.AutoMinorLocator()   )
 
 
 @serializationReg.registerForSerialization()
