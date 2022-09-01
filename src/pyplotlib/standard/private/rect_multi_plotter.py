@@ -1,5 +1,7 @@
 
 import itertools as it
+import string
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -42,7 +44,8 @@ def _createCommandList():
 	CreateRectGridAndAxes(),
 	SetHeightBasedOnNumberRows(),
 	SetWidthBasedOnNumberCols(),
-	PopulateAxesWithPlotters()
+	PopulateAxesWithPlotters(),
+	AddStringLabelAnnotations()
 
 	]
 	return outList
@@ -50,6 +53,10 @@ def _createCommandList():
 def _createOptionsList():
 	outList = [
 
+	AnnotateLabelFontSize(),
+	AnnotateLabelPosFract(),
+	AnnotateLabelStrings(),
+	AnnotateLabelStringsBoldedLowerAlphabetDefault(),
 	ConstrainedLayout(),
 	FillColsToMatchPlotters(),
 	FillPlottersToMatchGrid(),
@@ -68,6 +75,53 @@ def _createOptionsList():
 
 
 #Options
+@serializationReg.registerForSerialization()
+class AnnotateLabelFontSize(plotOptCoreHelp.IntOrIntIterPlotOption):
+	""" The font sizes to use for annotation labels
+
+	Example A: value=None; Will fall back on matplotlib defaults for font sizes
+	Example B: value=12; Will set all annotation label font sizes to 12
+	Example C: value = [10,12]; Will alternatingly set label font sizes to 10 and 12
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "annotateLabelFontSize"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class AnnotateLabelPosFract(plotOptCoreHelp.IterOfFloatIterPlotOption):
+	""" The positions of annotation labels, expressed as fractional values for each subplot.
+
+	Example A: [ [0.4,0.3] ] would put each annotation 40% along each x-axis and 30% along each y-axis
+	Example B: [ [0.1,0.2], [0.1,0.3] ] would put 1st/3rd/5th etc. 10%/20% along x/y. It would then put 2nd/4th/6th at 10%/30% along x/y.
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "annotateLabelPosFract"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class AnnotateLabelStrings(plotOptCoreHelp.StringIterPlotOption):
+	""" The strings to use as annotation labels. Setting a value of None for one entry will skip a plotter
+
+	Example A: ["a)",None,"b)"] means 1st/3rd plotters have labels a) and b). 2nd has no annotation label 
+	Example B: [r"$\bf{a)}$", r"$\bf{b)}$"] will have labels a) and b) but in bold
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "annotateLabelStrings"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class AnnotateLabelStringsBoldedLowerAlphabetDefault(plotOptCoreHelp.BooleanPlotOption):
+	""" If True, annotateLabelStrings option will automatically be set to use bolded lowercase letters for each plot. [i.e. bolded a) b) c) d) etc.]
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "annotateLabelStrings_useBoldedLowerAlphabetByDefault"
+		self.value = value
+
+
 @serializationReg.registerForSerialization()
 class ConstrainedLayout(plotOptCoreHelp.BooleanPlotOption):
 	""" Option for whether to use matplotlibs "constrained_layout" when creating the grid. This helps stop subplots overlapping; though is "experimental" at time of writing so may be removed (though seems unlikely)
@@ -170,6 +224,67 @@ class RelGridWidths(plotOptCoreHelp.IntIterPlotOption):
 
 
 #Commands
+@serializationReg.registerForSerialization()
+class AddStringLabelAnnotations(plotCmdCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "add-string-label-annotations"
+		self._description = "Add string-label annotations to each subplot (e.g. to label a,b,c)"
+		self._userStrOptName = "annotateLabelStrings"
+		self._userPosFractName = "annotateLabelPosFract"
+		self._userFontOptName = "annotateLabelFontSize"
+
+	def execute(self, plotterInstance):
+		#Get default values
+		useBoldedLowerAsDefault = plotCmdStdHelp._getValueFromOptName(plotterInstance, "annotateLabelStrings_useBoldedLowerAlphabetByDefault")
+		defStrs = self._getDefaultLowerCaseBolded() if useBoldedLowerAsDefault else None
+
+		#get user values
+		userStrs = plotCmdStdHelp._getValueFromOptName(plotterInstance, self._userStrOptName)
+
+		#figure out what to use based on user/def values 
+		useStrs = userStrs if userStrs is not None else defStrs
+		if useStrs is None:
+			return None
+
+		#Create the annotations
+		cycledPositions = self._getAnnotationPositions(plotterInstance)
+		axes = plotterInstance._scratchSpace["ax_handles"]
+		fontSizes = self._getFontSizes(plotterInstance)
+
+		for idx, (ax, inpStr, inpPos, fntSize) in enumerate( zip(axes,useStrs, cycledPositions, fontSizes) ):
+			currXLim, currYLim = ax.get_xlim(), ax.get_ylim()
+			xRange, yRange = currXLim[1]-currXLim[0], currYLim[1]-currYLim[0]
+			absPos = [ currXLim[0] + (xRange*inpPos[0]), currYLim[0] + (yRange*inpPos[1]) ]
+			ax.annotate(inpStr, absPos, fontsize=fntSize)
+
+	def _getAnnotationPositions(self, plotterInstance):
+		defaultPositions = it.cycle([[0.1,0.9]])
+		userPositions = plotCmdStdHelp._getValueFromOptName(plotterInstance, self._userPosFractName)
+		outVal = it.cycle(userPositions) if userPositions is not None else defaultPositions
+		return outVal
+
+	def _getDefaultLowerCaseBolded(self):
+		lowerCase = [x for x in string.ascii_lowercase]
+		output = [r"$\bf{" + x + r")}$" for x in lowerCase]
+		return output
+
+	def _getFontSizes(self, plotterInstance):
+		usrFontSize = plotCmdStdHelp._getValueFromOptName(plotterInstance, self._userFontOptName)
+
+		if usrFontSize is not None:
+			try:
+				iter(usrFontSize)
+			except TypeError:
+				outFont = it.cycle([usrFontSize])
+			else:
+				outFont = it.cycle(usrFontSize)
+		else:
+			outFont = it.cycle([None])
+
+		return outFont
+
+
 @serializationReg.registerForSerialization()
 class CreateEmptyFigureIfNeeded(plotCmdCoreHelp.PlotCommand):
 
