@@ -136,6 +136,10 @@ class IntPlotOption(SinglePlotOptionInter):
 class IntIterPlotOption(SinglePlotOptionInter):
 	pass
 
+@regHelp.registerForSerialization()
+class IntOrIntIterPlotOption(SinglePlotOptionInter):
+	pass
+
 
 @regHelp.registerForSerialization()
 class JsonTransObjPlotOption(SinglePlotOptionInter):

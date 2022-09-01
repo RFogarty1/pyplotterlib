@@ -395,6 +395,47 @@ class SetTickLabelFontSize(plotCommCoreHelp.PlotCommand):
 
 
 @serializationReg.registerForSerialization()
+class SetTickLabelValues(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "SetTickLabelValues"
+		self._description = "Sets the values for the tick labels on x/y axes"
+		self._optNameX = "tickMarkerLabelsX"
+		self._optNameY = "tickMarkerLabelsY"
+
+	def execute(self, plotterInstance):
+		xLabelVals = _getValueFromOptName(plotterInstance, self._optNameX)
+		yLabelVals = _getValueFromOptName(plotterInstance, self._optNameY)
+
+		print("xLabelVals = {}".format(xLabelVals))
+
+		if xLabelVals is not None:
+			plt.gca().set_xticklabels(xLabelVals)
+			
+		if yLabelVals is not None:
+			plt.gca().set_yticklabels(yLabelVals)
+
+@serializationReg.registerForSerialization()
+class SetTickMarkerValues(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setTickMarkerValues"
+		self._description = "Sets the values for the (major) tick marker positions on x/y axes"
+		self._optNameX = "tickMarkerValsX"
+		self._optNameY = "tickMarkerValsY"
+
+	def execute(self, plotterInstance):
+		xTickVals = _getValueFromOptName(plotterInstance, self._optNameX)
+		yTickVals = _getValueFromOptName(plotterInstance, self._optNameY)
+
+		if xTickVals is not None:
+			plt.gca().set_xticks(xTickVals)
+
+		if yTickVals is not None:
+			plt.gca().set_yticks(yTickVals)
+
+
+@serializationReg.registerForSerialization()
 class SetXLabelStr(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -509,6 +550,14 @@ class TurnLegendOnIfRequested(plotCommCoreHelp.PlotCommand):
 def _getDefaultFontSizeFromPlotter(plotterInstance):
 	try:
 		outVal = getattr(plotterInstance.opts, "fontSizeDefault").value
+	except AttributeError:
+		outVal = None
+	return outVal
+
+
+def _getValueFromOptName(plotterInstance, optName):
+	try:
+		outVal = getattr(plotterInstance.opts, optName).value
 	except AttributeError:
 		outVal = None
 	return outVal

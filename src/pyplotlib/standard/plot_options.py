@@ -257,7 +257,45 @@ class ShowTickLabelsOnSides(plotOptCore.BoolNamespaceOption):
 		self.name = "showTickLabelsOnSides"
 		self.value = value
 
+@serializationReg.registerForSerialization()
+class TickMarkerLabelsX(plotOptCore.StringIterPlotOption):
+	""" Labels to apply to x-axis tick markers (e.g. ["Sept", "Oct", "Nov", "Dec"])
 
+	NOTE: TickMarkerValsX should generally be set when doing this
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "tickMarkerLabelsX"
+		self.value = None
+
+@serializationReg.registerForSerialization()
+class TickMarkerLabelsY(plotOptCore.StringIterPlotOption):
+	""" Labels to apply to y-axis tick markers (e.g. ["Sept", "Oct", "Nov", "Dec"])
+
+		NOTE: TickMarkerValsY should also be set when doing this
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "tickMarkerLabelsY"
+		self.value = None
+
+@serializationReg.registerForSerialization()
+class TickMarkerValsX(plotOptCore.FloatIterPlotOption):
+	""" Positions at which to place the x-axis tick markers
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "tickMarkerValsX"
+		self.value = None
+
+@serializationReg.registerForSerialization()
+class TickMarkerValsY(plotOptCore.FloatIterPlotOption):
+	""" Positions at which to place the y-axis tick markers
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "tickMarkerValsY"
+		self.value = None
 
 
 @serializationReg.registerForSerialization()
