@@ -251,12 +251,25 @@ class AddStringLabelAnnotations(plotCmdCoreHelp.PlotCommand):
 		cycledPositions = self._getAnnotationPositions(plotterInstance)
 		axes = plotterInstance._scratchSpace["ax_handles"]
 		fontSizes = self._getFontSizes(plotterInstance)
+		figHandle = plt.gcf()
 
+		#Here we use figure level annotations (though may change in future)
 		for idx, (ax, inpStr, inpPos, fntSize) in enumerate( zip(axes,useStrs, cycledPositions, fontSizes) ):
-			currXLim, currYLim = ax.get_xlim(), ax.get_ylim()
-			xRange, yRange = currXLim[1]-currXLim[0], currYLim[1]-currYLim[0]
-			absPos = [ currXLim[0] + (xRange*inpPos[0]), currYLim[0] + (yRange*inpPos[1]) ]
-			ax.annotate(inpStr, absPos, fontsize=fntSize)
+			startX, startY, lenX, lenY = axes[idx].get_position().bounds
+			useX = startX + (lenX*inpPos[0])	
+			useY = startY + (lenY*inpPos[1])
+			usePos = [useX,useY]
+
+			currAnnotation = plt.annotate(inpStr, usePos, xytext=usePos, fontsize=fntSize,
+			                              textcoords="figure fraction", xycoords="figure fraction")
+			plt.gcf().texts.append(currAnnotation)
+
+		#Old code which used axis-level annotations + didnt work for split axis plotters
+#		for idx, (ax, inpStr, inpPos, fntSize) in enumerate( zip(axes,useStrs, cycledPositions, fontSizes) ):
+#			currXLim, currYLim = ax.get_xlim(), ax.get_ylim()
+#			xRange, yRange = currXLim[1]-currXLim[0], currYLim[1]-currYLim[0]
+#			absPos = [ currXLim[0] + (xRange*inpPos[0]), currYLim[0] + (yRange*inpPos[1]) ]
+#			ax.annotate(inpStr, absPos, fontsize=fntSize)
 
 	def _getAnnotationPositions(self, plotterInstance):
 		defaultPositions = it.cycle([[0.1,0.9]])
@@ -283,6 +296,22 @@ class AddStringLabelAnnotations(plotCmdCoreHelp.PlotCommand):
 			outFont = it.cycle([None])
 
 		return outFont
+
+	def _getVisibleAxis(self, plotterInstance):
+		axes = plotterInstance._scratchSpace["ax_handles"]
+		useAxis = None
+
+		#1) Try to find a visible primary axis
+		for rIdx, unused in enumerate(axes):
+			if axes[rIdx].get_visible():
+				useAxis = axes[rIdx]
+
+		#2) Else, assume we're dealing with a split axis plotter + look for the secondary axes
+		if useAxis is None:
+			raise NotImplementedError("")
+#			axGrid = plotterInstance
+
+		return useAxis
 
 
 @serializationReg.registerForSerialization()
