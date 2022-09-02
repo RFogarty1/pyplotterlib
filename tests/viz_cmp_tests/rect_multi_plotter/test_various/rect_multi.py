@@ -11,7 +11,8 @@ def main():
 	currKwargs = { "plotters":singlePlotters, "relGridWidths":[2,1,1,1],
 	               "relGridHeights":[1,2,1,1], "nColsGrid":3,
 	               "nRowsGrid":2, "fillRowsToMatchPlotters":True,
-	               "constrainedLayout":True }
+	               "constrainedLayout":True,
+	               "spacingVert":0.4, "spacingHoz":0.2 }
 	outPlotter = plotters.RectMultiPlotter(**currKwargs)
 
 	#Save plot

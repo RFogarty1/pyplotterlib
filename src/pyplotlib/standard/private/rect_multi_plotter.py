@@ -68,7 +68,9 @@ def _createOptionsList():
 	plotOptStdHelp.PlotterIter(),
 	RelGridHeights(),
 	RelGridWidths(),
-	plotOptStdHelp.SetFigsizeOnCreation()
+	plotOptStdHelp.SetFigsizeOnCreation(),
+	SpacingHoz(),
+	SpacingVert()
 
 	]
 	return outList
@@ -219,9 +221,27 @@ class RelGridWidths(plotOptCoreHelp.IntIterPlotOption):
 		self.value = value
 
 
+@serializationReg.registerForSerialization()
+class SpacingHoz(plotOptCoreHelp.FloatPlotOption):
+	""" Fractional value that controls horizontal spacing between plots. Corresponds to "wspace" in matplotlib. The value is relative to the width of the average plot.
 
+	Typical values are around 0.1
 
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "spacingHoz" if name is None else name
+		self.value = value
 
+@serializationReg.registerForSerialization()
+class SpacingVert(plotOptCoreHelp.FloatPlotOption):
+	""" Fractional value that controls vertical spacing between plots. Corresponds to "hspace" in matplotlib. The value if relative to the height of the average plot
+
+	Typical values are around 0.1
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "spacingVert" if name is None else name
+		self.value = value
 
 #Commands
 @serializationReg.registerForSerialization()
@@ -387,6 +407,7 @@ class CreateRectGridAndAxes(plotCmdCoreHelp.PlotCommand):
 		self._nRowsAttr, self._nColsAttr = "nRowsGrid", "nColsGrid"
 		self._relHeightAttr, self._relWidthAttr = "relGridHeights", "relGridWidths"
 		self._plottersAttr = "plotters"
+		self._hozSpaceAttr, self._vertSpaceAttr = "spacingHoz", "spacingVert"
 
 	def execute(self, plotterInstance):
 		#Check if work has already been done; if so quit
@@ -423,7 +444,9 @@ class CreateRectGridAndAxes(plotCmdCoreHelp.PlotCommand):
 		#Create the axes for each plotter
 		outAxes = list()
 #		outFig = plt.figure()
-		gridSpec = outFig.add_gridspec(nRows, nCols)
+		hozSpace = plotCmdStdHelp._getValueFromOptName(plotterInstance, self._hozSpaceAttr)
+		vertSpace = plotCmdStdHelp._getValueFromOptName(plotterInstance, self._vertSpaceAttr)
+		gridSpec = outFig.add_gridspec(nRows, nCols, wspace=hozSpace, hspace=vertSpace)
 
 		currRow, currCol = 0, 0
 		for idx, unused in enumerate(allPlotters):
