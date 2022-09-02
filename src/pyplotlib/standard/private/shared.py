@@ -17,3 +17,11 @@ class FromJsonMixin():
 		return outObj
 
 
+
+def _getAxisEdges(inpAx):
+	startX, startY, xLength, yLength = inpAx.get_position().bounds
+	endX, endY = startX+xLength, startY+yLength
+	return startX, startY, endX, endY
+
+
+

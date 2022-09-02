@@ -251,25 +251,29 @@ class AddStringLabelAnnotations(plotCmdCoreHelp.PlotCommand):
 		cycledPositions = self._getAnnotationPositions(plotterInstance)
 		axes = plotterInstance._scratchSpace["ax_handles"]
 		fontSizes = self._getFontSizes(plotterInstance)
-		figHandle = plt.gcf()
 
-		#Here we use figure level annotations (though may change in future)
+		#
 		for idx, (ax, inpStr, inpPos, fntSize) in enumerate( zip(axes,useStrs, cycledPositions, fontSizes) ):
-			startX, startY, lenX, lenY = axes[idx].get_position().bounds
-			useX = startX + (lenX*inpPos[0])	
-			useY = startY + (lenY*inpPos[1])
-			usePos = [useX,useY]
+			if ax.get_visible():
+				currXLim, currYLim = ax.get_xlim(), ax.get_ylim()
+				xRange, yRange = currXLim[1]-currXLim[0], currYLim[1]-currYLim[0]
+				absPos = [ currXLim[0] + (xRange*inpPos[0]), currYLim[0] + (yRange*inpPos[1]) ]
+				annotation = ax.annotate(inpStr, absPos, fontsize=fntSize)
+			else:
+				self._addAnnotationForSplitAxis(plotterInstance, idx, inpStr, inpPos, fntSize)
 
-			currAnnotation = plt.annotate(inpStr, usePos, xytext=usePos, fontsize=fntSize,
-			                              textcoords="figure fraction", xycoords="figure fraction")
-			plt.gcf().texts.append(currAnnotation)
 
-		#Old code which used axis-level annotations + didnt work for split axis plotters
-#		for idx, (ax, inpStr, inpPos, fntSize) in enumerate( zip(axes,useStrs, cycledPositions, fontSizes) ):
-#			currXLim, currYLim = ax.get_xlim(), ax.get_ylim()
-#			xRange, yRange = currXLim[1]-currXLim[0], currYLim[1]-currYLim[0]
-#			absPos = [ currXLim[0] + (xRange*inpPos[0]), currYLim[0] + (yRange*inpPos[1]) ]
-#			ax.annotate(inpStr, absPos, fontsize=fntSize)
+			#Take the annotation from the axis and put it on the figure level [FAILS]
+			#https://stackoverflow.com/questions/13831824/how-to-prevent-a-matplotlib-annotation-being-clipped-by-other-axes
+#			ax.figure.texts.append(ax.texts.pop())
+#			annotation.set_visible(True)
+#			annotation.set_zorder(500)
+
+#			ax.figure.texts.append(copy.deepcopy(annotation))
+#			ax.texts[-1].set_visible(False)
+#			annotation.set_visible(False)
+
+
 
 	def _getAnnotationPositions(self, plotterInstance):
 		defaultPositions = it.cycle([[0.1,0.9]])
@@ -296,6 +300,30 @@ class AddStringLabelAnnotations(plotCmdCoreHelp.PlotCommand):
 			outFont = it.cycle([None])
 
 		return outFont
+
+
+	def _addAnnotationForSplitAxis(self, plotterInstance, idx, inpStr, inpPos, fntSize):
+		#Get the relevant axes
+		currOutput = plotterInstance._scratchSpace["plotters_outputs"][idx]
+		origAxis = plotterInstance._scratchSpace["ax_handles"][idx]
+		useAxis = currOutput["plotter"]._scratchSpace["axis_grid"][0][0] #Starts at bottom left
+
+		#Figure out the scale factors for x/y
+		_origPos = origAxis.get_position().bounds
+		_newPos = useAxis.get_position().bounds
+		origWidth, origHeight = _origPos[2], _origPos[3]
+		newWidth, newHeight = _newPos[2], _newPos[3]
+		scaleX, scaleY = origWidth/newWidth, origHeight/newHeight
+
+		#Get the positions needed + add annotations
+		usePos = [inpPos[0]*scaleX, inpPos[1]*scaleY]
+		useAxis.annotate(inpStr, usePos, fontsize=fntSize, xycoords="axes fraction")
+
+		#Put this axis ABOVE the last plotted
+		baseZOrder = currOutput["plotter"]._scratchSpace["axis_grid"][0][0].get_zorder()
+		useAxis.set_zorder(baseZOrder+1)
+		
+
 
 	def _getVisibleAxis(self, plotterInstance):
 		axes = plotterInstance._scratchSpace["ax_handles"]
@@ -532,9 +560,15 @@ class PopulateAxesWithPlotters(plotCmdCoreHelp.PlotCommand):
 
 		axHandles = plotterInstance._scratchSpace[self._axesKey]
 
+		plottersOutputs = list()
 		for currAx, currPlotter in zip(axHandles, plotters):
 			if currPlotter is not None:
-				currPlotter.createPlot(currAx)
+				currOutput = currPlotter.createPlot(currAx)
+			else:
+				currOutput = dict()
+			plottersOutputs.append(currOutput)
+
+		plotterInstance._scratchSpace["plotters_outputs"] = plottersOutputs
 
 @serializationReg.registerForSerialization()
 class SetHeightBasedOnNumberRows(plotCmdCoreHelp.PlotCommand):

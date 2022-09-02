@@ -11,7 +11,8 @@ def main():
 
 	#Note: Constrained layout simply fails for the split axis plotters 
 	singlePlotters = createTwoPlotters()
-	currKwargs = { "annotateLabelStrings_useBoldedLowerAlphabetByDefault":True,
+	currKwargs = { "annotateLabelPosFract":[[0.1,0.7]],
+	               "annotateLabelStrings_useBoldedLowerAlphabetByDefault":True,
 	               "plotters":singlePlotters, "figSizeOnCreation":(12,4),
 	               "nColsGrid":2, "fillRowsToMatchPlotters":True,
 	               "constrainedLayout":False }

@@ -37,10 +37,13 @@ class SplitAxisPlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter)
 
 def _createCommandList():
 	outList = [
+		plotCmdStdHelp.AddPlotterToOutput(),
 		plotCmdStdHelp.CreateFigureIfNoAxHandle(),
 		CreateOutputAxes(),
 		AddPlotsToAxisGrid(),
 		MakeOrigAxisInvisible(),
+#		AddPlotToOrigAxis(),
+#		MakeOrigAxisLimitsSpanSubAxes(),
 		DrawDoubleLinesForAxisSplits()
 	]
 	return outList
@@ -194,7 +197,7 @@ class DrawDoubleLinesForAxisSplits(plotCmdCoreHelp.PlotCommand):
 		#2) Figure out how wide/high the TOTAL graph is
 		#TODO: Currently wrong; need the original axis NOT gca
 #		_startX, _startY, _endX, _endY = _getAxisEdges(plt.gca())
-		_startX, _startY, _endX, _endY = _getAxisEdges( plotterInstance._scratchSpace["original_axis"] )
+		_startX, _startY, _endX, _endY = shared._getAxisEdges( plotterInstance._scratchSpace["original_axis"] )
 		axWidth, axHeight = _endX - _startX, _endY - _startY
 
 		#3) Use all previous info to draw lines around x-splits
@@ -356,7 +359,7 @@ def _getOutputAxesPositions(plotterGrid, fractsX, fractsY, spacingX, spacingY):
 	spaceYList = _getListFromFloatOrFloatIter(spacingY, nPlottersY-1)
 
 	#Figure out the original axes bounds; these are fractional with respect to the whole figure so cant go outside them
-	startX, startY, endX, endY = _getAxisEdges(plt.gca())
+	startX, startY, endX, endY = shared._getAxisEdges(plt.gca())
 
 	#Divide the space in the RATIOS determined by spacing and fract values for each
 	xSpace, ySpace = endX - startX, endY - startY
@@ -400,11 +403,6 @@ def _getListFromFloatOrFloatIter(inpVal, maxLen):
 		return [ x for x,unused in zip( it.cycle(inpVal), range(maxLen) ) ] 
 
 
-def _getAxisEdges(inpAx):
-	startX, startY, xLength, yLength = inpAx.get_position().bounds
-	endX, endY = startX+xLength, startY+yLength
-	return startX, startY, endX, endY
-
 @serializationReg.registerForSerialization()
 class AddPlotsToAxisGrid(plotCmdCoreHelp.PlotCommand):
 
@@ -421,6 +419,30 @@ class AddPlotsToAxisGrid(plotCmdCoreHelp.PlotCommand):
 				plotterGrid[xIdx][yIdx].createPlot(axHandle=axGrid[xIdx][yIdx])
 
 
+
+#One attempt to make this work with multi plotters constrained layout
+@serializationReg.registerForSerialization()
+class AddPlotToOrigAxis(plotCmdCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "add-plot-to-orig-axis"
+		self._description = "Adds plot to the original axis (which should be made invisible later). This is an attempt to try to fix behaviour with multi-plotters constrained layout"
+
+	def execute(self, plotterInstance):
+		origAx = plotterInstance._scratchSpace["original_axis"]
+		plotterGrid = getattr(plotterInstance.opts,"plotterGrid").value
+
+		plotterGrid[0][0].createPlot(axHandle=origAx)
+
+#		axGrid = plotterInstance._scratchSpace["axis_grid"]
+#		plotterGrid = getattr(plotterInstance.opts,"plotterGrid").value
+#
+#		for xIdx, unused in enumerate(axGrid):
+#			for yIdx, unused in enumerate(axGrid[xIdx]):
+#				plotterGrid[xIdx][yIdx].createPlot(axHandle=axGrid[xIdx][yIdx])
+
+
+
 @serializationReg.registerForSerialization()
 class MakeOrigAxisInvisible(plotCmdCoreHelp.PlotCommand):
 
@@ -433,9 +455,35 @@ class MakeOrigAxisInvisible(plotCmdCoreHelp.PlotCommand):
 		origAx.set_visible(False)
 
 
+#This is needed for multi-plotters. If the original axis spans a different range, then the space for 
+#tick-labels etc. will be different between origina/subplots which can mess with constrained_layout
+@serializationReg.registerForSerialization()
+class MakeOrigAxisLimitsSpanSubAxes(plotCmdCoreHelp.PlotCommand):
 
+	def __init__(self):
+		self._name = "make-orig-axes-limit-span-sub-axes"
+		self._description = "Makes the original axis limits span those of the created axes"
 
+	def execute(self, plotterInstance):
+		origAx = plotterInstance._scratchSpace["original_axis"]
+		axisGrid = plotterInstance._scratchSpace["axis_grid"]
 
+		#Figure out all the axis limits
+		allXLims, allYLims = list(), list()
+		for rIdx, unused in enumerate(axisGrid):
+			for cIdx, unused in enumerate(axisGrid[rIdx]):
+				currAx = axisGrid[rIdx][cIdx]
+				currXLim, currYLim = currAx.get_xlim(), currAx.get_ylim()
+				allXLims.append(currXLim)
+				allYLims.append(currYLim)
+
+		#Find min/max x-vals
+		minX, maxX = min([x for x in it.chain(*allXLims)]), max([x for x in it.chain(*allXLims)])
+		minY, maxY = min([y for y in it.chain(*allYLims)]), max([y for y in it.chain(*allYLims)])
+
+		#Set the limits on this axis
+		origAx.set_xlim([minX,maxX])
+		origAx.set_ylim([minY,maxY])
 
 
 
