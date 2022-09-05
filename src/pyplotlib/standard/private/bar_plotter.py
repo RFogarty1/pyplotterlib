@@ -2,6 +2,7 @@
 import itertools as it
 import types
 
+import matplotlib.ticker
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -48,6 +49,7 @@ def _createCommandsList():
 	PlotOneDimDataAsBars(),
 	SetTickValsToGroupCentres(),
 	SetTickLabelsToGroupLabels(),
+	SetTickMinorValsOnOrOff(),
 	SetBarDataLabels(),
 	plotCmdStdHelp.SetXLabelStr(),
 	plotCmdStdHelp.SetYLabelStr(),
@@ -64,6 +66,7 @@ def _createCommandsList():
 	plotCmdStdHelp.SetLegendFontSize(),
 	plotCmdStdHelp.SetLegendFractPosStart(),
 	plotCmdStdHelp.SetLegendNumberColumns(),
+	plotCmdStdHelp.SetTitleStr(),
 	plotCmdStdHelp.TurnLegendOnIfRequested()
 	]
 	return outList
@@ -78,17 +81,21 @@ def _createOptionsList():
 	plotOptStdHelp.DataLabels(),
 	plotOptStdHelp.FontSizeDefault(),
 	GroupLabels(),
+	GroupLabelRotation(),
 	plotOptStdHelp.LegendFractPosStart(),
 	plotOptStdHelp.LegendLocStr(),
 	plotOptStdHelp.LegendNumbCols(),
 	plotOptStdHelp.LegendOn(),
 	plotOptStdHelp.PlotData1D(),
 	PlotHorizontally(value=False),
+	ShowMinorTickMarkers(),
+	ReverseIntraBarOrdering(),
 	WidthBars(value=1.0),
 	WidthInterSpacing(),
 	WidthIntraSpacing(value=0.0),
 	plotOptStdHelp.SetFigsizeOnCreation(),
 	plotOptStdHelp.ShowTicksAndLabelsOnSides( value=types.SimpleNamespace(top=None,bottom=None,left=None, right=None) ),
+	plotOptStdHelp.TitleStr(),
 	plotOptStdHelp.XLabelFractPos(),
 	plotOptStdHelp.XLabelStr(),
 	plotOptStdHelp.YLabelFractPos(),
@@ -113,12 +120,42 @@ class GroupLabels(plotOptCoreHelp.StringIterPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class GroupLabelRotation(plotOptCoreHelp.FloatPlotOption):
+	""" Sets the rotation angle (in degrees) for the bar chart labels (xtick labels for vertical, ytick labels for horizontal)
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "groupLabelRotation"
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class PlotHorizontally(plotOptCoreHelp.BooleanPlotOption):
 	""" Boolean. If False labels are on the x-axis and bars on the y-axis. If True, its the other way around.
 
 	"""
 	def __init__(self, name=None, value=None):
 		self.name = "plotHorizontally"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ReverseIntraBarOrdering(plotOptCoreHelp.BooleanPlotOption):
+	""" Boolean. Setting to True reverses the ordering of bars in a given group (but data series ordering is the same). 
+
+	For example, if you have three data series A,B,C and 1 value on the x-axis (and plot vertically) then setting to False will plot the bars as A/B/C; Setting to True with plot as C/B/A. But ordering in the legend will be unaffected.
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "reverseIntraBarOrdering"
+		self.value = value
+
+
+@serializationReg.registerForSerialization()
+class ShowMinorTickMarkers(plotOptCoreHelp.BooleanPlotOption):
+	""" Boolean. Setting to True means the minor tick markers will be shown
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "showMinorTickMarkers"
 		self.value = value
 
 @serializationReg.registerForSerialization()
@@ -193,11 +230,6 @@ class CalculateCentreVals(plotCommCoreHelp.PlotCommand):
 		plotterInstance._scratchSpace["centres"] = outCentres
 
 
-		#TODO: If requested reverse the ordering of each
-		reverseIntraOrdering = False
-#		if reverseIntraOrdering:
-			#NOT sure... Seems to be grouped by data series???
-
 		#Figure out the centre of each GROUP
 		groupCentres = list()
 		for idx in range(nGroups):
@@ -232,10 +264,18 @@ class PlotOneDimDataAsBars(plotCommCoreHelp.PlotCommand):
 		barWidth = 1.0 if barWidth is None else barWidth
 
 
+		#Optionally reverse the order the bars are plotted in
+		reverseIntraOrdering = getattr(plotterInstance.opts, "reverseIntraBarOrdering").value
+
 		#Plot the data; may want to return handles to scratch space later
 		outBars = list()
 		for idx,currData in enumerate(targVal):
-			centres = allCentres[idx]
+			#We need centres for idx from the other end is all
+			if reverseIntraOrdering:
+				centres = allCentres[len(targVal)-1-idx]
+
+			else:
+				centres = allCentres[idx]
 
 			useCentres = [centre for centre,val in zip(centres,currData) if val is not None]
 			useData = [val for val in currData if val is not None]
@@ -270,6 +310,29 @@ class SetBarDataLabels(plotCommCoreHelp.PlotCommand):
 		for barHandle, dataLabel in zip(plottedBars, dataLabels):
 			if dataLabel is not None:
 				barHandle.set_label(dataLabel)
+
+@serializationReg.registerForSerialization()
+class SetTickMinorValsOnOrOff(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-tick-minor-vals-on-or-off"
+		self._description = "Sets the minor tick values on/off. The axis to apply to is that which should be showing numerical data (where the height of bars matters)"
+		self._optName = "showMinorTickMarkers"
+
+	def execute(self, plotterInstance):
+		minorTicksOn = getattr(plotterInstance.opts, self._optName).value
+		plotHoz = getattr(plotterInstance.opts, "plotHorizontally").value
+
+		useAx = plt.gca().xaxis if plotHoz else plt.gca().yaxis
+		self._applyToAxis(useAx, minorTicksOn)
+
+	def _applyToAxis(self, inpAxis, minorTickOn):
+		if minorTickOn is False:
+			inpAxis.set_minor_locator( matplotlib.ticker.AutoMinorLocator(n=1) )
+		elif minorTickOn is True:
+			inpAxis.set_minor_locator( matplotlib.ticker.AutoMinorLocator() )
+
+
 
 @serializationReg.registerForSerialization()
 class SetTickValsToGroupCentres(plotCommCoreHelp.PlotCommand):
@@ -309,13 +372,14 @@ class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
 		#
 		nGroups = len(plotterInstance._scratchSpace["groupCentres"])
 		useLabels = [ label for label,unused in it.zip_longest(groupLabels, range(nGroups)) ]
+		rotation = plotCmdStdHelp._getValueFromOptName(plotterInstance, "groupLabelRotation")
 
 		#
 		plotHoz = plotterInstance.opts.plotHorizontally.value
 		if plotHoz:
-			plt.gca().set_yticklabels(useLabels)
+			plt.gca().set_yticklabels(useLabels, rotation=rotation)
 		else:
-			plt.gca().set_xticklabels(useLabels)
+			plt.gca().set_xticklabels(useLabels, rotation=rotation)
 
 
 
