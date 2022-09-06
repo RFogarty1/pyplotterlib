@@ -8,6 +8,8 @@ from ...core import plot_options as plotOptCoreHelp
 from ...core import plot_command as plotCmdCoreHelp
 from ...core.serialization import register as serializationReg
 
+from .. import plot_commands as plotCmdStdHelp
+
 from .line_plotter import LinePlotter
 from . import split_axis_plotter as splitAxisPlotterHelp
 
@@ -66,10 +68,12 @@ def _createCommandList():
 	RemoveAxisLabels(),
 	RemoveInternalAxes(),
 	RemoveLegends(),
+	RemovePlotTitles(),
 	SetAxisLimits(),
 	SetAxesRelativeWidthsAndHeights(),
 	SetSpacingXY(),
 	SetAxisLabelPositions(), #MUST come after we set the spacing values
+	SetTitleStrXPositions(),
 	SetSplitLineDrawOpts(),
 
 	AddPlotterGridToOutputPlotter()
@@ -89,8 +93,8 @@ def _createOptionsList():
 	YLimits(),
 	XLabelOffset(value=-0.1),
 	YLabelOffset(value=-0.1),
-	XSpacingFract(),
-	YSpacingFract()
+	XSpacingFract(value=0.1),
+	YSpacingFract(value=0.1)
 
 	]
 	return outList
@@ -309,6 +313,8 @@ class RemoveInternalAxes(ManipulatePlottersInGrid):
 		if (colIdx==numbCols-1):
 			axisVisOpts.top = False
 
+
+
 @serializationReg.registerForSerialization()
 class RemoveLegends(ManipulatePlottersInGrid):
 
@@ -327,6 +333,21 @@ class RemoveLegends(ManipulatePlottersInGrid):
 		currPlotter = plotterGrid[rowIdx][colIdx]
 		if not ( (rowIdx==allowedRowIdx) and (colIdx==allowedColIdx) ):
 			currPlotter.opts.showLegend.value = False
+
+@serializationReg.registerForSerialization()
+class RemovePlotTitles(ManipulatePlottersInGrid):
+
+	def __init__(self):
+		self._name = "remove-title-strs"
+		self._description = "Removes titles from all plotters except the leftmost/uppermost"
+
+	def _applyManipulation(self, plotterInstance, plotterGrid, rowIdx, colIdx):
+		if (rowIdx==0) and (colIdx==len(plotterGrid[0])-1):
+			pass
+		else:
+			currPlotter = plotterGrid[rowIdx][colIdx]
+			targAttrName, targAttrVal = "titleStr", None
+			plotCmdStdHelp._setAttributeIfPresent(currPlotter, targAttrName, targAttrVal)
 
 
 #TODO: Maybe later add an option to override any label positions on the template plotter
@@ -414,7 +435,6 @@ class SetAxisLabelPositions(plotCmdCoreHelp.PlotCommand):
 		heightFirst = fractPositionsY[0]
 
 		return totalHeight, heightFirst
-
 
 
 
@@ -510,6 +530,39 @@ class SetSpacingXY(plotCmdCoreHelp.PlotCommand):
 			plotterInstance._scratchSpace["outPlotter"].opts.spacingX.value = spacingX
 		if spacingY is not None:
 			plotterInstance._scratchSpace["outPlotter"].opts.spacingY.value = spacingY
+
+@serializationReg.registerForSerialization()
+class SetTitleStrXPositions(plotCmdCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-title-x-pos"
+		self._description = "Sets the title string x-position such that its in roughly the same position as pre-split (if pre-split not specified, we assume halfway along axis)"
+
+	def execute(self, plotterInstance):
+		#Figure out the default x-position
+		templPlotter = plotterInstance._scratchSpace["templPlotter"]
+		startX = plotCmdStdHelp._getValueFromOptName(templPlotter, "titleFractPosX")
+		startX = 0.5 if startX is None else startX
+
+		#Figure out the total width of x (normalised units)
+		outPlotter = plotterInstance._scratchSpace["outPlotter"]
+		numbSplitsX = plotterInstance._scratchSpace["numbX"] - 1
+		spacingX = spacingX = outPlotter.opts.spacingX.value
+
+		if plotterInstance.opts.axisSizeLinear.value is False:
+			fractPositionsX = [outPlotter.opts.fractsX.value for x in range(numbSplitsX+1)]
+		else: 
+			fractPositionsX = outPlotter.opts.fractsX.value
+
+
+		#Modify x-position based on the top-left plotter (which is the only one to contain the title, if any do)
+		titlePlotter = plotterInstance._scratchSpace["plotterGrid"][0][-1]
+		widthVal = fractPositionsX[0]
+		totalWidth = (numbSplitsX*spacingX) + sum(fractPositionsX)
+		widthFactor = totalWidth / widthVal
+
+		plotCmdStdHelp._setAttributeIfPresent(titlePlotter, "titleFractPosX", widthFactor*startX)
+
 
 
 @serializationReg.registerForSerialization()

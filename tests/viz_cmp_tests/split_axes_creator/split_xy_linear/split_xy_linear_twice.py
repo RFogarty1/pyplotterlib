@@ -26,6 +26,7 @@ def createTemplatePlotter():
 	currKwargs = {"dataLabels":["dataA"],"plotData":[dataAll],
 	              "lineMarkerStyles":['x'], "lineStyles":['none'],
 	              "showLegend":True,
+	              "titleStr": "Should be centred still (even after splits)",
 	              "xLabelStr":"x-label", "yLabelStr":"y-label"}
 	outPlotter = plotters.LinePlotter(**currKwargs)
 

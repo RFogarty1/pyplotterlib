@@ -97,6 +97,8 @@ def _createOptionsList():
 	plotOptStdHelp.TickMarkerLabelsY(),
 	plotOptStdHelp.TickMarkerValsX(),
 	plotOptStdHelp.TickMarkerValsY(),
+	plotOptStdHelp.TitleFractPosX(),
+	plotOptStdHelp.TitleFractPosY(),
 	plotOptStdHelp.TitleStr(),
 	plotOptStdHelp.XLabelFractPos(),
 	plotOptStdHelp.XLabelStr(),

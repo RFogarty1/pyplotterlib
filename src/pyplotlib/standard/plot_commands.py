@@ -97,9 +97,17 @@ class SetAxisBorderInvisible(plotCommCoreHelp.PlotCommand):
 			if attrVal is True:
 				plt.gca().spines[attrKey].set_visible(False)
 				if attrKey == "left":
-					plt.gca().get_yaxis().set_ticks([])
+#					plt.gca().get_yaxis().set_ticks([])
+					plt.gca().tick_params(which="both", left=False, labelleft=False)
 				if attrKey == "bottom":
-					plt.gca().get_xaxis().set_ticks([])
+#					plt.gca().get_xaxis().set_ticks([])
+					plt.gca().tick_params(which="both", bottom=False, labelbottom=False)
+				if attrKey == "right":
+					plt.gca().tick_params(which="both", right=False, labelright=False)
+				if attrKey == "top":
+					plt.gca().tick_params(which="both", top=False, labeltop=False)
+
+#				if attrKey == "right":
 
 		#NOTE: Possibly some better commands here
 		# hide the spines between ax and ax2
@@ -375,8 +383,12 @@ class SetTitleStr(plotCommCoreHelp.PlotCommand):
 			return None
 
 		defFontSize = _getDefaultFontSizeFromPlotter(plotterInstance)
+		xPosVal = _getValueFromOptName(plotterInstance, "titleFractPosX")
+		yPosVal = _getValueFromOptName(plotterInstance, "titleFractPosY")
 
-		plt.title(targVal,fontsize=defFontSize)
+		kwargDict = {"fontsize":defFontSize, "x":xPosVal, "y":yPosVal}
+		kwargDict = {k:v for k,v in kwargDict.items() if v is not None}
+		plt.title(targVal, **kwargDict)
 
 
 @serializationReg.registerForSerialization()
@@ -586,5 +598,13 @@ def _getValueFromOptName(plotterInstance, optName):
 	except AttributeError:
 		outVal = None
 	return outVal
+
+def _setAttributeIfPresent(plotterInstance, optName, value):
+	try:
+		getattr(plotterInstance.opts, optName).value = value
+	except AttributeError:
+		pass
+
+
 
 

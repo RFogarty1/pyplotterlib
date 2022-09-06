@@ -315,6 +315,27 @@ class TickMarkerValsY(plotOptCore.FloatIterPlotOption):
 		self.name = "tickMarkerValsY"
 		self.value = None
 
+@serializationReg.registerForSerialization()
+class TitleFractPosX(plotOptCore.FloatPlotOption):
+	""" Fractional x-position of the title. 0 = leftmost on axis, 1=rightmost on axis
+
+	Mainly included for split axis plotters, should rarely need modifying directly
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "titleFractPosX"
+		self.value = None
+
+@serializationReg.registerForSerialization()
+class TitleFractPosY(plotOptCore.FloatPlotOption):
+	""" Fractional y-position of the title. 0 = botton, 1=top.
+
+	 Should rarely need moving from defaults
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "titleFractPosY"
+		self.value = None
 
 @serializationReg.registerForSerialization()
 class TitleStr(plotOptCore.StringPlotOption):
