@@ -68,14 +68,18 @@ class AllowTwoIndependentAxes(plotOptCoreHelp.BooleanPlotOption):
 
 @serializationReg.registerForSerialization()
 class IndependentYAxis(plotOptCoreHelp.BooleanPlotOption):
+	""" Whether we have two separate y-axes or not (True=two y-axes, False=one y-axis)
 
+	"""
 	def __init__(self, name=None, value=None):
 		self.name = "independentYAxis" if name is None else name
 		self.value = value
 
 @serializationReg.registerForSerialization()
 class IndependentXAxis(plotOptCoreHelp.BooleanPlotOption):
+	""" Whether we have two separate x-axes or not (True=two x-axes, False=one x-axis)
 
+	"""
 	def __init__(self, name=None, value=None):
 		self.name = "independentXAxis" if name is None else name
 		self.value = value
