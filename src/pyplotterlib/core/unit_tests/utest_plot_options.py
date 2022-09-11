@@ -5,7 +5,7 @@ import unittest
 
 import numpy as np
 
-import pyplotlib.core.plot_options as tCode
+import pyplotterlib.core.plot_options as tCode
 
 
 class TestOptionsCol(unittest.TestCase):

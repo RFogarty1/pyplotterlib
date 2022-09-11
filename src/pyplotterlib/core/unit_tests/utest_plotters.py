@@ -5,12 +5,12 @@ import types
 import unittest
 
 #import pyplotlib.core.serialization.json_io as jsonIOHelp
-import pyplotlib.core.serialization.register as regHelp
+import pyplotterlib.core.serialization.register as regHelp
 
-import pyplotlib.core.plot_options as plotOptCoreHelp
-import pyplotlib.core.plot_command as plotCmdHelp
+import pyplotterlib.core.plot_options as plotOptCoreHelp
+import pyplotterlib.core.plot_command as plotCmdHelp
 
-import pyplotlib.core.plotters as tCode
+import pyplotterlib.core.plotters as tCode
 
 
 _EMBED_VAL = 6

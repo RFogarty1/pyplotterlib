@@ -2,9 +2,9 @@
 import json
 import unittest
 
-import pyplotlib.core.serialization.register as regHelp
+import pyplotterlib.core.serialization.register as regHelp
 
-import pyplotlib.core.serialization.json_io as tCode
+import pyplotterlib.core.serialization.json_io as tCode
 
 #Create some stubs with the expected interface
 @regHelp.registerForSerialization()

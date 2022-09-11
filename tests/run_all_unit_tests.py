@@ -6,7 +6,7 @@ import unittest
 
 def main():
 	startDir = os.path.split( os.path.abspath(os.getcwd(),) )[0]
-	startDir = os.path.join(startDir, "src", "pyplotlib")
+	startDir = os.path.join(startDir, "src", "pyplotterlib")
 #	print("startDir = {}".format(startDir))
 
 	#Find all unit-tests and run them

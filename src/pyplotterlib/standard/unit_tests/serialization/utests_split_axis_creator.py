@@ -2,7 +2,7 @@
 import os
 import unittest
 
-import pyplotlib.standard.plotters as ppl
+import pyplotterlib.standard.plotters as ppl
 
 
 class TestSplitAxisCreatorSerialization(unittest.TestCase):
@@ -19,7 +19,6 @@ class TestSplitAxisCreatorSerialization(unittest.TestCase):
 		""" Check reading/writing to a file is consistent for SplitAxisPlotterCreator """
 		actPlotter = ppl.readPlotterFromFile(self.tempFileName)
 		self.assertEqual(self.expected, actPlotter)
-
 
 
 def _createStandardSplitAxisCreator():

@@ -2,7 +2,7 @@
 import os
 import unittest
 
-import pyplotlib.standard.plotters as ppl
+import pyplotterlib.standard.plotters as ppl
 
 class TestLinePlotterSerialization(unittest.TestCase):
 

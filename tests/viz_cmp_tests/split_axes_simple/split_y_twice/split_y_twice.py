@@ -1,7 +1,7 @@
 
 import itertools as it
-import pyplotlib.standard.plotters as plotters
-import pyplotlib.reg_testing.viz_diff.helpers as helpers
+import pyplotterlib.standard.plotters as plotters
+import pyplotterlib.reg_testing.viz_diff.helpers as helpers
 
 
 def main():
