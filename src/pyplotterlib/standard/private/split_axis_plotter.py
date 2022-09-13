@@ -16,6 +16,7 @@ from ...core import json_transform as jsonTransformCoreHelp
 from ...core.serialization import register as serializationReg
 
 from .. import plot_commands as plotCmdStdHelp
+from .. import plot_options as plotOptStdHelp
 
 
 @serializationReg.registerForSerialization()
@@ -55,6 +56,7 @@ def _createOptionsList():
 	FractsX(),
 	FractsY(),
 	PlotterGrid(),
+	plotOptStdHelp.SetFigsizeOnCreation(),
 	SpacingX(),
 	SpacingY(),
 	SplitDrawDoubleLinesX(),

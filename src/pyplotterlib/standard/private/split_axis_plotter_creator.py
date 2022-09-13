@@ -60,11 +60,11 @@ class SplitAxisPlotterCreator(shared.FromJsonMixin, plotterCoreHelp.SingleGraphP
 #TODO: Make the "blankOutputPlotter" contain the plotter grid we create
 def _createCommandList():
 	outList = [
-
 	StorePlotterGridDimensions(),
 	StoreTemplatePlotter(),
 	CreatePlotterGrid(),
 	CreateBlankOutputPlotter(),
+	SetOutPlotterFigSizeOnCreation(),
 	RemoveAxisLabels(),
 	RemoveInternalAxes(),
 	RemoveLegends(),
@@ -514,6 +514,19 @@ class SetAxesRelativeWidthsAndHeights(plotCmdCoreHelp.PlotCommand):
 
 		outPlotter.opts.fractsX.value = fractsX
 		outPlotter.opts.fractsY.value = fractsY
+
+@serializationReg.registerForSerialization()
+class SetOutPlotterFigSizeOnCreation(plotCmdCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-outplotter-figsize-upon-creation"
+		self._description = "Sets the figure size for the output plotter to that on the template plotter"
+
+	def execute(self, plotterInstance):
+		templPlotter = plotterInstance._scratchSpace["templPlotter"]
+		outPlotter = plotterInstance._scratchSpace["outPlotter"]
+		useVal = plotCmdStdHelp._getValueFromOptName(templPlotter, "figSizeOnCreation")
+		plotCmdStdHelp._setAttributeIfPresent(outPlotter, "figSizeOnCreation", useVal)
 
 @serializationReg.registerForSerialization()
 class SetSpacingXY(plotCmdCoreHelp.PlotCommand):

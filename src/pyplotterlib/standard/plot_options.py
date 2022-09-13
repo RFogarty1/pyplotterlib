@@ -63,7 +63,7 @@ class AxisColorY_exclSpines(plotOptCore.BooleanPlotOption):
 
 @serializationReg.registerForSerialization()
 class DataLabels(plotOptCore.StringIterPlotOption):
-	""" Set the data labels for the plot. Values should be a list of string, with None for any data you want left with the default label. e.g. ["seriesA", None, "seriesC"] should mean only 1st and 3rd appear in the legend
+	""" Set the data labels for the plot. Values should be a list of strings, with None for any data you want left with the default label. e.g. ["seriesA", None, "seriesC"] should mean only 1st and 3rd appear in the legend
 
 	"""
 	def __init__(self, name=None, value=None):
