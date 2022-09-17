@@ -27,7 +27,7 @@ dependencies = [
 #Note: Initially created with python 3.10.4; but not sure if i can specify that anywhere
 [project.optional-dependencies]
 pinned = ["numpy ==1.22.2", "matplotlib==3.5.1"]
-dev = ["numpy", "matplotlib", "ipyplot"]
+dev = ["numpy", "matplotlib", "ipyplot", "pydataset"]
 
 #[project.urls]
 #Homepage = "https://github.com/RFogarty1/PUT_REPO_HERE"
