@@ -10,7 +10,7 @@ version = "1.0.0"
 description = "A package used to create plots in python"
 readme = "README.md"
 authors = [{ name = "Richard Fogarty", email = "richard.m.fogarty@gmail.com" }]
-license = { file = "LICENSE" }
+license = "MIT"
 classifiers = [
     "Framework :: Matplotlib",
     "License :: OSI Approved :: MIT License",
