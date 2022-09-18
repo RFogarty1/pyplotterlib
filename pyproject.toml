@@ -7,14 +7,16 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyplotterlib"
 version = "1.0.0"
-description = "TODO"
+description = "A package used to create plots in python"
 readme = "README.md"
 authors = [{ name = "Richard Fogarty", email = "richard.m.fogarty@gmail.com" }]
 license = { file = "LICENSE" }
 classifiers = [
+    "Framework :: Matplotlib",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Visualization",
 ]
 keywords = []
 dependencies = [
@@ -29,8 +31,9 @@ dependencies = [
 pinned = ["numpy ==1.22.2", "matplotlib==3.5.1"]
 dev = ["numpy", "matplotlib", "ipyplot", "pydataset","notebook"]
 
-#[project.urls]
-#Homepage = "https://github.com/RFogarty1/PUT_REPO_HERE"
+[project.urls]
+Documentation = "https://pyplotterlib.readthedocs.io/en/latest/index.html"
+Github = "https://github.com/RFogarty1/pyplotterlib"
 
 #[project.scripts]
 #something = "pyplotlib.__main__:main"
