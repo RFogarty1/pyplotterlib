@@ -4,8 +4,9 @@ Installation
 
 Using Pip
 ---------
+::
 
-Coming soon....
+	pip install pyplotterlib
 
 Using Git (Any version)
 ---------------------------
