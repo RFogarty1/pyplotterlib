@@ -118,6 +118,49 @@ class TestNumpyIter(unittest.TestCase):
 		self.testObjB = tCode.NumpyIterPlotOption.fromJSON(self.testObjA.toJSON())
 		self.assertEqual(self.testObjA, self.testObjB)
 
+class TestNumpyArray(unittest.TestCase):
+
+	def setUp(self):
+		self.name = "test-name"
+		self.value = np.zeros( (2,2,3,2) )
+		self.value[0][1][1][0] = 2.3
+		self.value[1][0][0][1] = 5.4
+		self.createTestObjs()
+
+	def createTestObjs(self):
+		self.testObjA = tCode.NumpyArrayPlotOption(self.name, np.array(self.value))
+		self.testObjB = tCode.NumpyArrayPlotOption(self.name, np.array(self.value))
+
+	def testEqCmpEq(self):
+		""" Two equal NumpyArrayPlotOption instances should compare equal """
+		self.assertEqual(self.testObjA, self.testObjB)
+
+	def testNonEqCmpNonEq_diffName(self):
+		""" Two NumpyArrayPlotOption instances with different names should compare unequal """
+		self.testObjB.name = self.testObjA.name + "extra-bit"
+		self.assertNotEqual(self.testObjA, self.testObjB)
+
+	def testNonEqCmpNonEq_diffVals(self):
+		""" Two NumpyArrayPlotOption instances with different values should compare unequal """
+		self.testObjB.value[0][1][1][0] += 0.2
+		self.assertNotEqual(self.testObjA, self.testObjB)
+
+	def testNonEqCmpNonEq_diffShapes(self):
+		""" Two NumpyArrayPlotOption instances with different shaped arrays should compare unequal """
+		self.testObjB.value = np.zeros( (4,1,4,5,2) )
+		self.assertNotEqual(self.testObjA, self.testObjB)
+
+	def testToAndFromJSONEqual(self):
+		""" Checking .toJSON and .fromJSON are consistent for NumpyArrayPlotOption """
+		self.testObjB = tCode.NumpyArrayPlotOption.fromJSON(self.testObjA.toJSON())
+		self.assertEqual(self.testObjA, self.testObjB)
+
+	def testToAndFromJSONEqual_NoneVals(self):
+		""" Checking .toJSON and .fromJSON are consistent for NumpyArrayPlotOption where value is None """
+		self.testObjA.value = None
+		self.testObjB = tCode.NumpyArrayPlotOption.fromJSON(self.testObjA.toJSON())
+		self.assertEqual(self.testObjA, self.testObjB)
+
 
 class TestBoolNamespaceOption(unittest.TestCase):
 

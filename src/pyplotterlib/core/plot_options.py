@@ -323,6 +323,51 @@ class ObjectTwoDimIterPlotOption(SinglePlotOptionInter):
 		return objs	
 
 
+class NumpyArrayPlotOption(SinglePlotOptionInter):
+
+	def __eq__(self, other):
+
+		#
+		if self.name != other.name:
+			return False
+
+		#
+		if self.value is None:
+			if other.value is None:
+				return True
+			else:
+				return False
+
+		#
+		if self.value.shape != other.value.shape:
+			return False
+
+		if not np.allclose( self.value, other.value ):
+			return False
+
+		return True
+
+	def toJSON(self):
+		#Note np arrays arent JSON-compatible; hence need to work with them as lists
+		if self.value is None:
+			outVal = None
+		else:
+			outVal = self.value.tolist()
+
+		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":outVal}})
+
+	@classmethod
+	def fromJSON(cls, inpJSON):
+		useDict = json.loads(inpJSON)
+		if useDict["payload"]["value"] is None:
+			outVal = None
+		else:
+			outVal = np.array(useDict["payload"]["value"])
+
+		return cls( useDict["payload"]["name"], outVal )
+
+
+
 class NumpyIterPlotOption(SinglePlotOptionInter):
 
 	def __eq__(self, other):
