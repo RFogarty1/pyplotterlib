@@ -21,7 +21,7 @@ class ImagePlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
 		""" Initializer
 		
 		Args:
-			kwargs: keys are strs in [x.name for x in ImagePlotter().opts]. Values are the values you want to set them to
+			kwargs: keys are strs in "ImagePlotter().optionNames". Values are the values you want to set them to
 				 
 		"""
 		self._createCommands()

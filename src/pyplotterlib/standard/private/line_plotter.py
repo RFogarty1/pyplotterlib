@@ -19,7 +19,7 @@ class LinePlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
 		""" Initializer
 		
 		Args:
-			kwargs: keys are strs in [x.name for x in LinePlotter().opts]. Values are the values you want to set them to
+			kwargs: keys are strs in "LinePlotter().optionNames". Values are the values you want to set them to
 				 
 		"""
 		self._createCommands()
