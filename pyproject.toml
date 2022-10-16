@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyplotterlib"
-version = "1.0.0"
+version = "1.0.1"
 description = "A package used to create plots in python"
 readme = "README.md"
 authors = [{ name = "Richard Fogarty", email = "richard.m.fogarty@gmail.com" }]
