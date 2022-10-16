@@ -7,7 +7,7 @@ import pyplotterlib.reg_testing.read_serialization_test.helpers as readSerHelp
 
 def main():
 	cmdLineArgs = readSerHelp.parseStdCommandLineArgs()
-	expPlotter = ppl.ImagePlotter()
+	expPlotter = ppl.ImagePlotter(xLabelStr="test")
 	readSerHelp.runStandardTest(cmdLineArgs, expPlotter)
 
 
