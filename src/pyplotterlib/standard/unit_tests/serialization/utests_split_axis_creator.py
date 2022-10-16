@@ -20,6 +20,13 @@ class TestSplitAxisCreatorSerialization(unittest.TestCase):
 		actPlotter = ppl.readPlotterFromFile(self.tempFileName)
 		self.assertEqual(self.expected, actPlotter)
 
+	def testReadAndWriteConsistent_noPlotter(self):
+		""" Check reading/writing consistent for SplitAxisPlotterCreator without a plotter kwarg set """
+		self.expected.setOptionVals({"plotter":None})
+		ppl.writePlotterToFile(self.expected, self.tempFileName)
+		actPlotter = ppl.readPlotterFromFile(self.tempFileName)
+		self.assertEqual(self.expected, actPlotter)
+
 
 def _createStandardSplitAxisCreator():
 	lineKwargA = {"xLabelStr":"Here is a label"}

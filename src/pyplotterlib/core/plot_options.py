@@ -145,13 +145,19 @@ class IntOrIntIterPlotOption(SinglePlotOptionInter):
 class JsonTransObjPlotOption(SinglePlotOptionInter):
 
 	def toJSON(self):
-		embeddedVal = self.value.toJSON()
+		if self.value is None:
+			embeddedVal = None
+		else:
+			embeddedVal = self.value.toJSON()
 		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":embeddedVal}})
 
 	@classmethod
 	def fromJSON(cls, inpJSON):
 		useDict = json.loads(inpJSON)
-		value = jsonIoHelp.createInstanceFromJSON( useDict["payload"]["value"] )
+		if useDict["payload"]["value"] is None:
+			value = None
+		else:
+			value = jsonIoHelp.createInstanceFromJSON( useDict["payload"]["value"] )
 		return cls( useDict["payload"]["name"], value)
 
 
