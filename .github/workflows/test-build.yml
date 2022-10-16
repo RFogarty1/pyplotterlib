@@ -31,5 +31,6 @@ jobs:
         python run_all_unit_tests.py
         python create_viz_cmp_figs.py
         python create_doc_figs.py
+        python run_read_ser_tests.py
         cd ..
 
