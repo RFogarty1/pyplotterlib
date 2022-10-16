@@ -10,6 +10,7 @@ def main():
 	testPaths = helpers.findFilesWithExt(START_FOLDER, ".ipynb")
 	convertNotebooks(testPaths)
 	pyPaths = helpers.findFilesWithExt(START_FOLDER, ".py")
+	pyPaths = [x for x in pyPaths if ".ipynb_checkpoints" not in x]
 	removeCommentLinesFromConvertedNotebooks(pyPaths)
 
 	for currPath in pyPaths:
