@@ -1,7 +1,7 @@
 
 import os
 import subprocess
-import pyplotterlib.reg_testing.viz_diff.helpers as helpers
+import pyplotterlib.reg_testing.shared as helpers
 
 START_FOLDER = os.path.join( os.getcwd(), "..", "Examples", "for_doc_pages")
 
