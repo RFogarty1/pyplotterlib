@@ -27,7 +27,7 @@ def main():
 
 
 def _createPlottersAB(imgA, imgB):
-	_currKwargs = {}
+	_currKwargs = {"gridLinesShow":True}
 	templPlotter = ppl.ImagePlotter(**_currKwargs)
 
 	plotterA = templPlotter.createFactory(plotDataImage=imgA, titleStr="Title A")

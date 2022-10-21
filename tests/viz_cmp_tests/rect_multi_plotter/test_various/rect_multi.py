@@ -27,10 +27,11 @@ def createFourPlotters():
 	basePlotter = plotters.LinePlotter( **currKwargs )
 
 	dataA, dataB, dataC, dataD = _getDataAToD()
-	plotterA = basePlotter.createFactory(xLabelStr="x-label-A", plotData=[dataA])
-	plotterB = basePlotter.createFactory(xLabelStr="x-label-B", plotData=[dataB])
-	plotterC = basePlotter.createFactory(xLabelStr="x-label-C", plotData=[dataC])
-	plotterD = basePlotter.createFactory(xLabelStr="x-label-D", plotData=[dataD])
+	plotterA = basePlotter.createFactory(xLabelStr="x-label-A", plotData=[dataA],gridLinesShow=True)
+	plotterB = basePlotter.createFactory(xLabelStr="x-label-B", plotData=[dataB], gridLinesShow=True, gridLinesShowX=False)
+	plotterC = basePlotter.createFactory(xLabelStr="x-label-C", plotData=[dataC], gridLinesShow=True, gridLinesShowY=False)
+	plotterD = basePlotter.createFactory(xLabelStr="x-label-D", plotData=[dataD],
+	                                     gridLinesShow=True, gridLinesStyle=':', gridLinesWidth=4)
 
 	return [plotterA, plotterB, plotterC, plotterD]
 

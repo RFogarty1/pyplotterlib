@@ -31,6 +31,7 @@ def getPlotterKwargDict():
 	"dataLabels": ["SeriesA", "SeriesB"],
 	"groupLabels": ["propA", "propB", "propC"],
 	"figSizeOnCreation": [8,4],
+	"gridLinesShowY":True,
 	"plotData1D": [dataA, dataB],
 	"showLegend": True,
 	"xLabelStr":"Test x-label"
