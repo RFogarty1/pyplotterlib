@@ -51,6 +51,124 @@ class CreateFigureIfNoAxHandle(plotCommCoreHelp.PlotCommand):
 		plotterInstance._scratchSpace["axHandle"] = plt.gca()
 
 
+@serializationReg.registerForSerialization()
+class GridLinesCreate(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "create-grid-lines"
+		self._description = "Creates grid lines if required" 
+		self._settingsComms = [_GridLinesSetVisibilityOption(),
+		                       _GridLinesSetLineStyles(),
+		                       _GridLinesSetLineWidths()]
+
+	def execute(self, plotterInstance):
+		#Run all the commands to set kwarg dict
+		for command in self._settingsComms:
+			command.execute(plotterInstance)
+
+		#Get kwarg dicts
+		genDict = plotterInstance._scratchSpace.get("grid_line_opts", None)
+		xDict = plotterInstance._scratchSpace.get("grid_line_opts_x", None)
+		yDict = plotterInstance._scratchSpace.get("grid_line_opts_y", None)
+
+		#Figure out if we need to do anything; return if not
+		allDicts = [genDict, xDict, yDict]
+		if all([x is None for x in allDicts]):
+			return None
+
+		#Figure out the visibility of the axis in general
+		if genDict is None:
+			genVis = False
+
+		#We need to set x and y visibility to global if its not specifically set
+		if xDict is not None:
+			xVis = xDict.get("visible", None)
+			if xVis is None:
+				xDict["visible"] = genVis
+
+		if yDict is not None:
+			yVis = yDict.get("visible", None)
+			if yVis is None:
+				yDict["visible"] = genVis
+
+		#Apply any options to grid lines (including turning on/off)
+#		self._applyGeneralGridLineOpts(genDict)
+		self._applyAxisGridLineOpts(genDict, axis="both")
+		self._applyAxisGridLineOpts(xDict, axis="x")
+		self._applyAxisGridLineOpts(yDict, axis="y")
+
+#		raise ValueError("TODO: Want to set linewidth/color on GENERAL only")
+
+	def _applyAxisGridLineOpts(self, genDict, axis="both"):
+		if genDict is None:
+			return None
+
+		plt.gca().grid(**genDict, axis=axis)
+
+
+@serializationReg.registerForSerialization()
+class _GridLinesSetVisibilityOption(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "grid-lines-set-visibility"
+		self._description = "Sets option for grid-lines visibility"
+		self._optNameGen = "gridLinesShow"
+		self._optNameX = "gridLinesShowX"
+		self._optNameY = "gridLinesShowY"
+
+		self._dictNameGen = "grid_line_opts"
+		self._dictNameX = "grid_line_opts_x"
+		self._dictNameY = "grid_line_opts_y"
+		self._dictKey = "visible"
+
+	def execute(self, plotterInstance):
+		#General settings
+		genVal = _getValueFromOptName(plotterInstance, self._optNameGen)
+		if genVal is not None:
+			_setScratchSpaceDictKey(plotterInstance, self._dictNameGen, self._dictKey, genVal)
+
+		#x-specific settings
+		xVal = _getValueFromOptName(plotterInstance, self._optNameX)
+		if xVal is not None:
+			_setScratchSpaceDictKey(plotterInstance, self._dictNameX, self._dictKey, xVal)
+
+		#y-specific settings
+		yVal = _getValueFromOptName(plotterInstance, self._optNameY)
+		if yVal is not None:
+			_setScratchSpaceDictKey(plotterInstance, self._dictNameY, self._dictKey, yVal)
+
+@serializationReg.registerForSerialization()
+class _GridLinesSetLineStyles(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "grid-lines-set-styles"
+		self._description = "Sets option for grid line styles"
+
+		self._dictNameGen = "grid_line_opts"
+		self._genOptName = "gridLinesStyle"
+		self._dictKey = "linestyle"
+
+	def execute(self, plotterInstance):
+		genVal = _getValueFromOptName(plotterInstance, self._genOptName)
+		if genVal is not None:
+			_setScratchSpaceDictKey(plotterInstance, self._dictNameGen, self._dictKey, genVal)
+
+@serializationReg.registerForSerialization()
+class _GridLinesSetLineWidths(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "grid-lines-set-widths"
+		self._description = "Sets the width of grid lines"
+
+		self._dictNameGen = "grid_line_opts"
+		self._genOptName = "gridLinesWidth"
+		self._dictKey = "linewidth"
+
+	def execute(self, plotterInstance):
+		genVal = _getValueFromOptName(plotterInstance, self._genOptName)
+		if genVal is not None:
+			_setScratchSpaceDictKey(plotterInstance, self._dictNameGen, self._dictKey, genVal)
+
 
 #Will likely need to factor most out + inherit
 @serializationReg.registerForSerialization()
@@ -605,6 +723,16 @@ def _setAttributeIfPresent(plotterInstance, optName, value):
 	except AttributeError:
 		pass
 
+def _setScratchSpaceDictKey(plotterInstance, dictName, key, value):
+	#
+	try:
+		useDict = plotterInstance._scratchSpace[dictName]
+	except KeyError:
+		useDict = dict()
+		plotterInstance._scratchSpace[dictName] = useDict
+
+	#
+	useDict[key] = value
 
 
 

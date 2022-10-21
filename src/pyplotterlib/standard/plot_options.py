@@ -82,6 +82,62 @@ class FontSizeDefault(plotOptCore.IntPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class GridLinesShow(plotOptCore.BooleanPlotOption):
+	""" Whether to show grid lines on the plot. Setting to True will show for both x/y, unless a more specific option overrides
+
+	True: Show grid lines
+	False : Don't show grid lines
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "gridLinesShow" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class GridLinesStyle(plotOptCore.StringPlotOption):
+	""" String representing the line style to use for grid lines. Options same as matplotlib, e.g. '-', '--', '-.', ':'
+	
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "gridLinesStyle" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class GridLinesShowX(plotOptCore.BooleanPlotOption):
+	""" Whether to show x-grid lines on the plot. 
+
+	True: Show x-grid lines
+	False: Don't show x-grid lines
+	None: Use the options for the less-specific option
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "gridLinesShowX" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class GridLinesShowY(plotOptCore.BooleanPlotOption):
+	""" Whether to show y-grid lines on the plot. 
+
+	True: Show y-grid lines
+	False: Don't show y-grid lines
+	None: Use the options for the less-specific option
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "gridLinesShowY" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class GridLinesWidth(plotOptCore.FloatPlotOption):
+	""" Width of grid lines. Values are floats (e.g. 2.5)
+	
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "gridLinesWidth" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class LegendLocStr(plotOptCore.StringPlotOption):
 	""" String representing location of legend, e.g. 'upper right' or 'best'. Same as used in matplotlib.
 
