@@ -315,6 +315,56 @@ class SetAxisTickAndLabelVisibilitiesEachSide(plotCommCoreHelp.PlotCommand):
 		plt.gca().tick_params(**useDict)
 		plt.gca().tick_params(which="minor",**useDict)
 
+@serializationReg.registerForSerialization()
+class SetBarDataLabels(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-data-labels-for-bars"
+		self._description = "Sets the data labels (to use in a legend) for a bar chart; this is different to the line plotter version since theres no safe equivalent to ax.get_lines()"
+		self._optName = "dataLabels"
+
+	def execute(self, plotterInstance):
+		dataLabels = getattr(plotterInstance.opts, self._optName).value
+		if dataLabels is None:
+			return None
+
+		plottedBars = plotterInstance._scratchSpace.get("barHandles", None)
+
+		if plottedBars is None:
+			return None
+
+		if len(plottedBars) == 0:
+			return None
+
+		for barHandle, dataLabel in zip(plottedBars, dataLabels):
+			if dataLabel is not None:
+				barHandle.set_label(dataLabel)
+
+
+@serializationReg.registerForSerialization()
+class SetBarColors(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-colors-for-bars"
+		self._description = "Sets the colors for series of bars"
+		self._optName = "barColors"
+
+	def execute(self, plotterInstance):
+		colors = getattr(plotterInstance.opts, self._optName).value
+		if colors is None:
+			colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+		plottedBars = plotterInstance._scratchSpace.get("barHandles", None)
+		if plottedBars is None:
+			return None
+		useColors = it.cycle(colors)
+
+		for color,barSet in zip(useColors,plottedBars):
+			_children = barSet.get_children()
+			for child in _children:
+				child.set_color(color)
+
+
 
 @serializationReg.registerForSerialization()
 class SetDataLabels(plotCommCoreHelp.PlotCommand):

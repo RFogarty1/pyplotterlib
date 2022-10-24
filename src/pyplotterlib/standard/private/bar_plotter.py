@@ -18,7 +18,7 @@ from .. import plot_options as plotOptStdHelp
 from .. import plot_commands as plotCmdStdHelp
 
 @serializationReg.registerForSerialization()
-class BarPlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
+class BarPlotter(shared.FromJsonMixin, shared.FromPlotterMixin, plotterCoreHelp.SingleGraphPlotter):
 
 	def __init__(self, **kwargs):
 		""" Initializer
@@ -52,6 +52,7 @@ def _createCommandsList():
 	SetTickMinorValsOnOrOff(),
 	plotCmdStdHelp.GridLinesCreate(),
 	SetBarDataLabels(),
+	plotCmdStdHelp.SetBarColors(),
 	plotCmdStdHelp.SetXLabelStr(),
 	plotCmdStdHelp.SetYLabelStr(),
 	plotCmdStdHelp.SetTickLabelFontSize(),
@@ -79,6 +80,7 @@ def _createOptionsList():
 	plotOptStdHelp.AxisColorX_exclSpines(),
 	plotOptStdHelp.AxisColorY(),
 	plotOptStdHelp.AxisColorY_exclSpines(),
+	plotOptStdHelp.BarColors(),
 	plotOptStdHelp.DataLabels(),
 	plotOptStdHelp.FontSizeDefault(),
 	plotOptStdHelp.GridLinesShow(value=False),
@@ -297,25 +299,8 @@ class PlotOneDimDataAsBars(plotCommCoreHelp.PlotCommand):
 		return
 
 @serializationReg.registerForSerialization()
-class SetBarDataLabels(plotCommCoreHelp.PlotCommand):
-
-	def __init__(self):
-		self._name = "set-data-labels-for-bars"
-		self._description = "Sets the data labels (to use in a legend) for a bar chart; this is different to the line plotter version since theres no safe equivalent to ax.get_lines()"
-		self._optName = "dataLabels"
-
-	def execute(self, plotterInstance):
-		dataLabels = getattr(plotterInstance.opts, self._optName).value
-		if dataLabels is None:
-			return None
-
-		if not _doesPlotterInstanceHaveData(plotterInstance):
-			return None
-
-		plottedBars = plotterInstance._scratchSpace["barHandles"] 
-		for barHandle, dataLabel in zip(plottedBars, dataLabels):
-			if dataLabel is not None:
-				barHandle.set_label(dataLabel)
+class SetBarDataLabels(plotCmdStdHelp.SetBarDataLabels):
+	pass
 
 @serializationReg.registerForSerialization()
 class SetTickMinorValsOnOrOff(plotCommCoreHelp.PlotCommand):

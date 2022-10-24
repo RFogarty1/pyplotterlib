@@ -60,6 +60,16 @@ class AxisColorY_exclSpines(plotOptCore.BooleanPlotOption):
 		self.name = "axisColorY_exclSpines"
 		self.value = value
 
+@serializationReg.registerForSerialization()
+class BarColors(plotOptCore.StringIterPlotOption):
+	""" The bar colors to use. Allowed strings are the same as in matplotlib, meaning special color names or hex rgb codes are both fine. For Example ['red','green','orange'] is a valid value
+
+	Note: The number of colors doesnt have to match the number of data series. If you provide too few colors, they will simply cycle. For example if you set ['red','green'] then plotted data would be [red, green, red, green,.... etc]
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "barColors"
+		self.value = value
 
 @serializationReg.registerForSerialization()
 class DataLabels(plotOptCore.StringIterPlotOption):
