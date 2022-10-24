@@ -27,7 +27,7 @@ def getPlotterKwargDict():
 	dataB = [4, 2, 20]
 	
 	_plotOptsDict = {
-	
+	"barColors":['r','g'],
 	"dataLabels": ["SeriesA", "SeriesB"],
 	"groupLabels": ["propA", "propB", "propC"],
 	"figSizeOnCreation": [8,4],
