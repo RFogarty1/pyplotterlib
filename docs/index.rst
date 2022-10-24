@@ -22,6 +22,7 @@ Welcome to pyplotterlib's documentation!
    content/examples/line_plotter
    content/examples/bar_plotter
    content/examples/rect_multi_plotter
+   content/examples/histogram_plotter
    content/examples/image_plotter
    content/examples/double_axis_plotter
    content/examples/split_axis_plotter
