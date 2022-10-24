@@ -1,5 +1,6 @@
 
 from .private.bar_plotter import BarPlotter as BarPlotter
+from .private.histogram_plotter import HistogramPlotter
 from .private.image_plotter import ImagePlotter
 from .private.line_plotter import LinePlotter as LinePlotter
 from .private.rect_multi_plotter import RectMultiPlotter as RectMultiPlotter
