@@ -13,7 +13,7 @@ from .. import plot_commands as plotCmdStdHelp
 
 
 @serializationReg.registerForSerialization()
-class LinePlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
+class LinePlotter(shared.FromJsonMixin, shared.FromPlotterMixin, plotterCoreHelp.SingleGraphPlotter):
 
 	def __init__(self, **kwargs):
 		""" Initializer

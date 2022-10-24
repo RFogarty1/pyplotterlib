@@ -24,7 +24,10 @@ def runStandardTest(cmdLineArgs, expPlotter):
 	if cmdLineArgs.saveExp:
 		ppl.writePlotterToFile(expPlotter, cmdLineArgs.expName)
 
-	actPlotter = ppl.readPlotterFromFile(cmdLineArgs.expName)
+
+	ppl.readPlotterFromFile(cmdLineArgs.expName, reInitPlotter=False)
+	actPlotter = ppl.readPlotterFromFile(cmdLineArgs.expName, reInitPlotter=True)
+
 	assert expPlotter==actPlotter
 
 

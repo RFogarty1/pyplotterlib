@@ -16,7 +16,7 @@ from ...core import plot_command as plotCmdCoreHelp
 from ...core.serialization import register as serializationReg
 
 @serializationReg.registerForSerialization()
-class RectMultiPlotter(shared.FromJsonMixin, plotterCoreHelp.MultiGraphPlotter):
+class RectMultiPlotter(shared.FromJsonMixin,  shared.FromPlotterMixin, plotterCoreHelp.MultiGraphPlotter):
 	""" MultiGraphPlotter which combines individual plotters into a rectangular grid
 
 	"""

@@ -14,7 +14,7 @@ from .line_plotter import LinePlotter
 from . import split_axis_plotter as splitAxisPlotterHelp
 
 @serializationReg.registerForSerialization()
-class SplitAxisPlotterCreator(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
+class SplitAxisPlotterCreator(shared.FromJsonMixin, shared.FromPlotterMixin, plotterCoreHelp.SingleGraphPlotter):
 	""" Goal is to create a split-axis plotter, with reasonable values, from a single plotter instance. Alternatively this can directly generate plots.
 
 	Note: This is tested on the LinePlotter class; it should work on others but it isnt gauranteed

@@ -15,7 +15,7 @@ from ...core import plot_options as plotOptCoreHelp
 from ...core.serialization import register as serializationReg
 
 @serializationReg.registerForSerialization()
-class ImagePlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
+class ImagePlotter(shared.FromJsonMixin, shared.FromPlotterMixin, plotterCoreHelp.SingleGraphPlotter):
 
 	def __init__(self, **kwargs):
 		""" Initializer

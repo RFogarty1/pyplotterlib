@@ -11,7 +11,7 @@ from ...core.serialization import register as serializationReg
 
 
 @serializationReg.registerForSerialization()
-class DoubleAxisPlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
+class DoubleAxisPlotter(shared.FromJsonMixin, shared.FromPlotterMixin, plotterCoreHelp.SingleGraphPlotter):
 	""" Plotter which creates a plot from a single axis handle, but can have 2 independent x XOR y axes
 
 	"""

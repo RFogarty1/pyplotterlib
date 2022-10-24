@@ -20,7 +20,7 @@ from .. import plot_options as plotOptStdHelp
 
 
 @serializationReg.registerForSerialization()
-class SplitAxisPlotter(shared.FromJsonMixin, plotterCoreHelp.SingleGraphPlotter):
+class SplitAxisPlotter(shared.FromJsonMixin, shared.FromPlotterMixin, plotterCoreHelp.SingleGraphPlotter):
 
 	def __init__(self, **kwargs):
 		self._createCommands()
