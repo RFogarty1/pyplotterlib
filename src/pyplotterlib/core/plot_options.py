@@ -127,6 +127,8 @@ class StringPlotOption(SinglePlotOptionInter):
 class StringIterPlotOption(SinglePlotOptionInter):
 	pass
 
+class StringOrStringIterPlotOption(SinglePlotOptionInter):
+	pass
 
 @regHelp.registerForSerialization()
 class IntPlotOption(SinglePlotOptionInter):
