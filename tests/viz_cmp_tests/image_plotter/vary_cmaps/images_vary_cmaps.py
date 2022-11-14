@@ -42,6 +42,12 @@ def _createPlottersForColorMaps(templImage, colorMaps):
 	for colorStr in colorMaps:
 		currPlotter = templPlotter.createFactory(colorMapStr=colorStr, titleStr=colorStr)
 		outPlotters.append( currPlotter )
+
+	#Randomly modify a couple; want to test a few more features
+	_currKwargs = {"colorBarLocation":"bottom", "colorBarLabel":"Test Label", "colorMapMaxVal":500,
+	               "colorMapMinVal":100}
+	outPlotters[-1].setOptionVals(_currKwargs)
+
 	return outPlotters
 
 
@@ -51,35 +57,6 @@ def _createMultiPlotter(inpPlotters):
 	outPlotter = ppl.RectMultiPlotter(**_currKwargs)
 	return outPlotter
 
-
-
-
-
-
-
-#def _createPlottersAB(imgA, imgB):
-#	_currKwargs = {}
-#	templPlotter = ppl.ImagePlotter(**_currKwargs)
-#
-#	plotterA = templPlotter.createFactory(plotDataImage=imgA, titleStr="Title A")
-#	plotterB = templPlotter.createFactory(plotDataImage=imgB, titleStr="Title B")
-#
-#	return plotterA, plotterB
-#
-#
-#def _createMultiPlotter(plotterA, plotterB):
-#	plotterC = copy.deepcopy(plotterA)
-#	plotterC.setOptionVals({"titleStr":"Image C (Copy of A)"})
-#	plotters = [plotterA, plotterB, plotterC]
-#
-#	_currKwargs = {"constrainedLayout":True,"figHeightPerRow":2, "figWidthPerCol":2,
-#	               "plotters":plotters, "nColsGrid":2}
-#
-#	outPlotter = ppl.RectMultiPlotter(**_currKwargs)
-#
-#	return outPlotter
-
-#figHeightPerRow=2, figWidthPerCol=2, constrainedLayout=True, nColsGrid=2
 
 
 if __name__ == '__main__':

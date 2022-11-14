@@ -43,6 +43,8 @@ def _createCommandsList():
 	plotCmdStdHelp.CreateFigureIfNoAxHandle(),
 	SetAspectStr(),
 	SetColormap(),
+	plotCmdStdHelp.SetColormapMaxValInPlotKwargs(),
+	plotCmdStdHelp.SetColormapMinValInPlotKwargs(),
 	AddImageToPlot(),
 	AddColorBar(),
 	plotCmdStdHelp.SetXLabelStr(),
@@ -70,7 +72,15 @@ def _createOptionsList():
 	plotOptStdHelp.AxisColorX_exclSpines(),
 	plotOptStdHelp.AxisColorY(),
 	plotOptStdHelp.AxisColorY_exclSpines(),
+	plotOptStdHelp.ColorBarFontSize(),
+	plotOptStdHelp.ColorBarLabelFontSize(),
 	ColorBarShow(),
+	plotOptStdHelp.ColorBarTickLabelFontSize(),
+	plotOptStdHelp.ColorBarLabel(),
+	plotOptStdHelp.ColorBarLocation(),
+	plotOptStdHelp.ColorBarLabelRotation(),
+	plotOptStdHelp.ColormapMaxVal(),
+	plotOptStdHelp.ColormapMinVal(),
 	ColormapStr(),
 	plotOptStdHelp.FontSizeDefault(),
 	plotOptStdHelp.GridLinesShow(value=False),
@@ -107,15 +117,8 @@ class AspectString(plotOptCoreHelp.StringPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
-class ColormapStr(plotOptCoreHelp.StringPlotOption):
-	""" String representing the color map to use. These correspond to matplotlib color maps, which are described here:
-
-	https://matplotlib.org/stable/tutorials/colors/colormaps.html
-
-	"""
-	def __init__(self, name=None, value=None):
-		self.name = "colorMapStr"
-		self.value = value
+class ColormapStr(plotOptStdHelp.ColormapStr):
+	pass
 
 @serializationReg.registerForSerialization()
 class PlotDataImage(plotOptCoreHelp.NumpyArrayPlotOption):
@@ -131,13 +134,8 @@ class PlotDataImage(plotOptCoreHelp.NumpyArrayPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
-class ColorBarShow(plotOptCoreHelp.BooleanPlotOption):
-	""" Whether to show a colorbar; True=Show it, False=Dont show it
-
-	"""
-	def __init__(self, name=None, value=None):
-		self.name = "colorBarShow"
-		self.value = value
+class ColorBarShow(plotOptStdHelp.ColorBarShow):
+	pass
 
 #Commands
 @serializationReg.registerForSerialization()
@@ -156,19 +154,8 @@ class AddImageToPlot(plotCmdCoreHelp.PlotCommand):
 			plt.imshow(data, **plotterInstance._scratchSpace["plotKwargs"])
 
 @serializationReg.registerForSerialization()
-class AddColorBar(plotCmdCoreHelp.PlotCommand):
-
-	def __init__(self):
-		self._name = "add-color-bar"
-		self._description = "Adds a color bar to the plot"
-		self._showAttr = "colorBarShow"
-
-	def execute(self, plotterInstance):
-		toShow = plotCmdStdHelp._getValueFromOptName(plotterInstance, self._showAttr)
-		if toShow is True:
-			plt.colorbar()
-		
-
+class AddColorBar(plotCmdStdHelp.AddColorBar):
+	pass
 
 @serializationReg.registerForSerialization()
 class SetAspectStr(plotCmdCoreHelp.PlotCommand):
@@ -186,18 +173,7 @@ class SetAspectStr(plotCmdCoreHelp.PlotCommand):
 			plotterInstance._scratchSpace["plotKwargs"]["aspect"] = aspectStr
 
 @serializationReg.registerForSerialization()
-class SetColormap(plotCmdCoreHelp.PlotCommand):
-
-	def __init__(self):
-		self._name = "set-color-map"
-		self._description = "Sets the color map to use"
-		self._optName = "colorMapStr"
-
-	def execute(self, plotterInstance):
-		colorMapStr = plotCmdStdHelp._getValueFromOptName(plotterInstance, self._optName)
-		if colorMapStr is None:
-			return None
-		else:
-			plotterInstance._scratchSpace["plotKwargs"]["cmap"] = colorMapStr
+class SetColormap(plotCmdStdHelp.SetColormapInPlotKwargs):
+	pass
 
 

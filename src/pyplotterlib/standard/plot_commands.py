@@ -1,5 +1,6 @@
 
 import itertools as it
+import json
 import matplotlib.ticker
 import matplotlib.pyplot as plt
 
@@ -26,6 +27,61 @@ class AddPlotterToOutput(plotCommCoreHelp.PlotCommand):
 #These are the multi-plotter class ones
 
 #Below ALL refer to single-plotter cases
+@serializationReg.registerForSerialization()
+class AddColorBar(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "add-color-bar"
+		self._description = "Adds a color bar to the plot"
+		self._showAttr = "colorBarShow"
+
+	def execute(self, plotterInstance):
+		toShow = _getValueFromOptName(plotterInstance, self._showAttr)
+		label = _getValueFromOptName(plotterInstance, "colorBarLabel")
+		location = _getValueFromOptName(plotterInstance, "colorBarLocation")
+		labelRotation = _getValueFromOptName(plotterInstance, "colorBarLabelRotation")
+
+		if toShow is True:
+			cbar = plt.colorbar(label=label,location=location)
+			plotterInstance._scratchSpace["cbar"] = cbar			
+
+			if labelRotation is not None:
+				cbar.ax.xaxis.label.set_rotation(labelRotation)
+				cbar.ax.yaxis.label.set_rotation(labelRotation)
+
+
+@serializationReg.registerForSerialization()
+class CopyNumpyArrayPlotDataToScratchSpace(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self, plotDataName="plotData"):
+		""" Initializer
+		
+		Args:
+			plotDataName: (str) The name of the attribute holding plot data. This may vary between plotters (e.g. at time of writing its plotData1D for BarPlotter)
+				 
+		"""
+		self._name = "copy-plot-data-to-scratch-space"
+		self._description = "Copies the basic plot data to the scratch space; this can be useful if data-processing is being carried out before plotting the data"
+		self.plotDataName = plotDataName
+
+	#Need to overwrite these classes to include the attr name for plotData
+	def toJSON(self):
+		outDict = {"class": str(self.__class__), "payload": {"plotDataName":self.plotDataName} }
+		return json.dumps(outDict)
+
+	@classmethod
+	def fromJSON(cls, inpJSON):
+		useDict = json.loads(inpJSON)
+		return cls( plotDataName=useDict["payload"]["plotDataName"] ) #Should almost ALWAYS be called without any values passed
+
+	def execute(self, plotterInstance):
+		plotData = _getValueFromOptName(plotterInstance, self.plotDataName)
+		if plotData is None:
+			plotterInstance._scratchSpace["usePlotData"] = None
+		else:
+			plotterInstance._scratchSpace["usePlotData"] = np.array(plotData,copy=True)
+
+
 @serializationReg.registerForSerialization()
 class CreateFigureIfNoAxHandle(plotCommCoreHelp.PlotCommand):
 
@@ -364,6 +420,83 @@ class SetBarColors(plotCommCoreHelp.PlotCommand):
 			for child in _children:
 				child.set_color(color)
 
+@serializationReg.registerForSerialization()
+class SetColorbarFontSizes(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-color-bar-fonts"
+		self._description = "Sets the font sizes on the color bar (if its present)"
+		self._dictKey = "cbar"
+
+	def execute(self, plotterInstance):
+		cbar = plotterInstance._scratchSpace.get("cbar",None)
+		if cbar is None:
+			return None
+		
+		#		
+		globDefFont = _getValueFromOptName(plotterInstance, "fontSizeDefault")
+		cbarDefFont = _getValueFromOptName(plotterInstance, "colorBarFontSize", retIfNone=globDefFont)
+		labelFont = _getValueFromOptName(plotterInstance, "colorBarLabelFontSize", retIfNone=cbarDefFont)
+		tickFont =  _getValueFromOptName(plotterInstance, "colorBarTickLabelFontSize", retIfNone=cbarDefFont)
+
+		#
+		self._setLabelFont(cbar, labelFont)
+		self._setTickFont(cbar, tickFont)
+
+	def _setLabelFont(self, cbar, labelFont):
+		if labelFont is not None:
+			cbar.ax.xaxis.label.set_fontsize(labelFont)
+			cbar.ax.yaxis.label.set_fontsize(labelFont)
+
+	def _setTickFont(self, cbar, tickFont):
+		if tickFont is not None:
+			cbar.ax.tick_params(labelsize=tickFont)
+
+
+@serializationReg.registerForSerialization()
+class SetColormapInPlotKwargs(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-color-map"
+		self._description = "Sets the color map to use (just sets in a scratch-space dict though)"
+		self._optName = "colorMapStr"
+
+	def execute(self, plotterInstance):
+		colorMapStr = _getValueFromOptName(plotterInstance, self._optName)
+		if colorMapStr is None:
+			return None
+		else:
+			_setScratchSpaceDictKey(plotterInstance, "plotKwargs", "cmap", colorMapStr) 
+
+@serializationReg.registerForSerialization()
+class SetColormapMaxValInPlotKwargs(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-max-colormap-val"
+		self._description = "Sets the maximum value to use when mapping data to colors (sets a value in a scratchSpace dict)"
+		self._optName = "colorMapMaxVal"
+
+	def execute(self, plotterInstance):
+		colorMapMaxVal = _getValueFromOptName(plotterInstance, self._optName)
+		if colorMapMaxVal is None:
+			return None
+		else:
+			_setScratchSpaceDictKey(plotterInstance, "plotKwargs", "vmax", colorMapMaxVal)
+
+@serializationReg.registerForSerialization()
+class SetColormapMinValInPlotKwargs(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-min-colormap-val"
+		self._description = "Sets the minimum value to use when mapping data to colors (sets a value in a scratchSpace dict)"
+		self._optName = "colorMapMinVal"
+
+	def execute(self, plotterInstance):
+		colorMapMinVal = _getValueFromOptName(plotterInstance, self._optName)
+		if colorMapMinVal is None:
+			return None
+		else:
+			_setScratchSpaceDictKey(plotterInstance, "plotKwargs", "vmin", colorMapMinVal)
 
 
 @serializationReg.registerForSerialization()
@@ -537,27 +670,6 @@ class SetLineStyles(plotCommCoreHelp.PlotCommand):
 		for dataLine, lineStyle in zip(dataLines, lineStyles):
 			dataLine.set_linestyle(lineStyle)
 
-@serializationReg.registerForSerialization()
-class SetTitleStr(plotCommCoreHelp.PlotCommand):
-
-	def __init__(self):
-		self._name = "setTitleString"
-		self._description = "Sets the axis title string"
-		self._optName = "titleStr"
-
-	def execute(self, plotterInstance):
-		targVal = getattr(plotterInstance.opts, self._optName).value
-		if targVal is None:
-			return None
-
-		defFontSize = _getDefaultFontSizeFromPlotter(plotterInstance)
-		xPosVal = _getValueFromOptName(plotterInstance, "titleFractPosX")
-		yPosVal = _getValueFromOptName(plotterInstance, "titleFractPosY")
-
-		kwargDict = {"fontsize":defFontSize, "x":xPosVal, "y":yPosVal}
-		kwargDict = {k:v for k,v in kwargDict.items() if v is not None}
-		plt.title(targVal, **kwargDict)
-
 
 @serializationReg.registerForSerialization()
 class SetTickLabelFontSize(plotCommCoreHelp.PlotCommand):
@@ -639,6 +751,26 @@ class SetTickMinorMarkersOn(plotCommCoreHelp.PlotCommand):
 			elif showMinorTicksY is True:
 				plt.gca().yaxis.set_minor_locator( matplotlib.ticker.AutoMinorLocator()   )
 
+@serializationReg.registerForSerialization()
+class SetTitleStr(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setTitleString"
+		self._description = "Sets the axis title string"
+		self._optName = "titleStr"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		defFontSize = _getDefaultFontSizeFromPlotter(plotterInstance)
+		xPosVal = _getValueFromOptName(plotterInstance, "titleFractPosX")
+		yPosVal = _getValueFromOptName(plotterInstance, "titleFractPosY")
+
+		kwargDict = {"fontsize":defFontSize, "x":xPosVal, "y":yPosVal}
+		kwargDict = {k:v for k,v in kwargDict.items() if v is not None}
+		plt.title(targVal, **kwargDict)
 
 @serializationReg.registerForSerialization()
 class SetXLabelStr(plotCommCoreHelp.PlotCommand):
@@ -760,11 +892,15 @@ def _getDefaultFontSizeFromPlotter(plotterInstance):
 	return outVal
 
 
-def _getValueFromOptName(plotterInstance, optName):
+def _getValueFromOptName(plotterInstance, optName, retIfNone=None):
 	try:
 		outVal = getattr(plotterInstance.opts, optName).value
 	except AttributeError:
 		outVal = None
+
+	if outVal is None:
+		outVal = retIfNone
+
 	return outVal
 
 def _setAttributeIfPresent(plotterInstance, optName, value):
