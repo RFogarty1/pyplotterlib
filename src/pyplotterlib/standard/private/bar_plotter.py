@@ -117,15 +117,14 @@ def _createOptionsList():
 
 #Options
 @serializationReg.registerForSerialization()
-class GroupLabels(plotOptCoreHelp.StringIterPlotOption):
+class GroupLabels(plotOptStdHelp.GroupLabels):
+
 	"""String iter. Each is a label for a group of bars; if your only plotting one data series then this means 1 label per value input. 
 
 	E.g. If plotting years vs population this might be ["1970", "1980", "1990"]
 
 	"""
-	def __init__(self, name=None, value=None):
-		self.name = "groupLabels"
-		self.value = value
+	pass
 
 @serializationReg.registerForSerialization()
 class GroupLabelRotation(plotOptCoreHelp.FloatPlotOption):

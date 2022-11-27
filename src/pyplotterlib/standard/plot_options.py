@@ -72,6 +72,94 @@ class BarColors(plotOptCore.StringIterPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class ColorBarFontSize(plotOptCore.IntPlotOption):
+	""" The font size to use for the colorbar
+	
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "colorBarFontSize"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ColorBarLabelFontSize(plotOptCore.IntPlotOption):
+	""" The font size to use for the colobar label
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "colorBarLabelFontSize"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ColorBarTickLabelFontSize(plotOptCore.IntPlotOption):
+	""" The font size to use for the colorbar tick labels """
+	def __init__(self, name=None, value=None):
+		self.name = "colorBarTickLabelFontSize"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ColorBarLabel(plotOptCore.StringPlotOption):
+	""" The colorbar label to show 
+	
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "colorBarLabel"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ColorBarLabelRotation(plotOptCore.FloatPlotOption):
+	""" The rotation of the colorbar label in degrees """
+	def __init__(self, name=None, value=None):
+		self.name = "colorBarLabelRotation"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ColorBarLocation(plotOptCore.StringPlotOption):
+	""" String representing the location of the colorbar. Allowed values are {'left', 'right', 'top', 'bottom'}
+	
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "colorBarLocation"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ColorBarShow(plotOptCore.BooleanPlotOption):
+	""" Whether to show a colorbar; True=Show it, False=Dont show it
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "colorBarShow"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ColormapMaxVal(plotOptCore.FloatPlotOption):
+	""" Maximum value to use when mapping floats to colors
+	
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "colorMapMaxVal"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ColormapMinVal(plotOptCore.FloatPlotOption):
+	""" Minimum value to use when mapping floats to colors
+	
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "colorMapMinVal"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ColormapStr(plotOptCore.StringPlotOption):
+	""" String representing the color map to use. These correspond to matplotlib color maps, which are described here:
+
+	https://matplotlib.org/stable/tutorials/colors/colormaps.html
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "colorMapStr"
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class DataLabels(plotOptCore.StringIterPlotOption):
 	""" Set the data labels for the plot. Values should be a list of strings, with None for any data you want left with the default label. e.g. ["seriesA", None, "seriesC"] should mean only 1st and 3rd appear in the legend
 
@@ -145,6 +233,13 @@ class GridLinesWidth(plotOptCore.FloatPlotOption):
 	"""
 	def __init__(self, name=None, value=None):
 		self.name = "gridLinesWidth" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class GroupLabels(plotOptCore.StringIterPlotOption):
+	""" 1-Dimensional labels for groups; e.g. for bar-plots or discreteHeatMaps """
+	def __init__(self, name=None, value=None):
+		self.name = "groupLabels"
 		self.value = value
 
 @serializationReg.registerForSerialization()

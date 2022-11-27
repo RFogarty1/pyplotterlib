@@ -1,5 +1,6 @@
 
 from .private.bar_plotter import BarPlotter as BarPlotter
+from .private.disc_heat_plotter import DiscreteHeatMapPlotter
 from .private.histogram_plotter import HistogramPlotter
 from .private.image_plotter import ImagePlotter
 from .private.line_plotter import LinePlotter as LinePlotter
