@@ -36,10 +36,10 @@ def createPlotters():
 	#Create a few plotters with slightly varying properties
 	outPlotters = list()
 	
-	#Few different shapes
+	#Few different shapes - also group labels on ONLY columns for one
 	outPlotters.append( templPlotter.createFactory(plotData=rectMatrixA) )
-	outPlotters.append( templPlotter.createFactory(plotData=sqrMatrixA) )
-	outPlotters.append( templPlotter.createFactory(plotData=sqrMatrixA, plotUpperTri=False))
+	outPlotters.append( templPlotter.createFactory(plotData=sqrMatrixA, groupLabelsRows=["x","y"]) )
+	outPlotters.append( templPlotter.createFactory(plotData=sqrMatrixA, plotUpperTri=False, groupLabelsCols=["a","b"]))
 
 	#Add colorbar, grouplabel, title
 	_currKwargs = {"colorBarShow":True, "gridLinesShow":False,
