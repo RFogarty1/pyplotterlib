@@ -25,6 +25,7 @@ Welcome to pyplotterlib's documentation!
    content/examples/histogram_plotter
    content/examples/image_plotter
    content/examples/discrete_heatmap_plotter
+   content/examples/box_plotter
    content/examples/double_axis_plotter
    content/examples/split_axis_plotter
    content/examples/extending_builtin
