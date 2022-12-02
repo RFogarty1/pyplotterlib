@@ -77,6 +77,62 @@ class TestBoolean(unittest.TestCase):
 		self.assertEqual(self.testObjA, self.testObjB)
 
 
+class TestIterOfNumpyIter(unittest.TestCase):
+
+	def setUp(self):
+		self.name = 'test-nameA'
+		_valA = [ np.array([ [1,1], [2,4.23] ]), np.array([ [1,1.4], [2,2.31]]) ]
+		_valB = [ np.array([ [4,8], [3,1.2]  ]), np.array([ [8,2.6], [4, 1.8]]) ]
+		self.value = [ _valA, _valB ]
+		self.createTestObjs()
+
+	def createTestObjs(self):
+		self.testObjA = tCode.IterOfNumpyIterPlotOption(self.name, copy.deepcopy(self.value))
+		self.testObjB = copy.deepcopy(self.testObjA)
+
+	def testEqCmpEq(self):
+		""" Two equal IterOfNumpyIterPlotOption instances should compare equal """
+		self.assertEqual( self.testObjA, self.testObjB )
+
+	def testEqCmpEq_bothNone(self):
+		""" Two equal IterOfNumpyIterPlotOption instances should compare equal when values are both None """
+		self.value = None
+		self.createTestObjs()
+		self.assertEqual(self.testObjA, self.testObjB)
+
+	def testNonEqCmpNonEq_oneNone(self):
+		""" Two IterOfNumpyIterPlotOption instances should compare unequal if one has a value set to None """
+		self.testObjB.value = None
+		self.assertNotEqual(self.testObjA, self.testObjB)
+
+	def testNonEqCmpNonEq_diffName(self):
+		""" Two IterOfNumpyIterPlotOption with different .name should compare unequal """
+		self.testObjB.name = self.testObjA.name + "_extraBit"
+		self.assertNotEqual( self.testObjA, self.testObjB ) 
+
+	def testNonEqCmpNonEq_diffLength(self):
+		""" Two IterOfNumpyIterPlotOption with different length .value should compare unequal """
+		self.testObjB.value = [self.value[0]]
+		self.assertNotEqual( self.testObjA, self.testObjB )
+
+	def testNonEqCmpNonEq_diffValues(self):
+		""" Two IterOfNumpyIterPlotOption with different values in arrays should compare unequal """
+		self.value[0][0][1] += 2
+		self.testObjB.value = self.value
+		self.assertNotEqual( self.testObjA, self.testObjB )
+
+	def testToAndFromJsonEqual(self):
+		""" Checking .toJSON and .fromJSON are consistent for IterOfNumpyIterPlotOption """
+		self.testObjB = tCode.IterOfNumpyIterPlotOption.fromJSON( self.testObjA.toJSON() )
+		self.assertEqual(self.testObjA, self.testObjB)
+
+	def testToAndFromJsonEqual_NoneVals(self):
+		""" Checking .toJSON and .fromJSON are consistent for IterOfNumpyIterPlotOption when value is None """
+		self.testObjA.value = None
+		self.testObjB = tCode.IterOfNumpyIterPlotOption.fromJSON(self.testObjA.toJSON())
+		self.assertEqual(self.testObjA, self.testObjB)
+
+
 class TestNumpyIter(unittest.TestCase):
 
 	def setUp(self):

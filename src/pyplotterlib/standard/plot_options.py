@@ -243,6 +243,15 @@ class GroupLabels(plotOptCore.StringIterPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class GroupLabelRotation(plotOptCore.FloatPlotOption):
+	""" Sets the rotation angle (in degrees) for the grouplabels (Could be xtick/ytick labels or both depending on plotter type) 
+
+	"""
+	def __init__(self, name="groupLabelRotation", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class LegendLocStr(plotOptCore.StringPlotOption):
 	""" String representing location of legend, e.g. 'upper right' or 'best'. Same as used in matplotlib.
 
@@ -368,6 +377,17 @@ class PlotData1D(plotOptCore.NumpyIterPlotOption):
 	def __init__(self, name=None, value=None):
 		self.name = "plotData1D" if name is None else name
 		self.value = value
+
+
+@serializationReg.registerForSerialization()
+class PlotHorizontally(plotOptCore.BooleanPlotOption):
+	""" Boolean. If False labels are on the x-axis and bars/boxes/similar along the y-axis. If True, its the other way around.
+
+	"""
+	def __init__(self, name="plotHorizontally", value=None):
+		self.name = name
+		self.value = value
+
 
 @serializationReg.registerForSerialization()
 class SetFigsizeOnCreation(plotOptCore.FloatIterPlotOption):

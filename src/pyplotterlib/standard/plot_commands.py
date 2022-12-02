@@ -531,7 +531,7 @@ class SetLegendFontSize(plotCommCoreHelp.PlotCommand):
 		if useFont is None:
 			return None
 
-		plotterInstance._scratchSpace["legendKwargDict"]["fontsize"] = useFont
+		_setScratchSpaceDictKey(plotterInstance, "legendKwargDict", "fontsize", useFont)
 
 
 @serializationReg.registerForSerialization()
@@ -547,7 +547,7 @@ class SetLegendNumberColumns(plotCommCoreHelp.PlotCommand):
 		if targVal is None:
 			return None
 
-		plotterInstance._scratchSpace["legendKwargDict"]["ncol"] = targVal
+		_setScratchSpaceDictKey(plotterInstance, "legendKwargDict", "ncol", targVal)
 
 
 @serializationReg.registerForSerialization()
@@ -566,7 +566,7 @@ class SetLegendLocStr(plotCommCoreHelp.PlotCommand):
 		#We REALLY want to avoid setting to something that isnt a string (such as the loc tuple)
 		#or things will get confusing when setting fractional position
 		assert isinstance(targVal, str)
-		plotterInstance._scratchSpace["legendKwargDict"]["loc"] = targVal
+		_setScratchSpaceDictKey(plotterInstance, "legendKwargDict", "loc", targVal)
 
 
 #Note: This should generally be called AFTER SetLegendLocStr
@@ -750,6 +750,62 @@ class SetTickMinorMarkersOn(plotCommCoreHelp.PlotCommand):
 				plt.gca().yaxis.grid(visible=False, which="minor")
 			elif showMinorTicksY is True:
 				plt.gca().yaxis.set_minor_locator( matplotlib.ticker.AutoMinorLocator()   )
+
+
+
+@serializationReg.registerForSerialization()
+class SetTickValsToGroupCentres(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-tick-val-to-group-centres"
+		self._description = "Sets the tick markers to the centre of each group of bars"
+		
+	def execute(self, plotterInstance):
+		#Check if we have any data; exit if not
+#		if not( _doesPlotterInstanceHaveData(plotterInstance) ):
+#			return None
+
+		plotHoz = plotterInstance.opts.plotHorizontally.value
+		groupCentres = plotterInstance._scratchSpace.get("groupCentres",None)
+		if groupCentres is None:
+			return None
+
+		if plotHoz:
+			plt.gca().set_yticks(groupCentres)
+		else:
+			plt.gca().set_xticks(groupCentres)
+
+@serializationReg.registerForSerialization()
+class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-tick-labels-to-group-names"
+		self._description = "Sets the axis tick labels to group names"
+
+	def execute(self, plotterInstance):
+
+		groupLabels = plotterInstance.opts.groupLabels.value
+		if groupLabels is None:
+			return None
+
+		groupCentres = plotterInstance._scratchSpace.get("groupCentres",None)
+		if groupCentres is None:
+			return None
+
+		#
+		nGroups = len(groupCentres)
+		useLabels = [ label for label,unused in it.zip_longest(groupLabels, range(nGroups)) ]
+		useLabels = useLabels[:nGroups] if len(groupLabels)>nGroups else useLabels
+
+		rotation = _getValueFromOptName(plotterInstance, "groupLabelRotation")
+
+		#
+		plotHoz = plotterInstance.opts.plotHorizontally.value
+		if plotHoz:
+			plt.gca().set_yticklabels(useLabels, rotation=rotation)
+		else:
+			plt.gca().set_xticklabels(useLabels, rotation=rotation)
+
 
 @serializationReg.registerForSerialization()
 class SetTitleStr(plotCommCoreHelp.PlotCommand):

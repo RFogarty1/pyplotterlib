@@ -386,22 +386,29 @@ class SetTickLabelsToGroupLabels(plotCmdCoreHelp.PlotCommand):
 	def execute(self, plotterInstance):
 		data = plotCmdStdHelp._getValueFromOptName(plotterInstance, self._plotDataAttr)
 		groupLabels = plotCmdStdHelp._getValueFromOptName(plotterInstance, self._groupLabelAttr)
+		groupLabelsCols = plotCmdStdHelp._getValueFromOptName(plotterInstance, "groupLabelsCols")
+		groupLabelsRows = plotCmdStdHelp._getValueFromOptName(plotterInstance, "groupLabelsRows")
 
-		if (data is None) or (groupLabels is None):
+		if (data is None):
+			return None
+
+		if (groupLabels is None) and (groupLabelsCols is None) and (groupLabelsRows is None):
 			return None
 
 		#
-		groupLabelsX = plotCmdStdHelp._getValueFromOptName(plotterInstance, "groupLabelsCols")
+		groupLabelsX = groupLabelsCols
 		groupLabelsX = groupLabelsX if groupLabelsX is not None else groupLabels
 		rotationX = plotCmdStdHelp._getValueFromOptName(plotterInstance, "groupLabelsColsRotation")
 
-		groupLabelsY = plotCmdStdHelp._getValueFromOptName(plotterInstance, "groupLabelsRows")
+		groupLabelsY = groupLabelsRows
 		groupLabelsY = groupLabelsY if groupLabelsY is not None else groupLabels
 		rotationY = plotCmdStdHelp._getValueFromOptName(plotterInstance, "groupLabelsRowsRotation")
 
 		#Figure out the labels to use
 		ticksX, ticksY = plt.gca().get_xticks(), plt.gca().get_yticks()
 		def _getUseLabels(inpTicks, inpLabels):
+			if inpLabels is None:
+				return None
 			outLabels = [label if label is not None else tickVal for label,tickVal in it.zip_longest(inpLabels, inpTicks)]
 			return outLabels[:len(inpTicks)]
 
@@ -409,8 +416,10 @@ class SetTickLabelsToGroupLabels(plotCmdCoreHelp.PlotCommand):
 		useLabelsY = _getUseLabels(ticksY, groupLabelsY)
 
 		#
-		plt.gca().set_xticklabels(useLabelsX, rotation=rotationX)
-		plt.gca().set_yticklabels(useLabelsY, rotation=rotationY)
+		if useLabelsX is not None:
+			plt.gca().set_xticklabels(useLabelsX, rotation=rotationX)
+		if useLabelsY is not None:
+			plt.gca().set_yticklabels(useLabelsY, rotation=rotationY)
 		
 
 

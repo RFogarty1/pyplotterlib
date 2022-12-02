@@ -127,22 +127,18 @@ class GroupLabels(plotOptStdHelp.GroupLabels):
 	pass
 
 @serializationReg.registerForSerialization()
-class GroupLabelRotation(plotOptCoreHelp.FloatPlotOption):
+class GroupLabelRotation(plotOptStdHelp.GroupLabelRotation):
 	""" Sets the rotation angle (in degrees) for the bar chart labels (xtick labels for vertical, ytick labels for horizontal)
 
 	"""
-	def __init__(self, name=None, value=None):
-		self.name = "groupLabelRotation"
-		self.value = value
+	pass
 
 @serializationReg.registerForSerialization()
-class PlotHorizontally(plotOptCoreHelp.BooleanPlotOption):
+class PlotHorizontally(plotOptStdHelp.PlotHorizontally):
 	""" Boolean. If False labels are on the x-axis and bars on the y-axis. If True, its the other way around.
 
 	"""
-	def __init__(self, name=None, value=None):
-		self.name = "plotHorizontally"
-		self.value = value
+	pass
 
 @serializationReg.registerForSerialization()
 class ReverseIntraBarOrdering(plotOptCoreHelp.BooleanPlotOption):
@@ -223,26 +219,11 @@ class CalculateCentreVals(plotCommCoreHelp.PlotCommand):
 		#Calculate the centre values
 		nGroups = max( [len(x) for x in plotData] )
 		nSeries = len(plotData)
-		outCentres = [ list() for x in range(nSeries) ] 
-		currPos = 0
 
-		for groupIdx in range(nGroups):
-			for seriesIdx in range(nSeries):
-				outCentres[seriesIdx].append(currPos)
-				currPos += widthBars
-				currPos += widthIntraSpacing
+		_currArgs = [nGroups, nSeries, widthBars, widthIntraSpacing, widthInterSpacing]
+		barCentres, groupCentres = shared._getIndividAndGroupCentresBarLikePlot(*_currArgs, startPos=0)
 
-			currPos += widthInterSpacing
-
-		plotterInstance._scratchSpace["centres"] = outCentres
-
-
-		#Figure out the centre of each GROUP
-		groupCentres = list()
-		for idx in range(nGroups):
-			currCentres = [ x[idx] for x in outCentres ]
-			currAverage = sum(currCentres)/len(currCentres)
-			groupCentres.append(currAverage)
+		plotterInstance._scratchSpace["centres"] = barCentres
 		plotterInstance._scratchSpace["groupCentres"] = groupCentres
 
 
@@ -325,52 +306,12 @@ class SetTickMinorValsOnOrOff(plotCommCoreHelp.PlotCommand):
 
 
 @serializationReg.registerForSerialization()
-class SetTickValsToGroupCentres(plotCommCoreHelp.PlotCommand):
-
-	def __init__(self):
-		self._name = "set-tick-val-to-group-centres"
-		self._description = "Sets the tick markers to the centre of each group of bars"
-		
-	def execute(self, plotterInstance):
-		#Check if we have any data; exit if not
-		if not( _doesPlotterInstanceHaveData(plotterInstance) ):
-			return None
-
-		plotHoz = plotterInstance.opts.plotHorizontally.value
-		groupCentres = plotterInstance._scratchSpace["groupCentres"]
-		if plotHoz:
-			plt.gca().set_yticks(groupCentres)
-		else:
-			plt.gca().set_xticks(groupCentres)
+class SetTickValsToGroupCentres(plotCmdStdHelp.SetTickValsToGroupCentres):
+	pass
 		
 @serializationReg.registerForSerialization()
-class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
-
-	def __init__(self):
-		self._name = "set-tick-labels-to-group-names"
-		self._description = "Sets the axis tick labels to group names"
-
-	def execute(self, plotterInstance):
-		#Check if we have any data; exit if not
-		if not( _doesPlotterInstanceHaveData(plotterInstance) ):
-			return None
-
-		groupLabels = plotterInstance.opts.groupLabels.value
-		if groupLabels is None:
-			return None
-
-		#
-		nGroups = len(plotterInstance._scratchSpace["groupCentres"])
-		useLabels = [ label for label,unused in it.zip_longest(groupLabels, range(nGroups)) ]
-		rotation = plotCmdStdHelp._getValueFromOptName(plotterInstance, "groupLabelRotation")
-
-		#
-		plotHoz = plotterInstance.opts.plotHorizontally.value
-		if plotHoz:
-			plt.gca().set_yticklabels(useLabels, rotation=rotation)
-		else:
-			plt.gca().set_xticklabels(useLabels, rotation=rotation)
-
+class SetTickLabelsToGroupLabels(plotCmdStdHelp.SetTickLabelsToGroupLabels):
+	pass
 
 
 def _doesPlotterInstanceHaveData(plotterInstance):
