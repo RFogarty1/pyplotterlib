@@ -57,3 +57,26 @@ def _getAxisEdges(inpAx):
 
 
 
+#Refactored/Extracted from bar_plotter; also usable in boxPlotter (and likely other similar plotters in the future)
+def _getIndividAndGroupCentresBarLikePlot(nGroups, nSeries, widthBar, widthIntraSpacing, widthInterSpacing, startPos=0):
+	outCentres = [ list() for x in range(nSeries) ]
+	currPos = startPos
+
+	#Figure out where to plot the individual bars/similar
+	for gIdx in range(nGroups):
+		for sIdx in range(nSeries):
+			outCentres[sIdx].append(currPos)
+			currPos += widthBar
+			currPos += widthIntraSpacing
+		currPos += widthInterSpacing
+
+
+	#Figure out the centre of each group
+	groupCentres = list()
+	for idx in range(nGroups):
+		currCentres = [ x[idx] for x in outCentres ]
+		currAverage = sum(currCentres)/len(currCentres)
+		groupCentres.append(currAverage)
+	
+	return outCentres, groupCentres
+

@@ -375,27 +375,82 @@ class NumpyArrayPlotOption(SinglePlotOptionInter):
 		return cls( useDict["payload"]["name"], outVal )
 
 
-
-class NumpyIterPlotOption(SinglePlotOptionInter):
+class IterOfNumpyIterPlotOption(SinglePlotOptionInter):
 
 	def __eq__(self, other):
 		if self.name != other.name:
 			return False
 
-		#TODO: likely factor this into a function
+		#Deal with "None" options
 		if (self.value is None) and (other.value is None):
 			return True
 		elif (self.value is None) or (other.value is None):
 			return False
 
+		#Make sure lengths are the same
 		if len(self.value) != len(other.value):
 			return False
 
-		for (arrA,arrB) in it.zip_longest(self.value, other.value):
-			if not np.allclose( np.array(arrA), np.array(arrB) ):
+		#If iter lengths are the same; check each pair of iters are equal
+		for iterA, iterB in it.zip_longest(self.value, other.value):
+			if _areNumpyIterValsEqual(iterA, iterB) is False:
 				return False
 
 		return True
+
+	def toJSON(self):
+		if self.value is None:
+			outArrays = None
+		else:
+			outArrays = list()
+			for arrIter in self.value:
+				currVals = [ np.array(x).tolist() for x in arrIter ]
+				outArrays.append(currVals)
+
+		return json.dumps({"class":str(self.__class__), "payload":{"name":self.name, "value":outArrays}})
+
+
+	@classmethod
+	def fromJSON(cls, inpJSON):
+		useDict = json.loads(inpJSON)
+		if useDict["payload"]["value"] is None:
+			outVal = useDict["payload"]["value"]
+		else:
+			outVal = list()
+			for arrIter in useDict["payload"]["value"]:
+				currVals = [np.array(x) for x in arrIter]
+				outVal.append(currVals)
+
+		return cls( useDict["payload"]["name"], outVal )
+
+
+def _areNumpyIterValsEqual(iterA, iterB):
+	#Deal with "None" options
+	if (iterA is None) and (iterB is None):
+		return True
+	elif (iterA is None) or (iterB is None):
+		return False
+
+	#
+	if len(iterA) != len(iterB):
+		return False
+
+	#
+	for (arrA, arrB) in it.zip_longest(iterA, iterB):
+		if not np.allclose( np.array(arrA), np.array(arrB) ):
+			return False
+
+	return True
+
+
+class NumpyIterPlotOption(SinglePlotOptionInter):
+
+	def __eq__(self, other):
+
+		if self.name != other.name:
+			return False
+
+		return _areNumpyIterValsEqual(self.value, other.value)
 
 	def toJSON(self):
 		#Note np arrays arent JSON-compatible; hence need to work with them as lists
