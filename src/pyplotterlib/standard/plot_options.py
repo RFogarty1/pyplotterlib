@@ -61,6 +61,29 @@ class AxisColorY_exclSpines(plotOptCore.BooleanPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class AxisScaleX(plotOptCore.StringPlotOption):
+	""" Scale to use for the x-axis. Values are the same as those allowed in matplotlib set_xscale option ["linear", "log", "symlog", "logit"]
+
+	Note this sets the type of scaling; a separate option will be added to deal with kwargs for each
+
+	"""
+	def __init__(self, name="axisScaleX", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class AxisScaleY(plotOptCore.StringPlotOption):
+	""" Scale to use for the y-axis. Values are the same as those allowed in matplotlib set_xscale option ["linear", "log", "symlog", "logit"]
+
+	Note this sets the type of scaling; a separate option will be added to deal with kwargs for each
+
+	"""
+	def __init__(self, name="axisScaleY", value=None):
+		self.name = name
+		self.value = value
+
+
+@serializationReg.registerForSerialization()
 class BarColors(plotOptCore.StringIterPlotOption):
 	""" The bar colors to use. Allowed strings are the same as in matplotlib, meaning special color names or hex rgb codes are both fine. For Example ['red','green','orange'] is a valid value
 
@@ -248,6 +271,17 @@ class GroupLabelRotation(plotOptCore.FloatPlotOption):
 
 	"""
 	def __init__(self, name="groupLabelRotation", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class GroupLabelTicksEveryN(plotOptCore.IntPlotOption):
+	""" If set, we use a tick marker for every N groups (default will generally be N=1).
+
+	For example, if value=2 and groups=["A","B","C"] we will only have tick markers for groups "A" and "C"
+
+	"""
+	def __init__(self, name="groupLabelTicksEveryN", value=None):
 		self.name = name
 		self.value = value
 
@@ -454,6 +488,24 @@ class ShowTickLabelsOnSides(plotOptCore.BoolNamespaceOption):
 	"""
 	def __init__(self, name=None, value=None):
 		self.name = "showTickLabelsOnSides"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class TickLabelRotationX(plotOptCore.FloatPlotOption):
+	""" Rotation (in degrees) for the tick marker labels for the x axis
+
+	"""
+	def __init__(self, name="tickLabelRotationX", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class TickLabelRotationY(plotOptCore.FloatPlotOption):
+	""" Rotation (in degrees) for the tick marker labels for the y axis
+
+	"""
+	def __init__(self, name="tickLabelRotationY", value=None):
+		self.name = name
 		self.value = value
 
 @serializationReg.registerForSerialization()

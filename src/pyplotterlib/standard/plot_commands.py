@@ -340,6 +340,35 @@ class SetAxisColorY(plotCommCoreHelp.PlotCommand):
 			currAx.spines["left"].set_color(targVal)
 			currAx.spines["right"].set_color(targVal)
 
+@serializationReg.registerForSerialization()
+class SetAxisScaleX(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-axis-scale-x"
+		self._description = "Sets the type of scale for the x-axis; uses matplotlib set_xscale"
+
+	def execute(self, plotterInstance):
+		scaleVal = _getValueFromOptName(plotterInstance, "axisScaleX")
+		if scaleVal is None:
+			return None
+
+		plt.gca().set_xscale(scaleVal)
+
+
+@serializationReg.registerForSerialization()
+class SetAxisScaleY(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-axis-scale-y"
+		self._description = "Sets the type of scale for the y-axis; uses matplotlib set_yscale"
+
+	def execute(self, plotterInstance):
+		scaleVal = _getValueFromOptName(plotterInstance, "axisScaleY")
+		if scaleVal is None:
+			return None
+
+		plt.gca().set_yscale(scaleVal)
+
 
 @serializationReg.registerForSerialization()
 class SetAxisTickAndLabelVisibilitiesEachSide(plotCommCoreHelp.PlotCommand):
@@ -770,10 +799,14 @@ class SetTickValsToGroupCentres(plotCommCoreHelp.PlotCommand):
 		if groupCentres is None:
 			return None
 
+		#
+		everyN = _getValueFromOptName(plotterInstance, "groupLabelTicksEveryN", retIfNone=1)
+		useCentres = [x for idx,x in enumerate(groupCentres) if idx%everyN==0]
+
 		if plotHoz:
-			plt.gca().set_yticks(groupCentres)
+			plt.gca().set_yticks(useCentres)
 		else:
-			plt.gca().set_xticks(groupCentres)
+			plt.gca().set_xticks(useCentres)
 
 @serializationReg.registerForSerialization()
 class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
@@ -793,6 +826,11 @@ class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
 			return None
 
 		#
+		everyN = _getValueFromOptName(plotterInstance, "groupLabelTicksEveryN", retIfNone=1)
+		groupCentres = [x for idx,x in enumerate(groupCentres) if idx%everyN==0]
+		groupCentres = [x for idx,x in enumerate(groupLabels) if idx%everyN==0]
+
+		#
 		nGroups = len(groupCentres)
 		useLabels = [ label for label,unused in it.zip_longest(groupLabels, range(nGroups)) ]
 		useLabels = useLabels[:nGroups] if len(groupLabels)>nGroups else useLabels
@@ -805,6 +843,24 @@ class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
 			plt.gca().set_yticklabels(useLabels, rotation=rotation)
 		else:
 			plt.gca().set_xticklabels(useLabels, rotation=rotation)
+
+
+@serializationReg.registerForSerialization()
+class SetTickLabelRotations(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-tick-label-rotation"
+		self._description = "Sets the rotation angle (in degrees) for labels on the x/y axis"
+
+	def execute(self, plotterInstance):
+		rotationX = _getValueFromOptName(plotterInstance, "tickLabelRotationX")
+		rotationY = _getValueFromOptName(plotterInstance, "tickLabelRotationY")
+
+		if rotationX is not None:
+			plt.gca().xaxis.set_tick_params(rotation=rotationX)
+
+		if rotationY is not None:
+			plt.gca().yaxis.set_tick_params(rotation=rotationY)
 
 
 @serializationReg.registerForSerialization()
