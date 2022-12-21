@@ -422,6 +422,88 @@ class PlotHorizontally(plotOptCore.BooleanPlotOption):
 		self.name = name
 		self.value = value
 
+@serializationReg.registerForSerialization()
+class PlotHozLinesColorStrs(plotOptCore.StringOrStringIterPlotOption):
+	""" Colors for horizontal lines. Can be either a single string or an iterable of strings
+
+	Example: 'red' would mean ALL the additional horizontal lines are red
+
+	Example: ['red','blue'] means they would alternative between red/blue (including if more than 2 were plotted)
+
+	"""
+	def __init__(self, name="plotHozLineColorStrs", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class PlotHozLinesPositions(plotOptCore.FloatIterOrSingleFloatOption):
+	""" Position(s) to plot a horizontal line; thus, the correspond to values on the y-axis. A float-iter can be used for drawing multiple horizontal lines. 
+
+	Example: [1.5, 3.5] would lead to lines which intersect with y at 1.5/3.5
+
+	Example: 0.5 would lead to a single line intersecting with y at 0.5
+
+	"""
+	def __init__(self, name="plotHozLinePositions", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class PlotHozLinesStyleStrs(plotOptCore.StringOrStringIterPlotOption):
+	""" Line style(s) for plotting horizontal lines. Can be either a single string or iterable
+
+	Valid values: '-', ':', '--', '-.'
+
+	Example: '-' means ALL will be solid
+
+	Example: [':','--'] means lines will alternate between dotted and solid
+
+	"""
+	def __init__(self, name="plotHozLineStyleStrs", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class PlotVertLinesColorStrs(plotOptCore.StringOrStringIterPlotOption):
+	""" Colors for vertical lines. Can be either a single string or an iterable of strings
+
+	Example: 'red' would mean ALL the additional vertical lines are red
+
+	Example: ['red','blue'] means they would alternative between red/blue (including if more than 2 were plotted)
+
+	"""
+	def __init__(self, name="plotVertLineColorStrs", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class PlotVertLinesPositions(plotOptCore.FloatIterOrSingleFloatOption):
+	""" Position(s) to plot a vertical line; thus, the correspond to values on the y-axis. A float-iter can be used for drawing multiple vertical lines. 
+
+	Example: [1.5, 3.5] would lead to lines which intersect with x at 1.5/3.5
+
+	Example: 0.5 would lead to a single line intersecting with x at 0.5
+
+	"""
+	def __init__(self, name="plotVertLinePositions", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class PlotVertLinesStyleStrs(plotOptCore.StringOrStringIterPlotOption):
+	""" Line style(s) for plotting vertical lines. Can be either a single string or iterable
+
+	Valid values: '-', ':', '--', '-.'
+
+	Example: '-' means ALL will be solid
+
+	Example: [':','--'] means lines will alternate between dotted and solid
+
+	"""
+	def __init__(self, name="plotVertLineStyleStrs", value=None):
+		self.name = name
+		self.value = value
+
 
 @serializationReg.registerForSerialization()
 class SetFigsizeOnCreation(plotOptCore.FloatIterPlotOption):

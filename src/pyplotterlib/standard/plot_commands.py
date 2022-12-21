@@ -250,6 +250,100 @@ class PlotDataAsLines(plotCommCoreHelp.PlotCommand):
 		return
 
 @serializationReg.registerForSerialization()
+class PlotHozAndVertLines(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "plot-hoz-and-vert-lines"
+		self._description = "Plots horizontal and vertical lines; generally should be AFTER the main plotting (and x/y limit setting)"
+
+	def execute(self, plotterInstance):
+		self._plotHozLines(plotterInstance)
+		self._plotVertLines(plotterInstance)
+
+	def _plotHozLines(self, plotterInstance):
+		#1) Get the positions
+		linePositions = self._getLinePositionsFromKwarg(plotterInstance, "plotHozLinePositions")
+		if linePositions is None:
+			return None
+
+		kwargDicts = self._getKwargDictsForHozLines(plotterInstance, len(linePositions))
+
+		for currPos,kwargDict in it.zip_longest(linePositions, kwargDicts):
+			plt.gca().axhline(y=currPos, **kwargDict)
+
+
+	def _plotVertLines(self, plotterInstance):
+		#1) Get the positions
+		linePositions = self._getLinePositionsFromKwarg(plotterInstance, "plotVertLinePositions")
+		if linePositions is None:
+			return None
+
+		kwargDicts = self._getKwargDictsForVertLines(plotterInstance, len(linePositions))
+
+		for currPos,kwargDict in it.zip_longest(linePositions,kwargDicts):
+			plt.gca().axvline(x=currPos,**kwargDict)
+
+
+	def _getKwargDictsForHozLines(self, plotterInstance, nLines):
+		#
+		lineColors = _getValueFromOptName(plotterInstance, "plotHozLineColorStrs")
+		lineColors = self._getCycledStrListFromStrOrStrIter(lineColors, nLines)
+
+		#
+		lineStyles = _getValueFromOptName(plotterInstance, "plotHozLineStyleStrs")
+		lineStyles = self._getCycledStrListFromStrOrStrIter(lineStyles, nLines)
+
+		outDicts = list()
+		for idx,unused in enumerate(lineColors):
+			_currDict = {"color": lineColors[idx], "linestyle":lineStyles[idx]}
+			_currDict = {k:v for k,v in _currDict.items() if v is not None}
+			outDicts.append(_currDict)
+		return outDicts
+
+	def _getKwargDictsForVertLines(self, plotterInstance, nLines):
+		#
+		lineColors = _getValueFromOptName(plotterInstance, "plotVertLineColorStrs")
+		lineColors = self._getCycledStrListFromStrOrStrIter(lineColors, nLines)
+
+		#
+		lineStyles = _getValueFromOptName(plotterInstance, "plotVertLineStyleStrs")
+		lineStyles = self._getCycledStrListFromStrOrStrIter(lineStyles, nLines)
+
+		outDicts = list()
+		for idx,unused in enumerate(lineColors):
+			_currDict = {"color": lineColors[idx], "linestyle":lineStyles[idx]}
+			_currDict = {k:v for k,v in _currDict.items() if v is not None}
+			outDicts.append(_currDict)
+		return outDicts
+
+	def _getCycledStrListFromStrOrStrIter(self, strOrStrIter, nLines):
+		if strOrStrIter is None:
+			return [None for x in range(nLines)]
+
+		if isinstance(strOrStrIter, str):
+			useVals = [x[1] for x in zip( range(nLines), it.cycle([strOrStrIter]) ) ]
+		else:
+			useVals = [x[1] for x in zip( range(nLines), it.cycle(strOrStrIter) ) ]
+		
+		return useVals
+
+	def _getLinePositionsFromKwarg(self, plotterInstance, kwarg):
+		linePositions = _getValueFromOptName(plotterInstance, kwarg)
+		if linePositions is None:
+			return None
+
+		try:
+			iter(linePositions)
+		except TypeError:
+			linePositions = [linePositions]
+		else:
+			pass
+
+		return linePositions
+
+
+
+@serializationReg.registerForSerialization()
 class SetAxisBorderInvisible(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
