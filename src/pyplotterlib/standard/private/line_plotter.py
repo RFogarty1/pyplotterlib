@@ -69,8 +69,8 @@ def _createCommandsList():
 	plotCmdStdHelp.SetLegendFontSize(),
 	plotCmdStdHelp.SetLegendFractPosStart(),
 	plotCmdStdHelp.SetLegendNumberColumns(),
-	plotCmdStdHelp.TurnLegendOnIfRequested(),
-	plotCmdStdHelp.PlotHozAndVertLines()
+	plotCmdStdHelp.PlotHozAndVertLines(),
+	plotCmdStdHelp.TurnLegendOnIfRequested()
 	]
 
 	return outList

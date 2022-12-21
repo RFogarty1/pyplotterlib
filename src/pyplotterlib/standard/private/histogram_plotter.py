@@ -65,6 +65,7 @@ def _createCommandsList():
 	plotCmdStdHelp.SetLegendFontSize(),
 	plotCmdStdHelp.SetLegendFractPosStart(),
 	plotCmdStdHelp.SetLegendNumberColumns(),
+	plotCmdStdHelp.PlotHozAndVertLines(),
 	plotCmdStdHelp.TurnLegendOnIfRequested(),
 	plotCmdStdHelp.AddPlotterToOutput()
 	]
@@ -95,6 +96,12 @@ def _createOptionsList():
 	plotOptStdHelp.LegendOn(),
 	PlotDataHisto(),
 	PlotInReverseOrder(),
+	plotOptStdHelp.PlotHozLinesColorStrs(),
+	plotOptStdHelp.PlotHozLinesPositions(),
+	plotOptStdHelp.PlotHozLinesStyleStrs(),
+	plotOptStdHelp.PlotVertLinesColorStrs(),
+	plotOptStdHelp.PlotVertLinesPositions(),
+	plotOptStdHelp.PlotVertLinesStyleStrs(),
 	plotOptStdHelp.SetFigsizeOnCreation(),
 	plotOptStdHelp.ShowMinorTickMarkersX(),
 	plotOptStdHelp.ShowMinorTickMarkersY(),

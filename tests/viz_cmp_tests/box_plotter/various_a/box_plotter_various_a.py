@@ -51,7 +51,9 @@ def createPlotters():
 	#Multi series with horizontally plotted boxes
 	_currKwargs = {"boxColorsOn":None, "boxNotchOn":False, "boxColorStrsInterSeries":['r','g'],
 	               "groupLabelRotation":45, "groupLabels":["Hello", "There"], "legendFractPosStart":None,
-	               "plotHorizontally":True, "titleStr":"Plot D", "widthBoxes":0.5}
+	               "plotHorizontally":True,
+	               "plotVertLinePositions":8,
+	               "titleStr":"Plot D", "widthBoxes":0.5}
 	outPlotters.append( outPlotters[-1].createFactory(**_currKwargs))
 
 	#Simple with tick markers shown every 2 (rather than every 1)
@@ -59,6 +61,7 @@ def createPlotters():
 	_currKwargs = { "groupLabels":["A", "B", "C"], "groupLabelTicksEveryN":2,"legendFractPosStart": [0.7,0.1],
 	                "outliersShow":False, 
 	                "plotDataSingleSeries":[ inpValsA, inpValsB, inpValsC ], "titleStr":"Plot A",
+	                "plotHozLinePositions":6.5,
 	                "whiskersShow":False }
 	outPlotters.append( templPlotter.createFactory(**_currKwargs) )
 

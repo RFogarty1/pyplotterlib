@@ -31,8 +31,8 @@ def _createPlotter():
 
 
 	#Create slightly different histogram plotters
-	_kwargsA = {"gridLinesShowX":True, "plotDataHisto":[ [countsA, edges] ]}
-	_kwargsB = {"gridLinesShowY":True, "plotDataHisto":[ [countsB, edges] ]}
+	_kwargsA = {"gridLinesShowX":True, "plotDataHisto":[ [countsA, edges] ], "plotHozLineColorStrs":'black', "plotHozLinePositions":20}
+	_kwargsB = {"gridLinesShowY":True, "plotDataHisto":[ [countsB, edges] ], "plotVertLineColorStrs":'black', "plotVertLinePositions":-0.5}
 
 	plotterA = templPlotter.createFactory(**_kwargsA)
 	plotterB = templPlotter.createFactory(**_kwargsB)

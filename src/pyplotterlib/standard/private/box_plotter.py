@@ -71,6 +71,8 @@ def _createCommandsList():
 	plotCmdStdHelp.SetXLimit(),
 	plotCmdStdHelp.SetYLimit(),
 
+	plotCmdStdHelp.PlotHozAndVertLines(),
+
 	plotCmdStdHelp.SetLegendFontSize(),
 	plotCmdStdHelp.SetLegendNumberColumns(),
 	plotCmdStdHelp.SetLegendLocStr(),
@@ -102,6 +104,12 @@ def _createOptionsList():
 	PlotDataSingleSeries(),
 	PlotDataBox(),
 	plotOptStdHelp.PlotHorizontally(value=False),
+	plotOptStdHelp.PlotHozLinesColorStrs(),
+	plotOptStdHelp.PlotHozLinesPositions(),
+	plotOptStdHelp.PlotHozLinesStyleStrs(),
+	plotOptStdHelp.PlotVertLinesColorStrs(),
+	plotOptStdHelp.PlotVertLinesPositions(),
+	plotOptStdHelp.PlotVertLinesStyleStrs(),
 	plotOptStdHelp.SetFigsizeOnCreation(),
 	plotOptStdHelp.TitleFractPosX(),
 	plotOptStdHelp.TitleFractPosY(),
