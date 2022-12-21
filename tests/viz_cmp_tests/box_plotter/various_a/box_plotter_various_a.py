@@ -55,8 +55,11 @@ def createPlotters():
 	outPlotters.append( outPlotters[-1].createFactory(**_currKwargs))
 
 	#Simple with tick markers shown every 2 (rather than every 1)
+	#Also dont show whiskers or outliers
 	_currKwargs = { "groupLabels":["A", "B", "C"], "groupLabelTicksEveryN":2,"legendFractPosStart": [0.7,0.1],
-	                "plotDataSingleSeries":[ inpValsA, inpValsB, inpValsC ], "titleStr":"Plot A" }
+	                "outliersShow":False, 
+	                "plotDataSingleSeries":[ inpValsA, inpValsB, inpValsC ], "titleStr":"Plot A",
+	                "whiskersShow":False }
 	outPlotters.append( templPlotter.createFactory(**_currKwargs) )
 
 
