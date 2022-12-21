@@ -919,10 +919,12 @@ class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
 		if groupCentres is None:
 			return None
 
-		#
+		#Basically same code i used to figure out where the ticks should go if every N
 		everyN = _getValueFromOptName(plotterInstance, "groupLabelTicksEveryN", retIfNone=1)
 		groupCentres = [x for idx,x in enumerate(groupCentres) if idx%everyN==0]
-		groupCentres = [x for idx,x in enumerate(groupLabels) if idx%everyN==0]
+
+		#
+		groupLabels = [x for idx,x in enumerate(groupLabels) if idx%everyN==0]
 
 		#
 		nGroups = len(groupCentres)
