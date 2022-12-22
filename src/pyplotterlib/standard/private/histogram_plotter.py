@@ -252,7 +252,7 @@ def _getBarCentresAndWidthsFromEdges(edges):
 	for idx,_unused in enumerate(edges[:-1]):
 		_edgePair = edges[idx], edges[idx+1]
 		_currWidth = abs(_edgePair[0] - _edgePair[1])
-		_currCentre = min(_edgePair) + _currWidth
+		_currCentre = min(_edgePair) + 0.5*_currWidth
 		outCentres.append(_currCentre)
 		outWidths.append(_currWidth)
 
