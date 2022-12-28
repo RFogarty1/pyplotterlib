@@ -25,6 +25,10 @@ def createTemplatePlotter():
 
 	currKwargs = {"dataLabels":["dataA"],"plotData":[dataAll],
 	              "lineMarkerStyles":['x'], "lineStyles":['none'],
+	              "plotHozLinePositions":300,
+	              "plotVertLineColorStrs":['red','green','green'],
+	              "plotVertLinePositions":[2,5,11],
+	              "plotVertLineStyleStrs":[':','--','--'],
 	              "showLegend":True,
 	              "xLabelStr":"x-label", "yLabelStr":"y-label"}
 	outPlotter = plotters.LinePlotter(**currKwargs)

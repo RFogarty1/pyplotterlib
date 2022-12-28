@@ -250,6 +250,100 @@ class PlotDataAsLines(plotCommCoreHelp.PlotCommand):
 		return
 
 @serializationReg.registerForSerialization()
+class PlotHozAndVertLines(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "plot-hoz-and-vert-lines"
+		self._description = "Plots horizontal and vertical lines; generally should be AFTER the main plotting (and x/y limit setting)"
+
+	def execute(self, plotterInstance):
+		self._plotHozLines(plotterInstance)
+		self._plotVertLines(plotterInstance)
+
+	def _plotHozLines(self, plotterInstance):
+		#1) Get the positions
+		linePositions = self._getLinePositionsFromKwarg(plotterInstance, "plotHozLinePositions")
+		if linePositions is None:
+			return None
+
+		kwargDicts = self._getKwargDictsForHozLines(plotterInstance, len(linePositions))
+
+		for currPos,kwargDict in it.zip_longest(linePositions, kwargDicts):
+			plt.gca().axhline(y=currPos, **kwargDict)
+
+
+	def _plotVertLines(self, plotterInstance):
+		#1) Get the positions
+		linePositions = self._getLinePositionsFromKwarg(plotterInstance, "plotVertLinePositions")
+		if linePositions is None:
+			return None
+
+		kwargDicts = self._getKwargDictsForVertLines(plotterInstance, len(linePositions))
+
+		for currPos,kwargDict in it.zip_longest(linePositions,kwargDicts):
+			plt.gca().axvline(x=currPos,**kwargDict)
+
+
+	def _getKwargDictsForHozLines(self, plotterInstance, nLines):
+		#
+		lineColors = _getValueFromOptName(plotterInstance, "plotHozLineColorStrs")
+		lineColors = self._getCycledStrListFromStrOrStrIter(lineColors, nLines)
+
+		#
+		lineStyles = _getValueFromOptName(plotterInstance, "plotHozLineStyleStrs")
+		lineStyles = self._getCycledStrListFromStrOrStrIter(lineStyles, nLines)
+
+		outDicts = list()
+		for idx,unused in enumerate(lineColors):
+			_currDict = {"color": lineColors[idx], "linestyle":lineStyles[idx]}
+			_currDict = {k:v for k,v in _currDict.items() if v is not None}
+			outDicts.append(_currDict)
+		return outDicts
+
+	def _getKwargDictsForVertLines(self, plotterInstance, nLines):
+		#
+		lineColors = _getValueFromOptName(plotterInstance, "plotVertLineColorStrs")
+		lineColors = self._getCycledStrListFromStrOrStrIter(lineColors, nLines)
+
+		#
+		lineStyles = _getValueFromOptName(plotterInstance, "plotVertLineStyleStrs")
+		lineStyles = self._getCycledStrListFromStrOrStrIter(lineStyles, nLines)
+
+		outDicts = list()
+		for idx,unused in enumerate(lineColors):
+			_currDict = {"color": lineColors[idx], "linestyle":lineStyles[idx]}
+			_currDict = {k:v for k,v in _currDict.items() if v is not None}
+			outDicts.append(_currDict)
+		return outDicts
+
+	def _getCycledStrListFromStrOrStrIter(self, strOrStrIter, nLines):
+		if strOrStrIter is None:
+			return [None for x in range(nLines)]
+
+		if isinstance(strOrStrIter, str):
+			useVals = [x[1] for x in zip( range(nLines), it.cycle([strOrStrIter]) ) ]
+		else:
+			useVals = [x[1] for x in zip( range(nLines), it.cycle(strOrStrIter) ) ]
+		
+		return useVals
+
+	def _getLinePositionsFromKwarg(self, plotterInstance, kwarg):
+		linePositions = _getValueFromOptName(plotterInstance, kwarg)
+		if linePositions is None:
+			return None
+
+		try:
+			iter(linePositions)
+		except TypeError:
+			linePositions = [linePositions]
+		else:
+			pass
+
+		return linePositions
+
+
+
+@serializationReg.registerForSerialization()
 class SetAxisBorderInvisible(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -339,6 +433,35 @@ class SetAxisColorY(plotCommCoreHelp.PlotCommand):
 		if exclSpines is not True:
 			currAx.spines["left"].set_color(targVal)
 			currAx.spines["right"].set_color(targVal)
+
+@serializationReg.registerForSerialization()
+class SetAxisScaleX(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-axis-scale-x"
+		self._description = "Sets the type of scale for the x-axis; uses matplotlib set_xscale"
+
+	def execute(self, plotterInstance):
+		scaleVal = _getValueFromOptName(plotterInstance, "axisScaleX")
+		if scaleVal is None:
+			return None
+
+		plt.gca().set_xscale(scaleVal)
+
+
+@serializationReg.registerForSerialization()
+class SetAxisScaleY(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-axis-scale-y"
+		self._description = "Sets the type of scale for the y-axis; uses matplotlib set_yscale"
+
+	def execute(self, plotterInstance):
+		scaleVal = _getValueFromOptName(plotterInstance, "axisScaleY")
+		if scaleVal is None:
+			return None
+
+		plt.gca().set_yscale(scaleVal)
 
 
 @serializationReg.registerForSerialization()
@@ -770,10 +893,14 @@ class SetTickValsToGroupCentres(plotCommCoreHelp.PlotCommand):
 		if groupCentres is None:
 			return None
 
+		#
+		everyN = _getValueFromOptName(plotterInstance, "groupLabelTicksEveryN", retIfNone=1)
+		useCentres = [x for idx,x in enumerate(groupCentres) if idx%everyN==0]
+
 		if plotHoz:
-			plt.gca().set_yticks(groupCentres)
+			plt.gca().set_yticks(useCentres)
 		else:
-			plt.gca().set_xticks(groupCentres)
+			plt.gca().set_xticks(useCentres)
 
 @serializationReg.registerForSerialization()
 class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
@@ -792,6 +919,13 @@ class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
 		if groupCentres is None:
 			return None
 
+		#Basically same code i used to figure out where the ticks should go if every N
+		everyN = _getValueFromOptName(plotterInstance, "groupLabelTicksEveryN", retIfNone=1)
+		groupCentres = [x for idx,x in enumerate(groupCentres) if idx%everyN==0]
+
+		#
+		groupLabels = [x for idx,x in enumerate(groupLabels) if idx%everyN==0]
+
 		#
 		nGroups = len(groupCentres)
 		useLabels = [ label for label,unused in it.zip_longest(groupLabels, range(nGroups)) ]
@@ -805,6 +939,24 @@ class SetTickLabelsToGroupLabels(plotCommCoreHelp.PlotCommand):
 			plt.gca().set_yticklabels(useLabels, rotation=rotation)
 		else:
 			plt.gca().set_xticklabels(useLabels, rotation=rotation)
+
+
+@serializationReg.registerForSerialization()
+class SetTickLabelRotations(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-tick-label-rotation"
+		self._description = "Sets the rotation angle (in degrees) for labels on the x/y axis"
+
+	def execute(self, plotterInstance):
+		rotationX = _getValueFromOptName(plotterInstance, "tickLabelRotationX")
+		rotationY = _getValueFromOptName(plotterInstance, "tickLabelRotationY")
+
+		if rotationX is not None:
+			plt.gca().xaxis.set_tick_params(rotation=rotationX)
+
+		if rotationY is not None:
+			plt.gca().yaxis.set_tick_params(rotation=rotationY)
 
 
 @serializationReg.registerForSerialization()

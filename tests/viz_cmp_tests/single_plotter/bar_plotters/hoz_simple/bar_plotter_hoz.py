@@ -34,6 +34,8 @@ def getPlotterKwargDict():
 	"gridLinesShowX":True,
 	"plotData1D": [dataA, dataB],
 	"plotHorizontally":True,
+	"plotHozLineColorStrs":'black', "plotHozLinePositions":1,
+	"plotVertLineColorStrs":'black', "plotVertLinePositions":[6,18],
 	"showLegend": True,
 	"xLabelStr":"Test x-label",
 	}

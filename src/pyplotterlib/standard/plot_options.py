@@ -61,6 +61,29 @@ class AxisColorY_exclSpines(plotOptCore.BooleanPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class AxisScaleX(plotOptCore.StringPlotOption):
+	""" Scale to use for the x-axis. Values are the same as those allowed in matplotlib set_xscale option ["linear", "log", "symlog", "logit"]
+
+	Note this sets the type of scaling; a separate option will be added to deal with kwargs for each
+
+	"""
+	def __init__(self, name="axisScaleX", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class AxisScaleY(plotOptCore.StringPlotOption):
+	""" Scale to use for the y-axis. Values are the same as those allowed in matplotlib set_xscale option ["linear", "log", "symlog", "logit"]
+
+	Note this sets the type of scaling; a separate option will be added to deal with kwargs for each
+
+	"""
+	def __init__(self, name="axisScaleY", value=None):
+		self.name = name
+		self.value = value
+
+
+@serializationReg.registerForSerialization()
 class BarColors(plotOptCore.StringIterPlotOption):
 	""" The bar colors to use. Allowed strings are the same as in matplotlib, meaning special color names or hex rgb codes are both fine. For Example ['red','green','orange'] is a valid value
 
@@ -252,6 +275,17 @@ class GroupLabelRotation(plotOptCore.FloatPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class GroupLabelTicksEveryN(plotOptCore.IntPlotOption):
+	""" If set, we use a tick marker for every N groups (default will generally be N=1).
+
+	For example, if value=2 and groups=["A","B","C"] we will only have tick markers for groups "A" and "C"
+
+	"""
+	def __init__(self, name="groupLabelTicksEveryN", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class LegendLocStr(plotOptCore.StringPlotOption):
 	""" String representing location of legend, e.g. 'upper right' or 'best'. Same as used in matplotlib.
 
@@ -388,6 +422,88 @@ class PlotHorizontally(plotOptCore.BooleanPlotOption):
 		self.name = name
 		self.value = value
 
+@serializationReg.registerForSerialization()
+class PlotHozLinesColorStrs(plotOptCore.StringOrStringIterPlotOption):
+	""" Colors for horizontal lines. Can be either a single string or an iterable of strings
+
+	Example: 'red' would mean ALL the additional horizontal lines are red
+
+	Example: ['red','blue'] means they would alternative between red/blue (including if more than 2 were plotted)
+
+	"""
+	def __init__(self, name="plotHozLineColorStrs", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class PlotHozLinesPositions(plotOptCore.FloatIterOrSingleFloatOption):
+	""" Position(s) to plot a horizontal line; thus, the correspond to values on the y-axis. A float-iter can be used for drawing multiple horizontal lines. 
+
+	Example: [1.5, 3.5] would lead to lines which intersect with y at 1.5/3.5
+
+	Example: 0.5 would lead to a single line intersecting with y at 0.5
+
+	"""
+	def __init__(self, name="plotHozLinePositions", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class PlotHozLinesStyleStrs(plotOptCore.StringOrStringIterPlotOption):
+	""" Line style(s) for plotting horizontal lines. Can be either a single string or iterable
+
+	Valid values: '-', ':', '--', '-.'
+
+	Example: '-' means ALL will be solid
+
+	Example: [':','--'] means lines will alternate between dotted and solid
+
+	"""
+	def __init__(self, name="plotHozLineStyleStrs", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class PlotVertLinesColorStrs(plotOptCore.StringOrStringIterPlotOption):
+	""" Colors for vertical lines. Can be either a single string or an iterable of strings
+
+	Example: 'red' would mean ALL the additional vertical lines are red
+
+	Example: ['red','blue'] means they would alternative between red/blue (including if more than 2 were plotted)
+
+	"""
+	def __init__(self, name="plotVertLineColorStrs", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class PlotVertLinesPositions(plotOptCore.FloatIterOrSingleFloatOption):
+	""" Position(s) to plot a vertical line; thus, the correspond to values on the y-axis. A float-iter can be used for drawing multiple vertical lines. 
+
+	Example: [1.5, 3.5] would lead to lines which intersect with x at 1.5/3.5
+
+	Example: 0.5 would lead to a single line intersecting with x at 0.5
+
+	"""
+	def __init__(self, name="plotVertLinePositions", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class PlotVertLinesStyleStrs(plotOptCore.StringOrStringIterPlotOption):
+	""" Line style(s) for plotting vertical lines. Can be either a single string or iterable
+
+	Valid values: '-', ':', '--', '-.'
+
+	Example: '-' means ALL will be solid
+
+	Example: [':','--'] means lines will alternate between dotted and solid
+
+	"""
+	def __init__(self, name="plotVertLineStyleStrs", value=None):
+		self.name = name
+		self.value = value
+
 
 @serializationReg.registerForSerialization()
 class SetFigsizeOnCreation(plotOptCore.FloatIterPlotOption):
@@ -454,6 +570,24 @@ class ShowTickLabelsOnSides(plotOptCore.BoolNamespaceOption):
 	"""
 	def __init__(self, name=None, value=None):
 		self.name = "showTickLabelsOnSides"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class TickLabelRotationX(plotOptCore.FloatPlotOption):
+	""" Rotation (in degrees) for the tick marker labels for the x axis
+
+	"""
+	def __init__(self, name="tickLabelRotationX", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class TickLabelRotationY(plotOptCore.FloatPlotOption):
+	""" Rotation (in degrees) for the tick marker labels for the y axis
+
+	"""
+	def __init__(self, name="tickLabelRotationY", value=None):
+		self.name = name
 		self.value = value
 
 @serializationReg.registerForSerialization()

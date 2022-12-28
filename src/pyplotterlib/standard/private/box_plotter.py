@@ -56,6 +56,8 @@ def _createCommandsList():
 	AddBoxPositionsToScratch(),
 	AddHozPlotOptionToScratch(),
 	AddNotchesOnOrOffToScratch(),
+	AddOutlierOptsToScratch(),
+	AddWhiskerOnOrOffToScratch(),
 	PlotBoxData(),
 	plotCmdStdHelp.SetTickValsToGroupCentres(),
 	plotCmdStdHelp.SetTickLabelsToGroupLabels(),
@@ -68,6 +70,8 @@ def _createCommandsList():
 	plotCmdStdHelp.SetYLabelFractPos(),
 	plotCmdStdHelp.SetXLimit(),
 	plotCmdStdHelp.SetYLimit(),
+
+	plotCmdStdHelp.PlotHozAndVertLines(),
 
 	plotCmdStdHelp.SetLegendFontSize(),
 	plotCmdStdHelp.SetLegendNumberColumns(),
@@ -91,13 +95,21 @@ def _createOptionsList():
 	plotOptStdHelp.GridLinesShowY(),
 	plotOptStdHelp.GroupLabels(),
 	plotOptStdHelp.GroupLabelRotation(),
+	plotOptStdHelp.GroupLabelTicksEveryN(),
 	plotOptStdHelp.LegendLocStr(),
 	plotOptStdHelp.LegendFractPosStart(),
 	plotOptStdHelp.LegendOn(),
 	plotOptStdHelp.LegendNumbCols(),
+	OutliersShow(),
 	PlotDataSingleSeries(),
 	PlotDataBox(),
 	plotOptStdHelp.PlotHorizontally(value=False),
+	plotOptStdHelp.PlotHozLinesColorStrs(),
+	plotOptStdHelp.PlotHozLinesPositions(),
+	plotOptStdHelp.PlotHozLinesStyleStrs(),
+	plotOptStdHelp.PlotVertLinesColorStrs(),
+	plotOptStdHelp.PlotVertLinesPositions(),
+	plotOptStdHelp.PlotVertLinesStyleStrs(),
 	plotOptStdHelp.SetFigsizeOnCreation(),
 	plotOptStdHelp.TitleFractPosX(),
 	plotOptStdHelp.TitleFractPosY(),
@@ -110,7 +122,8 @@ def _createOptionsList():
 	plotOptStdHelp.YLimit(),
 	WidthBoxes(),
 	WidthInterSpacing(),
-	WidthIntraSpacing()
+	WidthIntraSpacing(),
+	WhiskersShow()
 	]
 	return outList
 
@@ -148,6 +161,16 @@ class BoxNotchOn(plotOptCoreHelp.BooleanPlotOption):
 	def __init__(self, name="boxNotchOn", value=None):
 		self.name = name
 		self.value = value
+
+@serializationReg.registerForSerialization()
+class OutliersShow(plotOptCoreHelp.BooleanPlotOption):
+	""" Boolean. If True then outliers will be shown.
+
+	"""
+	def __init__(self, name="outliersShow", value=None):
+		self.name = name
+		self.value = value
+
 
 @serializationReg.registerForSerialization()
 class PlotDataSingleSeries(plotOptCoreHelp.NumpyIterPlotOption):
@@ -213,6 +236,14 @@ class WidthIntraSpacing(plotOptCoreHelp.FloatPlotOption):
 		self.name = name
 		self.value = value
 
+@serializationReg.registerForSerialization()
+class WhiskersShow(plotOptCoreHelp.BooleanPlotOption):
+	"""The summary line for a class docstring should fit on one line.
+
+	"""
+	def __init__(self, name="whiskersShow", value=None):
+		self.name = name
+		self.value = value
 
 #Commands down here
 @serializationReg.registerForSerialization()
@@ -321,6 +352,18 @@ class AddHozPlotOptionToScratch(plotCmdCoreHelp.PlotCommand):
 			plotCmdStdHelp._setScratchSpaceDictKey(plotterInstance, "boxPlotKwargsGlobal", "vert", False)
 
 @serializationReg.registerForSerialization()
+class AddOutlierOptsToScratch(plotCmdCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "add-outlier-opts-to-scratch"
+		self._description = "Modifies boxPlotKwargsGlobal to include options related to how to plot outliers (if at all)"
+
+	def execute(self, plotterInstance):
+		onOpt = plotCmdStdHelp._getValueFromOptName(plotterInstance, "outliersShow")
+		if onOpt is False:
+			plotCmdStdHelp._setScratchSpaceDictKey(plotterInstance, "boxPlotKwargsGlobal", "showfliers", False)
+
+@serializationReg.registerForSerialization()
 class AddNotchesOnOrOffToScratch(plotCmdCoreHelp.PlotCommand):
 
 	def __init__(self):
@@ -332,7 +375,17 @@ class AddNotchesOnOrOffToScratch(plotCmdCoreHelp.PlotCommand):
 		if notchesOn is True:
 			plotCmdStdHelp._setScratchSpaceDictKey(plotterInstance, "boxPlotKwargsGlobal", "notch", True)
 
+@serializationReg.registerForSerialization()
+class AddWhiskerOnOrOffToScratch(plotCmdCoreHelp.PlotCommand):
 
+	def __init__(self):
+		self._name = "set-whiskers-on-or-off"
+		self._description = "Modifies boxPlotKwargsGlobal to turn whiskers on or off"
+
+	def execute(self, plotterInstance):
+		showWhiskers = plotCmdStdHelp._getValueFromOptName(plotterInstance, "whiskersShow")
+		if showWhiskers is False:
+			plotCmdStdHelp._setScratchSpaceDictKey(plotterInstance, "boxPlotKwargsGlobal", "whis", 0)
 
 @serializationReg.registerForSerialization()
 class PlotBoxData(plotCmdCoreHelp.PlotCommand):

@@ -65,6 +65,7 @@ def _createCommandsList():
 	plotCmdStdHelp.SetLegendFontSize(),
 	plotCmdStdHelp.SetLegendFractPosStart(),
 	plotCmdStdHelp.SetLegendNumberColumns(),
+	plotCmdStdHelp.PlotHozAndVertLines(),
 	plotCmdStdHelp.TurnLegendOnIfRequested(),
 	plotCmdStdHelp.AddPlotterToOutput()
 	]
@@ -89,12 +90,19 @@ def _createOptionsList():
 	plotOptStdHelp.GridLinesShowY(),
 	plotOptStdHelp.GridLinesStyle(),
 	plotOptStdHelp.GridLinesWidth(),
+	InterBarFractSpace(),
 	plotOptStdHelp.LegendFractPosStart(),
 	plotOptStdHelp.LegendLocStr(),
 	plotOptStdHelp.LegendNumbCols(),
 	plotOptStdHelp.LegendOn(),
 	PlotDataHisto(),
 	PlotInReverseOrder(),
+	plotOptStdHelp.PlotHozLinesColorStrs(),
+	plotOptStdHelp.PlotHozLinesPositions(),
+	plotOptStdHelp.PlotHozLinesStyleStrs(),
+	plotOptStdHelp.PlotVertLinesColorStrs(),
+	plotOptStdHelp.PlotVertLinesPositions(),
+	plotOptStdHelp.PlotVertLinesStyleStrs(),
 	plotOptStdHelp.SetFigsizeOnCreation(),
 	plotOptStdHelp.ShowMinorTickMarkersX(),
 	plotOptStdHelp.ShowMinorTickMarkersY(),
@@ -117,6 +125,16 @@ def _createOptionsList():
 
 
 #Create options
+@serializationReg.registerForSerialization()
+class InterBarFractSpace(plotOptCoreHelp.FloatPlotOption):
+	""" Determines how much space to leave between bars. The value should be between 0.0 (no space) and 1.0 (no bars)
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "interBarFractSpace"
+		self.value = value
+
+
 @serializationReg.registerForSerialization()
 class PlotDataHisto(plotOptCoreHelp.SinglePlotOptionInter):
 	""" Data for plotting in a histogram. The format is an iter of [counts,edges]; each element is equivalent to the return value of numpy.histogram()
@@ -212,10 +230,11 @@ class PlotHistoData(plotCommCoreHelp.PlotCommand):
 			return None
 
 		#Figure out all our bars centres and widths
+		_fractSpace = plotCmdStdHelp._getValueFromOptName(plotterInstance, "interBarFractSpace", retIfNone=0.0)
 		centresAndWidths = list()
 		for currData in data:
 			edges = currData[1]
-			_currVals = _getBarCentresAndWidthsFromEdges(edges)
+			_currVals = _getBarCentresAndWidthsFromEdges(edges, fractSpace=_fractSpace)
 			centresAndWidths.append(_currVals)
 
 		counts = [x[0] for x in data]
@@ -239,15 +258,16 @@ class PlotHistoData(plotCommCoreHelp.PlotCommand):
 		plotterInstance._scratchSpace["barHandles"] = outBars
 
 
-def _getBarCentresAndWidthsFromEdges(edges):
+def _getBarCentresAndWidthsFromEdges(edges, fractSpace=0.0):
 	outCentres, outWidths = list(), list()
 
 	for idx,_unused in enumerate(edges[:-1]):
 		_edgePair = edges[idx], edges[idx+1]
 		_currWidth = abs(_edgePair[0] - _edgePair[1])
-		_currCentre = min(_edgePair) + _currWidth
+		_currCentre = min(_edgePair) + 0.5*_currWidth
+		_useWidth = _currWidth - (fractSpace*_currWidth)
 		outCentres.append(_currCentre)
-		outWidths.append(_currWidth)
+		outWidths.append(_useWidth)
 
 	return outCentres, outWidths
 
