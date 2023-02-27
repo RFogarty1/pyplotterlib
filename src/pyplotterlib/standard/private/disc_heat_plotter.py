@@ -47,6 +47,7 @@ class DiscreteHeatMapPlotter(shared.FromJsonMixin, shared.FromPlotterMixin, plot
 def _createCommandsList():
 	outList = [
 	plotCmdStdHelp.CreateFigureIfNoAxHandle(),
+	plotCmdStdHelp.SetAspectStr(),
 	plotCmdStdHelp.AddPlotterToOutput(),
 	plotCmdStdHelp.CopyNumpyArrayPlotDataToScratchSpace(),
 	RemoveUnwantedPlotData(),
@@ -71,8 +72,10 @@ def _createOptionsList():
 	outList = [
 	AnnotateVals(),
 	AnnotateValsFontSize(),
+	AnnotateValsRotation(),
 	AnnotateValsStrFmt(value="{:.2f}"),
 	AnnotateValsTextColor(),
+	plotOptStdHelp.AspectString(value="auto"),
 	plotOptStdHelp.ColorBarFontSize(),
 	plotOptStdHelp.ColorBarLabelFontSize(),
 	plotOptStdHelp.ColorBarTickLabelFontSize(),
@@ -98,6 +101,7 @@ def _createOptionsList():
 	PlotDiag(value=True),
 	PlotLowerTri(value=True),
 	PlotUpperTri(value=True),
+	plotOptStdHelp.SetFigsizeOnCreation(),
 	plotOptStdHelp.TitleStr(),
 	plotOptStdHelp.XLabelStr(),
 	plotOptStdHelp.YLabelStr()
@@ -122,6 +126,15 @@ class AnnotateValsFontSize(plotOptCoreHelp.IntPlotOption):
 	"""
 	def __init__(self, name=None, value=None):
 		self.name = "annotateValsFontSize"
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class AnnotateValsRotation(plotOptCoreHelp.FloatPlotOption):
+	""" The rotation of text annotations. Units are degrees
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "annotateValsRotation"
 		self.value = value
 
 @serializationReg.registerForSerialization()
@@ -256,6 +269,7 @@ class AddDataAnnotations(plotCmdCoreHelp.PlotCommand):
 		fmtStr = plotCmdStdHelp._getValueFromOptName(plotterInstance,"annotateValsStrFmt", retIfNone="{}")
 		nRows, nCols = data.shape
 		annotateColor = plotCmdStdHelp._getValueFromOptName(plotterInstance, "annotateValsTextColor")
+		annotateRotation = plotCmdStdHelp._getValueFromOptName(plotterInstance, "annotateValsRotation")
 
 		useFontSize = plotCmdStdHelp._getValueFromOptName(plotterInstance, "fontSizeDefault")
 		useFontSize = plotCmdStdHelp._getValueFromOptName(plotterInstance, "annotateValsFontSize", retIfNone=useFontSize)
@@ -267,7 +281,7 @@ class AddDataAnnotations(plotCmdCoreHelp.PlotCommand):
 				currVal = data[rIdx,cIdx]
 				if not np.isnan(currVal):
 					plt.gca().text(cIdx, rIdx, fmtStr.format(currVal),
-					               ha="center", va="center", color=colorArray[rIdx][cIdx], fontsize=useFontSize)
+					               ha="center", va="center", color=colorArray[rIdx][cIdx], fontsize=useFontSize, rotation=annotateRotation)
 
 
 	def _getColorArray(self, plotterInstance, inpData):

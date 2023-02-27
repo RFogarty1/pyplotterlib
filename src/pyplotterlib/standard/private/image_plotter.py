@@ -105,16 +105,8 @@ def _createOptionsList():
 
 #Options
 @serializationReg.registerForSerialization()
-class AspectString(plotOptCoreHelp.StringPlotOption):
-	""" String controlling how the image aspect works
-
-	equal: Pixels kept square; aspect ratio is maintained but axes may not fill the space
-	auto: Aspect ratio is altered such that the image fits the axes; may be useful when creating grids of images
-
-	"""
-	def __init__(self, name=None, value=None):
-		self.name = "aspectStr"
-		self.value = value
+class AspectString(plotOptStdHelp.AspectString):
+	pass
 
 @serializationReg.registerForSerialization()
 class ColormapStr(plotOptStdHelp.ColormapStr):
@@ -158,19 +150,9 @@ class AddColorBar(plotCmdStdHelp.AddColorBar):
 	pass
 
 @serializationReg.registerForSerialization()
-class SetAspectStr(plotCmdCoreHelp.PlotCommand):
+class SetAspectStr(plotCmdStdHelp.SetAspectStr):
+	pass
 
-	def __init__(self):
-		self._name = "set-aspect-str"
-		self._description = "Sets the aspect string for the axis"
-		self._optName = "aspectStr"
-
-	def execute(self, plotterInstance):
-		aspectStr = plotCmdStdHelp._getValueFromOptName(plotterInstance, self._optName)
-		if aspectStr is None:
-			return None
-		else:
-			plotterInstance._scratchSpace["plotKwargs"]["aspect"] = aspectStr
 
 @serializationReg.registerForSerialization()
 class SetColormap(plotCmdStdHelp.SetColormapInPlotKwargs):

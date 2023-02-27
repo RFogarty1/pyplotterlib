@@ -6,6 +6,17 @@ import numpy as np
 from ..core import plot_options as plotOptCore
 from ..core.serialization import register as serializationReg
 
+@serializationReg.registerForSerialization()
+class AspectString(plotOptCore.StringPlotOption):
+	""" String controlling how the image aspect works
+
+	equal: Pixels kept square; aspect ratio is maintained but axes may not fill the space
+	auto: Aspect ratio is altered such that the image fits the axes; may be useful when creating grids of images
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "aspectStr"
+		self.value = value
 
 @serializationReg.registerForSerialization()
 class AxisBorderMakeInvisible(plotOptCore.BoolNamespaceOption):

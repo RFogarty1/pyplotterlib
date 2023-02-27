@@ -342,6 +342,21 @@ class PlotHozAndVertLines(plotCommCoreHelp.PlotCommand):
 		return linePositions
 
 
+@serializationReg.registerForSerialization()
+class SetAspectStr(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-aspect-str"
+		self._description = "Sets the aspect string for the axis"
+		self._optName = "aspectStr"
+
+	def execute(self, plotterInstance):
+		aspectStr = _getValueFromOptName(plotterInstance, self._optName)
+		if aspectStr is None:
+			return None
+		else:
+			_setScratchSpaceDictKey(plotterInstance, "plotKwargs", "aspect", aspectStr)
+
 
 @serializationReg.registerForSerialization()
 class SetAxisBorderInvisible(plotCommCoreHelp.PlotCommand):
