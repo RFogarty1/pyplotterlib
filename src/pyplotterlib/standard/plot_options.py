@@ -106,6 +106,17 @@ class BarColors(plotOptCore.StringIterPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class BarOpacities(plotOptCore.FloatIterPlotOption):
+	""" The opacities to use for each bar. Values should be between 0 (invisible) and 1 (fully opaque). Corresponds to the alpha keyword in matplotlib.
+
+	Note: The number of values doesnt have to match the number of data series, if you provide too few values, they should cycle. For example setting [0.5,1.0] may lead to plotted opacities of [0.5, 1.0, 0.5, 1.0, .... etc]
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "barOpacities" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class ColorBarFontSize(plotOptCore.IntPlotOption):
 	""" The font size to use for the colorbar
 	

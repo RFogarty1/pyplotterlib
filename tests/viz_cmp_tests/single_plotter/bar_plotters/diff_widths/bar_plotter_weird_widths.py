@@ -27,7 +27,7 @@ def getPlotterKwargDict():
 	dataB = [4, 2, 20]
 	
 	_plotOptsDict = {
-	
+	"barOpacities":[0.3,0.8],
 	"dataLabels": ["SeriesA", "SeriesB"],
 	"groupLabels": ["propA", "propB", "propC"],
 	"figSizeOnCreation": [8,4],

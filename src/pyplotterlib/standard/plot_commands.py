@@ -559,6 +559,28 @@ class SetBarColors(plotCommCoreHelp.PlotCommand):
 				child.set_color(color)
 
 @serializationReg.registerForSerialization()
+class SetBarOpacities(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-opacities-for-bars"
+		self._description = "Sets the opacities for a series of bars"
+		self._optName = "barOpacities"
+
+	def execute(self, plotterInstance):
+		opacities = getattr(plotterInstance.opts, self._optName).value
+		plottedBars = plotterInstance._scratchSpace.get("barHandles", None)
+
+		if (plottedBars is None) or (opacities is None):
+			return None
+
+		useOpacities = it.cycle(opacities)
+		for opacity, barSet in zip(useOpacities, plottedBars):
+			_children = barSet.get_children()
+			for child in _children:
+				child.set_alpha(opacity)
+
+
+@serializationReg.registerForSerialization()
 class SetColorbarFontSizes(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):
