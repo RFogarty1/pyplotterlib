@@ -21,7 +21,7 @@ We next want to create a plotter for each data series. We want multiple options 
 
 .. image:: images/rect_multi_plotter_a/create_templ_plotter.png
 
-The next step is to create an individual plotter for each data series we want to plot, generally overiding at minimum the templatesplotData and y-axis label (which we left empty).
+The next step is to create an individual plotter for each data series we want to plot, generally overiding at minimum the templates plotData and y-axis label (which we left empty).
 
 .. image:: images/rect_multi_plotter_a/create_individual_plotters.png
 
