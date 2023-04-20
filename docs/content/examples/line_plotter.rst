@@ -46,8 +46,8 @@ The code below can be run directly, assuming dependencies are properly installed
 	_unTreatedFrame = DF.loc[DF["state"]=="untreated"]
 	plotDataRaw = [_treatedFrame[["conc","rate"]].to_numpy(), _unTreatedFrame[["conc","rate"]].to_numpy()]
 	
-	_treatedMean = _treatedFrame.groupby("conc").mean()
-	_unTreatedMean = _unTreatedFrame.groupby("conc").mean()
+	_treatedMean = _treatedFrame.groupby("conc").mean(numeric_only=True)
+	_unTreatedMean = _unTreatedFrame.groupby("conc").mean(numeric_only=True)
 	_treatedMean, _unTreatedMean = _treatedMean.reset_index(), _unTreatedMean.reset_index()
 	averagedPlotData = [ _treatedMean[["conc","rate"]], _unTreatedMean[["conc","rate"]]  ]
 	
