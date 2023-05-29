@@ -2,6 +2,7 @@
 
 import copy
 import itertools as it
+import types
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -62,6 +63,8 @@ def _createCommandsList():
 	plotCmdStdHelp.SetTickValsToGroupCentres(),
 	plotCmdStdHelp.SetTickLabelsToGroupLabels(),
 	plotCmdStdHelp.SetTickLabelFontSize(),
+	plotCmdStdHelp.SetAxisTickAndLabelVisibilitiesEachSide(),
+	plotCmdStdHelp.SetTickMinorMarkersOn(),
 	plotCmdStdHelp.GridLinesCreate(),
 	plotCmdStdHelp.SetTitleStr(),
 	plotCmdStdHelp.SetXLabelStr(),
@@ -70,6 +73,8 @@ def _createCommandsList():
 	plotCmdStdHelp.SetYLabelFractPos(),
 	plotCmdStdHelp.SetXLimit(),
 	plotCmdStdHelp.SetYLimit(),
+	plotCmdStdHelp.SetAxisColorX(), #Best if done after labels etc. set
+	plotCmdStdHelp.SetAxisColorY(),
 
 	plotCmdStdHelp.PlotHozAndVertLines(),
 
@@ -85,6 +90,10 @@ def _createCommandsList():
 
 def _createOptionsList():
 	outList = [
+	plotOptStdHelp.AxisColorX(),
+	plotOptStdHelp.AxisColorX_exclSpines(),
+	plotOptStdHelp.AxisColorY(),
+	plotOptStdHelp.AxisColorY_exclSpines(),
 	BoxColorsOn(),
 	BoxColorStrsInterSeries(),
 	BoxNotchOn(),
@@ -111,6 +120,9 @@ def _createOptionsList():
 	plotOptStdHelp.PlotVertLinesPositions(),
 	plotOptStdHelp.PlotVertLinesStyleStrs(),
 	plotOptStdHelp.SetFigsizeOnCreation(),
+	plotOptStdHelp.ShowMinorTickMarkersX(),
+	plotOptStdHelp.ShowMinorTickMarkersY(),
+	plotOptStdHelp.ShowTicksAndLabelsOnSides( value=types.SimpleNamespace(top=None,bottom=None,left=None, right=None) ),
 	plotOptStdHelp.TitleFractPosX(),
 	plotOptStdHelp.TitleFractPosY(),
 	plotOptStdHelp.TitleStr(),
