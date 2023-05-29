@@ -49,8 +49,8 @@ def _createOptionsList():
 	AllowTwoIndependentAxes(),
 	plotOptStdHelp.PlotterIter(),
 	IndependentXAxis(),
-	IndependentYAxis()
-
+	IndependentYAxis(),
+	plotOptStdHelp.SetFigsizeOnCreation()
 	]
 	return outList
 
