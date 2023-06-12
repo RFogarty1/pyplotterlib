@@ -68,7 +68,8 @@ def _createCommandsList():
 	plotCmdStdHelp.SetLegendNumberColumns(),
 	plotCmdStdHelp.PlotHozAndVertLines(),
 	plotCmdStdHelp.TurnLegendOnIfRequested(),
-	plotCmdStdHelp.AddPlotterToOutput()
+	plotCmdStdHelp.AddPlotterToOutput(),
+	plotCmdStdHelp.DrawTextAnnotationsGeneric()
 	]
 
 	return outList
@@ -78,6 +79,7 @@ def _createCommandsList():
 #TODO: Various forms of plotData
 def _createOptionsList():
 	outList = [
+	plotOptStdHelp.AnnotationsTextGeneric(),
 	plotOptStdHelp.AxisBorderMakeInvisible(),
 	plotOptStdHelp.AxisColorX(),
 	plotOptStdHelp.AxisColorX_exclSpines(),

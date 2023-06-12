@@ -6,6 +6,17 @@ import numpy as np
 from ..core import plot_options as plotOptCore
 from ..core.serialization import register as serializationReg
 
+
+@serializationReg.registerForSerialization()
+class AnnotationsTextGeneric(plotOptCore.ObjectIterPlotOption):
+	""" Options containing details of various text annotations
+
+	Values should be iter of TextAnnotation objects (found in .annotations module)
+	"""
+	def __init__(self,name=None, value=None):
+		self.name = "annotationsTextGeneric"
+		self.value = value
+
 @serializationReg.registerForSerialization()
 class AspectString(plotOptCore.StringPlotOption):
 	""" String controlling how the image aspect works

@@ -64,7 +64,8 @@ def _createCommandsList():
 	AddDataAnnotations(),
 	plotCmdStdHelp.SetTickLabelFontSize(),
 	plotCmdStdHelp.GridLinesCreate(),
-	plotCmdStdHelp.SetTitleStr()
+	plotCmdStdHelp.SetTitleStr(),
+	plotCmdStdHelp.DrawTextAnnotationsGeneric(),
 	]
 	return outList
 
@@ -75,6 +76,7 @@ def _createOptionsList():
 	AnnotateValsRotation(),
 	AnnotateValsStrFmt(value="{:.2f}"),
 	AnnotateValsTextColor(),
+	plotOptStdHelp.AnnotationsTextGeneric(),
 	plotOptStdHelp.AspectString(value="auto"),
 	plotOptStdHelp.ColorBarFontSize(),
 	plotOptStdHelp.ColorBarLabelFontSize(),

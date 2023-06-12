@@ -106,6 +106,50 @@ class CreateFigureIfNoAxHandle(plotCommCoreHelp.PlotCommand):
 		currFigHandle.add_subplot(111)
 		plotterInstance._scratchSpace["axHandle"] = plt.gca()
 
+@serializationReg.registerForSerialization()
+class DrawTextAnnotationsGeneric(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "drawGenericAnnotations"
+		self._description = "Adds Text annotations to the plot"
+		self._optName = "annotationsTextGeneric"
+
+	def execute(self, plotterInstance):
+		vals = _getValueFromOptName(plotterInstance, self._optName)
+		if vals is None:
+			return None
+
+		for annotation in vals:
+			self._addSingleAnnotation(plotterInstance, annotation)
+
+	def _addSingleAnnotation(self, plotterInstance, annotation):
+		annotatePos = annotation.arrowPos if annotation.arrowPos is not None else annotation.textPos
+		posArgs = [annotation.textVal, annotatePos]
+		useDict = {"xytext":annotation.textPos}
+
+		#Deal with fontsize; Note this can still be overwritten with "annotateMplHooks"
+		fontSize = _getValueFromOptName(plotterInstance, "fontSizeDefault")
+		fontSize = fontSize if annotation.fontSize is None else annotation.fontSize
+		useDict["fontsize"] = fontSize
+
+		#Update various fields
+		if annotation.arrowPos is not None:
+			useDict["arrowprops"] = dict()
+			if annotation.arrowPropHooks is not None:
+				useDict.update({"arrowprops":annotation.arrowPropHooks})
+
+		if annotation.annotateMplHooks is not None:
+			useDict.update(annotation.annotateMplHooks)
+
+		if annotation.arrowCoordSys is not None:
+			useDict.update({"xycoords":annotation.arrowCoordSys})
+
+		if annotation.textCoordSys is not None:
+			useDict.update({"textcoords":annotation.textCoordSys})
+
+		#Actually add the annotation
+		plt.annotate(*posArgs, **useDict)
+
 
 @serializationReg.registerForSerialization()
 class GridLinesCreate(plotCommCoreHelp.PlotCommand):

@@ -13,6 +13,8 @@ from .private import shared_axis_plotter
 #Code for serialization
 from .serialization import writePlotterToFile, readPlotterFromFile
 
+#Other objects
+from . import annotations
 
 
 #Define them like this to keep the file easier to read + plotters easy as possible to access

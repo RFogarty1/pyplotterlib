@@ -58,7 +58,8 @@ def _createCommandsList():
 	plotCmdStdHelp.SetYLimit(),
 	plotCmdStdHelp.SetAxisColorX(), #Best if done after labels etc. set
 	plotCmdStdHelp.SetAxisColorY(),
-	plotCmdStdHelp.SetTitleStr()
+	plotCmdStdHelp.SetTitleStr(),
+	plotCmdStdHelp.DrawTextAnnotationsGeneric(),
 	]
 
 	return outList
@@ -67,6 +68,7 @@ def _createCommandsList():
 #Write in alphabetical order
 def _createOptionsList():
 	outList = [
+	plotOptStdHelp.AnnotationsTextGeneric(),
 	AspectString(),
 	plotOptStdHelp.AxisColorX(),
 	plotOptStdHelp.AxisColorX_exclSpines(),

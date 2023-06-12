@@ -71,12 +71,14 @@ def _createCommandsList():
 	plotCmdStdHelp.SetLegendNumberColumns(),
 	plotCmdStdHelp.SetTitleStr(),
 	plotCmdStdHelp.PlotHozAndVertLines(),
-	plotCmdStdHelp.TurnLegendOnIfRequested()
+	plotCmdStdHelp.TurnLegendOnIfRequested(),
+	plotCmdStdHelp.DrawTextAnnotationsGeneric()
 	]
 	return outList
 
 def _createOptionsList():
 	outList = [
+	plotOptStdHelp.AnnotationsTextGeneric(),
 	plotOptStdHelp.AxisBorderMakeInvisible(),
 	plotOptStdHelp.AxisColorX(),
 	plotOptStdHelp.AxisColorX_exclSpines(),

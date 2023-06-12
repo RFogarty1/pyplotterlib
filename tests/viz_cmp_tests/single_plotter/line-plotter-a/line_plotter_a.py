@@ -26,7 +26,7 @@ def getPlotterKwargDict():
 	_dataB = np.array( [[x,val] for x,val in it.zip_longest(_xVals, _yValsB)] )
 	
 	_plotOptsDict = {
-	
+	"annotationsTextGeneric": _getAnnotateObjs(),
 	"dataLabels": ["LabelA", "LabelB"],
 	"figSizeOnCreation": [8,4],
 	"plotData": [_dataA, _dataB],
@@ -36,7 +36,24 @@ def getPlotterKwargDict():
 	
 	}
 	return _plotOptsDict
-	
+
+
+def _getAnnotateObjs():
+	#Basic annotation A
+	_currKwargs = {"textVal":"Annotation A", "textPos":[0,16],"arrowPos":[6,16]}
+	annotationA = plotters.annotations.TextAnnotation(**_currKwargs)
+
+	#Different coord system
+	_updateKwargs = {"textVal":"Annotation B","arrowPos":None, "textPos":[0.1,0.5], "textCoordSys":"axes fraction"}
+	_currKwargs.update(_updateKwargs)
+	annotationB = plotters.annotations.TextAnnotation(**_currKwargs)
+
+	#Changes to text color and arrow width
+	_updateKwargs =  {"arrowPropHooks":{"width":1}, "annotateMplHooks":{"color":"blue"}, "textPos":[0.1,0.4], "textVal":"Annotation C"} 
+	_currKwargs.update(_updateKwargs)
+	annotationC = plotters.annotations.TextAnnotation(**_currKwargs)
+
+	return [annotationA, annotationB, annotationC]
 
 if __name__ == '__main__':
 	main()
