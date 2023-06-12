@@ -28,8 +28,8 @@ dependencies = [
 
 #Note: Initially created with python 3.10.4; but not sure if i can specify that anywhere
 [project.optional-dependencies]
-pinned = ["numpy ==1.22.2", "matplotlib==3.5.1"]
-dev = ["numpy", "matplotlib", "ipyplot", "pydataset","notebook"]
+pinned = ["numpy==1.22.2", "matplotlib==3.5.1"]
+dev = ["numpy==1.22.2", "matplotlib==3.5.1", "matplotlib-inline==0.1.3", "ipython==8.4.0", "ipyplot==1.1.1", "pydataset","notebook==6.4.12"]
 
 [project.urls]
 Documentation = "https://pyplotterlib.readthedocs.io/en/latest/index.html"
