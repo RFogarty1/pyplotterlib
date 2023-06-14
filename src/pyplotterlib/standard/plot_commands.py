@@ -107,6 +107,49 @@ class CreateFigureIfNoAxHandle(plotCommCoreHelp.PlotCommand):
 		plotterInstance._scratchSpace["axHandle"] = plt.gca()
 
 @serializationReg.registerForSerialization()
+class DrawShadedAnnotationsGeneric(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "drawGenericShadedAnnotations"
+		self._description = "Adds shaded area annotations to the plot"
+		self._optName = "annotationsShadedGeneric"
+
+	def execute(self, plotterInstance):
+		vals = _getValueFromOptName(plotterInstance, self._optName)
+		if vals is None:
+			return None
+
+		for annotation in vals:
+			self._addSingleAnnotation(plotterInstance, annotation)
+
+
+	def _addSingleAnnotation(self, plotterInstance, annotation):
+		#Figure out the command to use
+		useComm = self._getUseComm(annotation)		
+
+		#Figure out the keyword arguments
+		kwargDict = {"alpha":annotation.opacity}
+
+		if annotation.color is not None:
+			kwargDict["color"] = annotation.color
+
+		if annotation.polygonHooks is not None:
+			kwargDict.update(annotation.polygonHooks)
+
+		useComm(*annotation.shadeRange, **kwargDict)
+
+
+
+	def _getUseComm(self, annotation):
+		if annotation.direction.lower() == "vertical":
+			return plt.axvspan
+		elif annotation.direction.lower() == "horizontal":
+			return plt.axhspan
+		else:
+			raise ValueError("{} is an invalid value for annotation.direction".format(annotation.direction))
+
+
+@serializationReg.registerForSerialization()
 class DrawTextAnnotationsGeneric(plotCommCoreHelp.PlotCommand):
 
 	def __init__(self):

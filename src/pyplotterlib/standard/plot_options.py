@@ -18,6 +18,16 @@ class AnnotationsTextGeneric(plotOptCore.ObjectIterPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class AnnotationsShadedGeneric(plotOptCore.ObjectIterPlotOption):
+	""" Options containing details of areas of the axis to shade
+
+	Values should be ShadedSliceAnnotation objects
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "annotationsShadedGeneric"
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class AspectString(plotOptCore.StringPlotOption):
 	""" String controlling how the image aspect works
 

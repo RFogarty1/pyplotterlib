@@ -4,6 +4,27 @@
 from ..core import json_transform as jsonTransHelp
 from ..core.serialization import register as serializationReg
 
+
+@serializationReg.registerForSerialization()
+class ShadedSliceAnnotation(jsonTransHelp.JSONTransformInterface):
+	""" Object representing data for a shading a slice of an axis
+
+	Attributes:
+		shadeRange (float,float): The start and end values to shade (in data units).
+		direction (str): Either "vertical" or "horizontal". Vertical means shadeRange refers to x-values, horiontal means to y-values
+		opacity (float): Value from 0 to 1 representing how opaque to make the shading (1=fully opaque, 0=fully transparent)
+		color (usually Str): Color to shade. Any valid matplotlib formats for color should work (though some may break serialization) 
+		polygonHooks (dict): Dictionary to pass to matplotlib Polygon properties; passed as keywords to axvspan and axhspan
+
+	"""
+	def __init__(self, shadeRange, direction="vertical", opacity=0.5, color=None, polygonHooks=None):
+		self.shadeRange = shadeRange
+		self.direction = direction
+		self.opacity = opacity
+		self.color = color
+		self.polygonHooks = polygonHooks
+
+
 @serializationReg.registerForSerialization()
 class TextAnnotation(jsonTransHelp.JSONTransformInterface):
 	""" Object representing data for a simple text annotation on a plot (which can include an arrow too)

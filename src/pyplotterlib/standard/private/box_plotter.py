@@ -84,6 +84,7 @@ def _createCommandsList():
 	plotCmdStdHelp.SetLegendFractPosStart(),
 	SetLegendDataHandlesAndLabels(),
 	plotCmdStdHelp.TurnLegendOnIfRequested(),
+	plotCmdStdHelp.DrawShadedAnnotationsGeneric(),
 	plotCmdStdHelp.DrawTextAnnotationsGeneric(),
 	]
 	return outList
@@ -91,6 +92,7 @@ def _createCommandsList():
 
 def _createOptionsList():
 	outList = [
+	plotOptStdHelp.AnnotationsShadedGeneric(),
 	plotOptStdHelp.AnnotationsTextGeneric(),
 	plotOptStdHelp.AxisColorX(),
 	plotOptStdHelp.AxisColorX_exclSpines(),
