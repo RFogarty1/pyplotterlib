@@ -58,17 +58,27 @@ def _getAxisEdges(inpAx):
 
 
 #Refactored/Extracted from bar_plotter; also usable in boxPlotter (and likely other similar plotters in the future)
-def _getIndividAndGroupCentresBarLikePlot(nGroups, nSeries, widthBar, widthIntraSpacing, widthInterSpacing, startPos=0):
+def _getIndividAndGroupCentresBarLikePlot(nGroups, nSeries, widthBar, widthIntraSpacing,
+                                          widthInterSpacing, startPos=0, skipSeries=None):
 	outCentres = [ list() for x in range(nSeries) ]
 	currPos = startPos
 
+	if skipSeries is None:
+		skipSeries = [False for x in range(nSeries)]
+
 	#Figure out where to plot the individual bars/similar
 	for gIdx in range(nGroups):
-		for sIdx in range(nSeries):
+		for skipShift,sIdx in zip(skipSeries, range(nSeries)):
 			outCentres[sIdx].append(currPos)
-			currPos += widthBar
-			currPos += widthIntraSpacing
-		currPos += widthInterSpacing
+			if skipShift is False:
+				currPos += widthIntraSpacing
+				currPos += widthBar
+
+		#Not 100% sure why this if statement had to be added
+		if any(skipSeries):
+			currPos += widthInterSpacing + widthBar
+		else:
+			currPos += widthInterSpacing
 
 
 	#Figure out the centre of each group

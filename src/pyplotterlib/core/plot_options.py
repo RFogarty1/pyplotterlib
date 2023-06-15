@@ -118,6 +118,9 @@ class SinglePlotOptionInter(jsonTransHelp.JSONTransformInterface):
 class BooleanPlotOption(SinglePlotOptionInter):
 	pass
 
+class BooleanOrBoolIterPlotOption(SinglePlotOptionInter):
+	pass
+
 @regHelp.registerForSerialization()
 class StringPlotOption(SinglePlotOptionInter):
 	pass
