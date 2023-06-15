@@ -25,20 +25,33 @@ def createPlotter():
 def getPlotterKwargDict():
 	dataA = [10,8,12]
 	dataB = [4, 2, 20]
+	dataC = [6,4,18]
+	dataD = [8,10,4]
 	
 	_plotOptsDict = {
-	
-	"dataLabels": ["SeriesA", "SeriesB"],
+	"barLabels":_getBarLabels(),
+	"dataLabels": ["SeriesA", "SeriesB", "Series C", "Series D"],
 	"groupLabels": ["propA", "propB", "propC"],
 	"figSizeOnCreation": [8,4],
 	"gridLinesShowY":True,
-	"plotData1D": [dataA, dataB],
+	"plotData1D": [dataA, dataB, dataC, dataD],
 	"showLegend": True,
 	"xLabelStr":"Test x-label"
 	
 	}
 	return _plotOptsDict
 	
+
+def _getBarLabels():
+	#
+	_kwargs = {"fmt":"{:.0f}", "paddingVal":2, "fontSize":8, "mplBarLabelHooks":{"color":"red"}}
+	barLabelsA = plotters.annotations.BarLabelAnnotation(**_kwargs)
+
+	#
+	_kwargs.update( {"mplBarLabelHooks":{"color":None, "label_type":"center"}, "fontRotation":90, "fontSize":14} ) 
+	barLabelsB = plotters.annotations.BarLabelAnnotation(**_kwargs)
+
+	return [barLabelsA, barLabelsB]
 
 if __name__ == '__main__':
 	main()

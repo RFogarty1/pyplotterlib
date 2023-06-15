@@ -6,6 +6,40 @@ from ..core.serialization import register as serializationReg
 
 
 @serializationReg.registerForSerialization()
+class BarLabelAnnotation(jsonTransHelp.JSONTransformInterface):
+	""" Object representing bar labels to use for a single data series
+
+	Attributes:
+		fmt (str): The format string to pass values into to turn them into text
+		fontSize (int): The size of the font
+		fontRotation (int): Rotation of the font in degrees
+		paddingVal (float): Represents distance of the label from the bars
+		mplBarLabelHooks (dict): A dictionary of options to pass to bar_label in matplotlib. ANY other options can be effectively overiden using this (as well as accesing options without a direct interface)
+
+	"""
+	def __init__(self, fmt="{:.2f}", fontSize=None, fontRotation=None, paddingVal=0, mplBarLabelHooks=None):
+		self.fmt = fmt
+		self.fontSize = fontSize
+		self.fontRotation = fontRotation
+		self.paddingVal = paddingVal
+		self.mplBarLabelHooks = mplBarLabelHooks
+
+	def _getPayloadDict(self):
+		kwargs = ["fmt", "fontSize", "fontRotation", "paddingVal", "mplBarLabelHooks"]
+		outDict = {kwarg:getattr(self,kwarg) for kwarg in kwargs}
+		return outDict
+	
+	def toJSON(self):
+		return json.dumps({"class":str(self.__class__), "payload":self._getPayloadDict()})
+
+	@classmethod
+	def fromJSON(cls, inpJSON):
+		useDict = json.loads(inpJSON)
+		return cls( **useDict["payload"] )
+
+
+
+@serializationReg.registerForSerialization()
 class ShadedSliceAnnotation(jsonTransHelp.JSONTransformInterface):
 	""" Object representing data for a shading a slice of an axis
 
@@ -23,6 +57,20 @@ class ShadedSliceAnnotation(jsonTransHelp.JSONTransformInterface):
 		self.opacity = opacity
 		self.color = color
 		self.polygonHooks = polygonHooks
+
+	def _getPayloadDict(self):
+		kwargs = ["shadeRange", "direction", "opacity", "color", "polygonHooks"]
+		outDict = {kwarg:getattr(self,kwarg) for kwarg in kwargs}
+		return outDict
+	
+	def toJSON(self):
+		return json.dumps({"class":str(self.__class__), "payload":self._getPayloadDict()})
+
+	@classmethod
+	def fromJSON(cls, inpJSON):
+		useDict = json.loads(inpJSON)
+		return cls( **useDict["payload"] )
+
 
 
 @serializationReg.registerForSerialization()

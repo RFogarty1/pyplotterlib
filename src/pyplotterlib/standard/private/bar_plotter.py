@@ -14,8 +14,10 @@ from ...core import plot_options as plotOptCoreHelp
 
 from ...core.serialization import register as serializationReg
 
+from .. import annotations as annotateHelp
 from .. import plot_options as plotOptStdHelp
 from .. import plot_commands as plotCmdStdHelp
+
 
 @serializationReg.registerForSerialization()
 class BarPlotter(shared.FromJsonMixin, shared.FromPlotterMixin, plotterCoreHelp.SingleGraphPlotter):
@@ -74,12 +76,15 @@ def _createCommandsList():
 	plotCmdStdHelp.PlotHozAndVertLines(),
 	plotCmdStdHelp.TurnLegendOnIfRequested(),
 	plotCmdStdHelp.DrawShadedAnnotationsGeneric(),
-	plotCmdStdHelp.DrawTextAnnotationsGeneric()
+	plotCmdStdHelp.DrawTextAnnotationsGeneric(),
+	AddBarLabels(),
 	]
 	return outList
 
 def _createOptionsList():
 	outList = [
+	AddBarLabelsByDefault(value=False),
+	BarLabels(),
 	plotOptStdHelp.AnnotationsShadedGeneric(),
 	plotOptStdHelp.AnnotationsTextGeneric(),
 	plotOptStdHelp.AxisBorderMakeInvisible(),
@@ -131,6 +136,28 @@ def _createOptionsList():
 
 
 #Options
+@serializationReg.registerForSerialization()
+class AddBarLabelsByDefault(plotOptCoreHelp.BooleanPlotOption):
+	""" Boolean.
+
+	If True, then default bar labels will be added *iff* they are not specified in a more specific option
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "addBarLabelsByDefault" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class BarLabels(plotOptCoreHelp.ObjectIterPlotOption):
+	""" Iter of "BarLabelAnnotation" objects (found in the .annotations module)
+
+	These each refer to options to use for bar labels for a single data series. MUST pass an iterable, but will cycle over whatevers passed (meaning you can pass a single object for N data series)
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "barLabels" if name is None else name
+		self.value = value
+
+
 @serializationReg.registerForSerialization()
 class GroupLabels(plotOptStdHelp.GroupLabels):
 
@@ -222,6 +249,55 @@ class WidthIntraSpacing(plotOptCoreHelp.FloatPlotOption):
 
 
 #Commands
+@serializationReg.registerForSerialization()
+class AddBarLabels(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "add-labels-to-bars"
+		self._description = "Adds labels to bars; generally showing the value for each"
+
+	def execute(self, plotterInstance):
+		#Get relevant values
+		labelByDefault = plotCmdStdHelp._getValueFromOptName(plotterInstance, "addBarLabelsByDefault")
+		nonDefaultLabels = plotCmdStdHelp._getValueFromOptName(plotterInstance, "barLabels", retIfNone=list())
+
+		if (labelByDefault is not True) and (len(nonDefaultLabels)==0):
+			return None
+
+		#Populate default labels if required; exit if no plot data to populate them with
+		plotData = plotCmdStdHelp._getValueFromOptName(plotterInstance, "plotData1D", retIfNone=list())
+		if len(nonDefaultLabels)==0:
+			if len(plotData)==0:
+				return None
+			nonDefaultLabels = [annotateHelp.BarLabelAnnotation() for x in plotData]
+
+		#
+		bars = plotterInstance._scratchSpace["barHandles"]
+		cycledLabels = it.cycle(nonDefaultLabels)
+		for data, bar,annotation in zip(plotData, bars,cycledLabels):
+			self._addAnnotation(data, bar, annotation, plotterInstance)
+
+	#TODO: Probably need to check for None with the format
+	def _addAnnotation(self, data, inpBar, annotation, plotterInstance):
+		labels = [annotation.fmt.format(x) for x in data]
+
+		#Set standard kwargs
+		defaultFontsize = plotCmdStdHelp._getDefaultFontSizeFromPlotter(plotterInstance)
+		kwargs = {"labels":labels, "padding":annotation.paddingVal, "fontsize":defaultFontsize}
+
+		if annotation.fontSize is not None:
+			kwargs["fontsize"] = annotation.fontSize
+
+		if annotation.fontRotation is not None:
+			kwargs["rotation"] = annotation.fontRotation
+
+		#Add overides; this can likely include the "labels" as a keyword
+		if annotation.mplBarLabelHooks is not None:
+			kwargs.update(annotation.mplBarLabelHooks)
+
+		plt.bar_label(inpBar, **kwargs)
+
+
 class _CalcValsMixin():
 
 	#List is actually 1 element longer than needed i think but...
