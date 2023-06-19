@@ -236,6 +236,17 @@ class DataLabels(plotOptCore.StringIterPlotOption):
 
 
 @serializationReg.registerForSerialization()
+class ErrorBarCapsize(plotOptCore.FloatIterPlotOption):
+	""" Float-iter. Controls the size of caps on error bars. These are passed to the capsize argument in matplotlib.
+
+	Note: The number of entries doesnt have to match the number of data series. If you provide too few entries, they will simply cycle. E.g. errorBarCapsize=[2.5] will cause error bars for ALL series to have capsizes of 2.5
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "errorBarCapsize" if name is None else name
+		self.value = value
+
+
+@serializationReg.registerForSerialization()
 class ErrorBarColors(plotOptCore.StringIterPlotOption):
 	""" The colors to use for error bars. Allowed strings are the same as in matplotlib, meaning special color names or hex rgb codes are both fine. For Example ['red','green','orange'] is a valid value
 

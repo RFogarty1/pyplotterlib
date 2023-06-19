@@ -93,6 +93,7 @@ def _createOptionsList():
 	plotOptStdHelp.AxisScaleX(),
 	plotOptStdHelp.AxisScaleY(),
 	plotOptStdHelp.DataLabels(),
+	plotOptStdHelp.ErrorBarCapsize(),
 	plotOptStdHelp.ErrorBarColors(),
 	plotOptStdHelp.ErrorBarColorsMatchLinesByDefault(value=True),
     plotOptStdHelp.ErrorBarDataX(),

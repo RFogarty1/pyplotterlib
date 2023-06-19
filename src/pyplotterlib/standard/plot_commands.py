@@ -341,11 +341,14 @@ class PlotDataAsLines(plotCommCoreHelp.PlotCommand):
 		#Plot the data; may want to return handles to scratch space later
 		lineHandles = list()
 		errorLineHandles, errorCapHandles = list(), list()
-		for currData, xErrBars, yErrBars, hooks in it.zip_longest(targVal,errorBarsX,errorBarsY, errorBarMplHooks):
+		capsizeVals = self._getCapsizeVals(plotterInstance)
+		for idx,(currData, xErrBars, yErrBars, hooks) in enumerate(it.zip_longest(targVal,errorBarsX,errorBarsY, errorBarMplHooks)):
 			xData, yData = np.array(currData)[:,0], np.array(currData)[:,1]
 			if (xErrBars is not None) or (yErrBars is not None):
 				_xBars, _yBars = [self._reshapeErrorBarData(bars) for bars in [xErrBars,yErrBars]]
 				hooks = dict() if hooks is None else hooks
+				if capsizeVals[idx] is not None:
+					hooks["capsize"] = capsizeVals[idx]
 				_allLines = plt.errorbar( xData, yData, yerr=_yBars, xerr=_xBars, **hooks ).lines
 				currLines = _allLines[0]
 				errorCapHandles.append(_allLines[1])
@@ -372,6 +375,21 @@ class PlotDataAsLines(plotCommCoreHelp.PlotCommand):
 			return useData.transpose()
 		else:
 			return useData
+
+	def _getCapsizeVals(self, plotterInstance):
+		#Figure out how many vals we need to know
+		plotData = _getValueFromOptName(plotterInstance, self._optName, retIfNone=list())
+
+		#Figure out what capsizes to use
+		errorCapsizes = _getValueFromOptName(plotterInstance, "errorBarCapsize", retIfNone=None)
+		if errorCapsizes is None:
+			return [None for x in plotData]
+
+		useCapsizes = it.cycle(errorCapsizes)
+		outVals = [capsize for data,capsize in zip(plotData, useCapsizes)]
+
+		return outVals
+
 
 @serializationReg.registerForSerialization()
 class PlotHozAndVertLines(plotCommCoreHelp.PlotCommand):
