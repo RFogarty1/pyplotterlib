@@ -330,11 +330,48 @@ class PlotDataAsLines(plotCommCoreHelp.PlotCommand):
 		elif len(targVal)==0:
 			return None
 
+		#Look for any error bars present
+		_errorBarDefVal = [None for x in targVal]
+		errorBarsY = _getValueFromOptName(plotterInstance, "errorBarDataY", _errorBarDefVal)
+		errorBarsX = _getValueFromOptName(plotterInstance, "errorBarDataX", _errorBarDefVal)
+		errorBarMplHooks = _getValueFromOptName(plotterInstance, "errorBarLineMplHooks", _errorBarDefVal)
+
+		errorBarMplHooks = [hooks for hooks,unused in zip( it.cycle(errorBarMplHooks), targVal)]
+
 		#Plot the data; may want to return handles to scratch space later
-		for currData in targVal:
-			plt.plot( np.array(currData)[:,0], np.array(currData)[:,1] )
+		lineHandles = list()
+		errorLineHandles, errorCapHandles = list(), list()
+		for currData, xErrBars, yErrBars, hooks in it.zip_longest(targVal,errorBarsX,errorBarsY, errorBarMplHooks):
+			xData, yData = np.array(currData)[:,0], np.array(currData)[:,1]
+			if (xErrBars is not None) or (yErrBars is not None):
+				_xBars, _yBars = [self._reshapeErrorBarData(bars) for bars in [xErrBars,yErrBars]]
+				hooks = dict() if hooks is None else hooks
+				_allLines = plt.errorbar( xData, yData, yerr=_yBars, xerr=_xBars, **hooks ).lines
+				currLines = _allLines[0]
+				errorCapHandles.append(_allLines[1])
+				errorLineHandles.append(_allLines[2])
+			else:
+				currLines = plt.plot( xData, yData )[0]
+			lineHandles.append(currLines)
+
+		#Add plotted lines to scratch space
+		_setScratchSpaceDictKey(plotterInstance, "plotLineHandles", "value", lineHandles)
+		if len(errorLineHandles) > 0:
+			_setScratchSpaceDictKey(plotterInstance, "errorBars", "lineHandles", errorLineHandles)
+			_setScratchSpaceDictKey(plotterInstance, "errorBars", "capHandles", errorCapHandles)
 
 		return
+
+	def _reshapeErrorBarData(self, errorBarData):
+		if errorBarData is None:
+			return None
+
+		useData = np.array(errorBarData)
+
+		if useData.shape[-1] == 2:
+			return useData.transpose()
+		else:
+			return useData
 
 @serializationReg.registerForSerialization()
 class PlotHozAndVertLines(plotCommCoreHelp.PlotCommand):
@@ -759,10 +796,54 @@ class SetDataLabels(plotCommCoreHelp.PlotCommand):
 		if targVal is None:
 			return None
 
-		plottedLineHandles = plt.gca().get_lines()
+		_defVal = list()
+		plottedLineHandles = _getScratchSpaceValueIfPresent(plotterInstance, "plotLineHandles", "value", retValIfNone=_defVal)
+
 		for lineHandle, dataLabel in zip(plottedLineHandles, targVal):
 			if dataLabel is not None:
 				lineHandle.set_label(dataLabel)
+
+
+@serializationReg.registerForSerialization()
+class SetLineErrorBarColors(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setLineErrorBarColors"
+		self._description = "Sets the color of the error bars"
+
+	def execute(self, plotterInstance):
+		#Get error bar handles (exit if not present)
+		errorHandles = _getScratchSpaceValueIfPresent(plotterInstance, "errorBars", "lineHandles", retValIfNone=None)
+		errorCapHandles = _getScratchSpaceValueIfPresent(plotterInstance, "errorBars", "capHandles", retValIfNone=None)
+		if errorHandles is None:
+			return None
+
+		#Figure out what colors to use; if empty then exit without doing anything
+		colorCycle = self._getColorCycle(plotterInstance)
+		if colorCycle is None:
+			return None
+
+		useColors = it.cycle(colorCycle)
+
+		for capHandles,barHandles,color in zip(errorCapHandles,errorHandles,useColors):
+			[handle.set_color(color) for handle in barHandles]
+			[handle.set_color(color) for handle in capHandles]
+
+	def _getColorCycle(self, plotterInstance):
+		outCycles = None #The output variable
+
+		#Set default values to the data line colors if their present
+		useLineColors = _getValueFromOptName(plotterInstance, "errorBarColorsMatchLinesByDefault", retIfNone=False)
+		lineColors = _getValueFromOptName(plotterInstance, "lineColors", retIfNone=None)
+		if (lineColors is not None) and (useLineColors is True):
+			outCycles = lineColors
+
+		#TODO: Overwrite this with a more specific option if present
+		overwriteColors = _getValueFromOptName(plotterInstance, "errorBarColors", retIfNone=None)
+		if overwriteColors is not None:
+			outCycles = overwriteColors
+
+		return outCycles
 
 
 @serializationReg.registerForSerialization()
@@ -837,6 +918,21 @@ class SetLegendFractPosStart(plotCommCoreHelp.PlotCommand):
 		else:
 			plotterInstance._scratchSpace["legendKwargDict"]["bbox_to_anchor"] = targVal
 
+#
+@serializationReg.registerForSerialization()
+class SetLegendHandlesToPlottedLinesDefault(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setLegendHandlesToPlottedLines"
+		self._description = "If they are present in the scratch space, the legend handles are set to plotLineHandles; this is to avoid errorbars interfering with the legend"
+
+	def execute(self, plotterInstance):
+		lineHandles = _getScratchSpaceValueIfPresent(plotterInstance, "plotLineHandles", "value")
+		if lineHandles is None:
+			return None
+		_setScratchSpaceDictKey(plotterInstance, "legendKwargDict", "handles", lineHandles)
+		
+
 
 @serializationReg.registerForSerialization()
 class SetLineColors(plotCommCoreHelp.PlotCommand):
@@ -851,7 +947,10 @@ class SetLineColors(plotCommCoreHelp.PlotCommand):
 		if targVal is None:
 			return None
 
-		dataLines = plt.gca().get_lines()
+
+
+		_defVal = list()
+		dataLines = _getScratchSpaceValueIfPresent(plotterInstance, "plotLineHandles", "value", retValIfNone=_defVal)
 		colors = it.cycle(targVal)
 		for dataLine, color in zip(dataLines, colors):
 			dataLine.set_color(color)
@@ -869,7 +968,7 @@ class SetLineMarkerSizes(plotCommCoreHelp.PlotCommand):
 		if targVal is None:
 			return None
 
-		dataLines = plt.gca().get_lines()
+		dataLines = _getScratchSpaceValueIfPresent(plotterInstance, "plotLineHandles", "value", retValIfNone=list())
 		try:
 			iter(targVal)
 		except TypeError:
@@ -894,7 +993,7 @@ class SetLineMarkerStyles(plotCommCoreHelp.PlotCommand):
 		if targVal is None:
 			return None
 
-		dataLines = plt.gca().get_lines()
+		dataLines = _getScratchSpaceValueIfPresent(plotterInstance, "plotLineHandles", "value", retValIfNone=list())
 		markerStyles = it.cycle(targVal)
 		for dataLine, markerStyle in zip(dataLines, markerStyles):
 			dataLine.set_marker(markerStyle)
@@ -912,7 +1011,11 @@ class SetLineStyles(plotCommCoreHelp.PlotCommand):
 		if targVal is None:
 			return None
 
-		dataLines = plt.gca().get_lines()
+		#
+		_defLinesVal = list()
+		dataLines = _getScratchSpaceValueIfPresent(plotterInstance, "plotLineHandles", "value", retValIfNone=_defLinesVal)
+
+
 		lineStyles = it.cycle(targVal)
 		for dataLine, lineStyle in zip(dataLines, lineStyles):
 			dataLine.set_linestyle(lineStyle)
@@ -1210,7 +1313,15 @@ class TurnLegendOnIfRequested(plotCommCoreHelp.PlotCommand):
 
 		legendKwargDict = plotterInstance._scratchSpace["legendKwargDict"]
 
+		#Need to pass data line handles explicitly if present, otherwise error bars can interfere
+		_defLinesVal = list()
+		dataLines = _getScratchSpaceValueIfPresent(plotterInstance, "plotLineHandles", "value")
+
+
 		if targVal is True:
+#			if dataLines is not None:
+#				plt.legend(dataLines,**legendKwargDict)
+#			else:
 			plt.legend(**legendKwargDict)
 
 
@@ -1253,4 +1364,18 @@ def _setScratchSpaceDictKey(plotterInstance, dictName, key, value):
 	useDict[key] = value
 
 
+def _getScratchSpaceValueIfPresent(plotterInstance, dictName, key, retValIfNone=None):
+	#Check for dictionary, and get key if present
+	try:
+		useDict = plotterInstance._scratchSpace[dictName]
+	except KeyError:
+		return retValIfNone
+
+	#Check for key in dictionary + return it if present
+	try:
+		outVal = useDict[key]
+	except KeyError:
+		return retValIfNone
+
+	return outVal
 

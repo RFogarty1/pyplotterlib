@@ -7,3 +7,4 @@ actual-plot-vizdiff.png
 */for_doc_pages/*.py
 */for_doc_pages/*.png
 */for_doc_pages/*.json
+*.un~

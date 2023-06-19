@@ -234,6 +234,83 @@ class DataLabels(plotOptCore.StringIterPlotOption):
 		self.name = "dataLabels" if name is None else name
 		self.value = value
 
+
+@serializationReg.registerForSerialization()
+class ErrorBarColors(plotOptCore.StringIterPlotOption):
+	""" The colors to use for error bars. Allowed strings are the same as in matplotlib, meaning special color names or hex rgb codes are both fine. For Example ['red','green','orange'] is a valid value
+
+	Note: The number of colors doesnt have to match the number of data series. If you provide too few colors, they will simply cycle. For example if you set ['red','green'] then plotted data would be [red, green, red, green,.... etc]
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "errorBarColors" if name is None else name
+		self.value = value
+
+
+@serializationReg.registerForSerialization()
+class ErrorBarColorsMatchLinesByDefault(plotOptCore.BooleanPlotOption):
+	""" Boolean. If True, then error bar colors will match plotted line colors by default.
+
+	Note, that this behavior can be overwritten by other options (e.g. errorBarColors option)
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "errorBarColorsMatchLinesByDefault" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ErrorBarDataX(plotOptCore.NumpyIterPlotOption):
+	""" Data for error bars for the x-direction. None will lead to no error bars being plotted; else an iterable should be passed with one value per data series:
+
+	1) None - to not plot any error bars
+	2) nx1 array: where values are symmetric for each data point in the relevant plotData series
+	3) nx2 array: where values are [lowerBar, upperBar] around the central values
+
+	Notes:
+		a) If N values are passed for N-1 data series, the last will be ignored
+		b) If N-1 values are passed for N data series, the last data series will be plotted without any error bars
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "errorBarDataX" if name is None else name
+		self.value = value
+
+
+@serializationReg.registerForSerialization()
+class ErrorBarDataY(plotOptCore.NumpyIterPlotOption):
+	""" Data for error bars for the y-direction. None will lead to no error bars being plotted; else an iterable should be passed with one value per data series:
+
+	1) None - to not plot any error bars
+	2) nx1 array: where values are symmetric for each data point in the relevant plotData series
+	3) nx2 array: where values are [lowerBar, upperBar] around the central values
+
+	Notes:
+		a) If N values are passed for N-1 data series, the last will be ignored
+		b) If N-1 values are passed for N data series, the last data series will be plotted without any error bars
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "errorBarDataY" if name is None else name
+		self.value = value
+
+@serializationReg.registerForSerialization()
+class ErrorBarLineMplHooks(plotOptCore.ObjectIterPlotOption):
+	""" Dicts that get passed as keywords to plt.errorbar (assuming errorBarData is present) when making line plots
+
+	See the matplotlib documentation for valid keys/vals:
+
+	https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.errorbar.html
+
+	Notes:
+		a) Need to pass an iterable of dicts.
+		b) If there are more series than dicts, then values will cycle. This means you can pass a len-1 list (e.g. [dict()]) to use the same options for all
+
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "errorBarLineMplHooks" if name is None else name
+		self.value = value
+
+
 @serializationReg.registerForSerialization()
 class FontSizeDefault(plotOptCore.IntPlotOption):
 	""" The default font size to use for a figure. None will fall back on matplotlib value.
