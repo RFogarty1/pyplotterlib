@@ -27,10 +27,16 @@ def getPlotterKwargDict():
 	dataB = [4, 2, 20]
 	dataC = [6,4,18]
 	dataD = [8,10,4]
+
+	errorBarDataB = [x*0.2 for x in dataB]
+	errorBarDataC = [x*0.05 for x in dataC]
 	
 	_plotOptsDict = {
 	"barLabels":_getBarLabels(),
 	"dataLabels": ["SeriesA", "SeriesB", "Series C", "Series D"],
+	"errorBarData":[None, errorBarDataB, errorBarDataC, None],
+	"errorBarCapsize":[3,6],
+	"errorBarColors":["red","blue"],
 	"groupLabels": ["propA", "propB", "propC"],
 	"figSizeOnCreation": [8,4],
 	"gridLinesShowY":True,

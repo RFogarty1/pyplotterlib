@@ -95,6 +95,9 @@ def _createOptionsList():
 	plotOptStdHelp.BarColors(),
 	plotOptStdHelp.BarOpacities(),
 	plotOptStdHelp.DataLabels(),
+	plotOptStdHelp.ErrorBarCapsize(),
+	plotOptStdHelp.ErrorBarColors(),
+	ErrorBarData(),
 	plotOptStdHelp.FontSizeDefault(),
 	plotOptStdHelp.GridLinesShow(value=False),
 	plotOptStdHelp.GridLinesShowX(),
@@ -157,6 +160,24 @@ class BarLabels(plotOptCoreHelp.ObjectIterPlotOption):
 		self.name = "barLabels" if name is None else name
 		self.value = value
 
+
+@serializationReg.registerForSerialization()
+class ErrorBarData(plotOptCoreHelp.NumpyIterPlotOption):
+	""" Data for error bars. None will lead to no error bars being plotted; else an iterable should be passed with one value per data series:
+
+	1) None - to not plot any error bars
+	2) nx1 array: where values are symmetric for each data point in the relevant plotData series
+	3) nx2 array: where values are [lowerBar, upperBar] around the central values
+
+	Notes:
+		a) If N values are passed for N-1 data series, the last will be ignored
+		b) If N-1 values are passed for N data series, the last data series will be plotted without any error bars
+
+	"""
+
+	def __init__(self, name=None, value=None):
+		self.name = "errorBarData" if name is None else name
+		self.value = value
 
 @serializationReg.registerForSerialization()
 class GroupLabels(plotOptStdHelp.GroupLabels):
@@ -440,6 +461,9 @@ class PlotOneDimDataAsBars(plotCommCoreHelp.PlotCommand):
 		barWidth = plotterInstance.opts.widthBars.value
 		barWidth = 1.0 if barWidth is None else barWidth
 
+		#Figure out any options for plotting error bars - this includes doing things like reversing order
+		# and figuring out if error bars are along x or y
+		allErrorBars = self._getErrorBarOpts(plotterInstance)
 
 		#Optionally reverse the order the bars are plotted in
 		reverseIntraOrdering = getattr(plotterInstance.opts, "reverseIntraBarOrdering").value
@@ -458,16 +482,58 @@ class PlotOneDimDataAsBars(plotCommCoreHelp.PlotCommand):
 			useCentres = [centre for centre,val in zip(centres,currData) if val is not None]
 			useBottoms = [bottom for bottom,val in zip(bottoms,currData) if val is not None]
 			useData = [val for val in currData if val is not None]
+			useErrorBarOpts = allErrorBars[idx]
 
 			if plotHoz:
-				currBars = plt.barh( np.array(useCentres), np.array(useData), height=barWidth, left=np.array(useBottoms) )
+				currBars = plt.barh( np.array(useCentres), np.array(useData), height=barWidth, left=np.array(useBottoms), **useErrorBarOpts )
 			else:
-				currBars = plt.bar( np.array(useCentres), np.array(useData), width=barWidth, bottom=np.array(useBottoms) )
+				currBars = plt.bar( np.array(useCentres), np.array(useData), width=barWidth, bottom=np.array(useBottoms), **useErrorBarOpts )
 
 			outBars.append(currBars)
 
 		plotterInstance._scratchSpace["barHandles"] = outBars
 		return
+
+	def _getErrorBarOpts(self, plotterInstance):
+		#
+		barCentres = plotterInstance._scratchSpace["centres"]
+
+		#
+		errorBarData = plotCmdStdHelp._getValueFromOptName(plotterInstance, "errorBarData")
+		if errorBarData is None:
+			return [dict() for x in barCentres]
+
+		#Sort out the data if its present
+		outDicts = [dict() for x in barCentres]
+		dataKwarg = self._getErrorBarDirectionKey(plotterInstance)
+		for idx,data in enumerate(errorBarData):
+			if data is not None:
+				outDicts[idx][dataKwarg] = data
+
+		#If colors are present, use them cyclically
+		errorBarColors = plotCmdStdHelp._getValueFromOptName(plotterInstance, "errorBarColors")
+		if errorBarColors is not None:
+			useColors = it.cycle(errorBarColors)
+			for idx,(data,color) in enumerate( zip(errorBarData, useColors) ):
+				if color is not None:
+					outDicts[idx]["ecolor"] = color
+
+		#Set the capsizes if present
+		capsizeVals = plotCmdStdHelp._getValueFromOptName(plotterInstance, "errorBarCapsize")
+		if capsizeVals is not None:
+			useCapsizes = it.cycle(capsizeVals)
+			for idx,(data,capsize) in enumerate( zip(errorBarData,useCapsizes) ):
+				outDicts[idx]["capsize"] = capsize
+
+		return outDicts
+
+	def _getErrorBarDirectionKey(self, plotterInstance):
+		plotHoz = plotterInstance.opts.plotHorizontally.value
+		if plotHoz is True:
+			return "xerr"
+		else:
+			return "yerr"
+
 
 @serializationReg.registerForSerialization()
 class SetBarDataLabels(plotCmdStdHelp.SetBarDataLabels):
