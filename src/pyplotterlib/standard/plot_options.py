@@ -406,6 +406,17 @@ class GroupLabelRotation(plotOptCore.FloatPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class GroupLabelTickPosKey(plotOptCore.StringPlotOption):
+	""" String representing where we put the tick marker for each group of bars in a bar plotter (or similar plotter)
+
+	Originally allowed values are "groupCentres", "groupLeftEdges", "groupRightEdges"
+
+	"""
+	def __init__(self, name="groupLabelTickPosKey", value=None):
+		self.name = name
+		self.value = value
+
+@serializationReg.registerForSerialization()
 class GroupLabelTicksEveryN(plotOptCore.IntPlotOption):
 	""" If set, we use a tick marker for every N groups (default will generally be N=1).
 

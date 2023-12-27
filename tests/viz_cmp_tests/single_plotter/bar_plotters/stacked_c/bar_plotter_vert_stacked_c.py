@@ -34,6 +34,7 @@ def getPlotterKwargDict():
 	"groupLabels": ["propA", "propB", "propC"],
 	"figSizeOnCreation": [8,4],
 	"gridLinesShowY":True,
+	"groupLabelTickPosKey":"groupRightEdges",
 	"plotData1D": [dataA, dataB,dataC,dataD],
 	"stackBars":True,
 	"showLegend": True,

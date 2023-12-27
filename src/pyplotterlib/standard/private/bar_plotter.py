@@ -49,8 +49,10 @@ def _createCommandsList():
 	plotCmdStdHelp.CreateFigureIfNoAxHandle(),
 	CalculateCentreVals(),
 	CalculateBottomVals(),
+	CalculateGroupEdgesFromCentreVals(),
 	PlotOneDimDataAsBars(),
-	SetTickValsToGroupCentres(),
+#	SetTickValsToGroupCentres(),
+	plotCmdStdHelp.SetGroupTickValsToPosKey(),
 	SetTickLabelsToGroupLabels(),
 	SetTickMinorValsOnOrOff(),
 	plotCmdStdHelp.GridLinesCreate(),
@@ -106,6 +108,7 @@ def _createOptionsList():
 	plotOptStdHelp.GridLinesWidth(),
 	GroupLabels(),
 	GroupLabelRotation(),
+	plotOptStdHelp.GroupLabelTickPosKey(),
 	plotOptStdHelp.LegendFractPosStart(),
 	plotOptStdHelp.LegendLocStr(),
 	plotOptStdHelp.LegendNumbCols(),
@@ -435,6 +438,36 @@ class CalculateCentreVals(plotCommCoreHelp.PlotCommand, _CalcValsMixin):
 		plotterInstance._scratchSpace["centres"] = barCentres
 		plotterInstance._scratchSpace["groupCentres"] = groupCentres
 
+
+@serializationReg.registerForSerialization()
+class CalculateGroupEdgesFromCentreVals(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "calculate-group-edges-vals"
+		self._description = "Calculates the left/right edges of each group; using central positions of each bar (calculated by another function)"
+
+	
+	def execute(self, plotterInstance):
+		#Get all info we need
+		barCentres = plotterInstance._scratchSpace["centres"]
+		groupCentres = plotterInstance._scratchSpace["groupCentres"]
+
+		#
+		widthBars = plotterInstance.opts.widthBars.value
+		widthBars = 1 if widthBars is None else widthBars
+
+		#barCentres is a list for each series; so we have 1 group per entry in each list
+		nGroups = len(barCentres[0])
+		groupEdges = list()
+		for n in range(nGroups):
+			groupVals = [x[n] for x in barCentres]
+			minCentre, maxCentre = min(groupVals), max(groupVals)
+			edges = [minCentre - 0.5*widthBars, maxCentre+0.5*widthBars]
+			groupEdges.append(edges)
+
+		#
+		plotterInstance._scratchSpace["groupLeftEdges"] = [x[0] for x in groupEdges]
+		plotterInstance._scratchSpace["groupRightEdges"] = [x[1] for x in groupEdges]
 
 #This will get A LOT more complicated later (when dealing with widths etc)
 @serializationReg.registerForSerialization()

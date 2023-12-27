@@ -1177,6 +1177,33 @@ class SetTickMinorMarkersOn(plotCommCoreHelp.PlotCommand):
 				plt.gca().yaxis.set_minor_locator( matplotlib.ticker.AutoMinorLocator()   )
 
 
+@serializationReg.registerForSerialization()
+class SetGroupTickValsToPosKey(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "set-tick-vals-to-values-in-scratchspace"
+		self._description = "Sets the tick markers to groups of values found in the scratchspace. More general than setting to group Centres (original goal was to allow labels to be on left/right of bars)"
+		self.defaultKey = "groupCentres"
+		self.groupLabelPosKey = "groupLabelTickPosKey"
+
+	def execute(self, plotterInstance):
+		#
+		plotHoz = plotterInstance.opts.plotHorizontally.value
+		useKey = _getValueFromOptName(plotterInstance, self.groupLabelPosKey, retIfNone=self.defaultKey)
+		useVals = plotterInstance._scratchSpace.get(useKey,None)
+
+		if useVals is None:
+			return None
+
+		#
+		everyN = _getValueFromOptName(plotterInstance, "groupLabelTicksEveryN", retIfNone=1)
+		useCentres = [x for idx,x in enumerate(useVals) if idx%everyN==0]
+
+		if plotHoz:
+			plt.gca().set_yticks(useCentres)
+		else:
+			plt.gca().set_xticks(useCentres)
+
 
 @serializationReg.registerForSerialization()
 class SetTickValsToGroupCentres(plotCommCoreHelp.PlotCommand):
