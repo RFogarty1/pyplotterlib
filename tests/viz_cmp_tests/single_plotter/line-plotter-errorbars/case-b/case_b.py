@@ -34,6 +34,7 @@ def getPlotterKwargDict():
 	_errorBarsB_x = [0.4 for x in _xVals]
 	_errorBarsB_y = [0.2*y for y in _yValsB]
 
+
 	_plotOptsDict = {
 	"annotationsTextGeneric": _getTextAnnotateObjs(),
 	"annotationsShadedGeneric": _getShadedAnnotateObjs(),
@@ -50,6 +51,13 @@ def getPlotterKwargDict():
 	"xLimit": [-1,10] 
 	
 	}
+
+
+	#Unrelated; but just adding some alpha/thickness arguments
+	_overides = {"lineAlpha":0.5,
+	             "lineThickness":[3,1]}
+	_plotOptsDict.update(_overides)
+
 	return _plotOptsDict
 
 

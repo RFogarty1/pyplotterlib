@@ -951,6 +951,34 @@ class SetLegendHandlesToPlottedLinesDefault(plotCommCoreHelp.PlotCommand):
 		_setScratchSpaceDictKey(plotterInstance, "legendKwargDict", "handles", lineHandles)
 		
 
+@serializationReg.registerForSerialization()
+class SetLineAlpha(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setLineThickness"
+		self._description = "Sets the line thicknesses for lines currently plotted"
+		self._optName = "lineAlpha"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		#
+		try:
+			iter(targVal)
+		except TypeError:
+			useVal = it.cycle([targVal])
+		else:
+			useVal = it.cycle(targVal)
+
+		#
+		lineHandles = _getScratchSpaceValueIfPresent(plotterInstance, "plotLineHandles", "value", retValIfNone=list())
+
+		for line, alpha in zip(lineHandles, useVal):
+			line.set_alpha(alpha)
+
+
 
 @serializationReg.registerForSerialization()
 class SetLineColors(plotCommCoreHelp.PlotCommand):
@@ -1037,6 +1065,35 @@ class SetLineStyles(plotCommCoreHelp.PlotCommand):
 		lineStyles = it.cycle(targVal)
 		for dataLine, lineStyle in zip(dataLines, lineStyles):
 			dataLine.set_linestyle(lineStyle)
+
+
+@serializationReg.registerForSerialization()
+class SetLineThickness(plotCommCoreHelp.PlotCommand):
+
+	def __init__(self):
+		self._name = "setLineThickness"
+		self._description = "Sets the line thicknesses for lines currently plotted"
+		self._optName = "lineThickness"
+
+	def execute(self, plotterInstance):
+		targVal = getattr(plotterInstance.opts, self._optName).value
+		if targVal is None:
+			return None
+
+		#
+		try:
+			iter(targVal)
+		except TypeError:
+			useVal = it.cycle([targVal])
+		else:
+			useVal = it.cycle(targVal)
+
+		#
+		lineHandles = _getScratchSpaceValueIfPresent(plotterInstance, "plotLineHandles", "value", retValIfNone=list())
+
+		for line, thickness in zip(lineHandles, useVal):
+			line.set_linewidth(thickness)
+
 
 
 @serializationReg.registerForSerialization()

@@ -461,6 +461,17 @@ class LegendNumbCols(plotOptCore.IntPlotOption):
 		self.value = value
 
 @serializationReg.registerForSerialization()
+class LineAlpha(plotOptCore.FloatIterOrSingleFloatOption):
+	""" Alpha values to use for lines when plotting; 1 means opaque whilst 0 means fully transparent
+
+	Equivalent to using set_alpha(value) in matplotlib
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "lineAlpha"
+		self.value = value
+
+
+@serializationReg.registerForSerialization()
 class LineColors(plotOptCore.StringIterPlotOption):
 	""" The line colors to use. Allowed strings are the same as in matplotlib, meaning special color names or hex rgb codes are both fine. For Example ['red','green','orange'] is a valid value
 
@@ -504,6 +515,17 @@ class LineStyles(plotOptCore.StringIterPlotOption):
 	def __init__(self, name=None, value=None):
 		self.name = "lineStyles"
 		self.value = value
+
+@serializationReg.registerForSerialization()
+class LineThickness(plotOptCore.FloatIterOrSingleFloatOption):
+	""" Thicknesses of the lines to use when plotting 
+
+	Equivalent to using set_linewidth(value) in matplotlib
+	"""
+	def __init__(self, name=None, value=None):
+		self.name = "lineThickness"
+		self.value = value
+
 
 @serializationReg.registerForSerialization()
 class PlotterIter(plotOptCore.ObjectIterPlotOption):
